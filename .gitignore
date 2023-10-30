@@ -1,0 +1,6 @@
+node_modules
+dist
+.inspector/
+lib
+example.json
+.env
