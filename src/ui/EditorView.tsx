@@ -11,12 +11,6 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
 function a11yProps(index: number) {
   return {
     id: `menu-tab-${index}`,
@@ -27,30 +21,30 @@ function a11yProps(index: number) {
 export const EditorView = () => {
   const [activeTab, setActiveTab] = React.useState(0);
   const [tabs, setTabs] = React.useState([]);
-  const PLUGIN_DATA = React.useContext(PluginDataContext);
-  const [editorData, setEditorData] = React.useState(DEFAULT_DOC_DATA[0]);
+  const pluginContext = React.useContext(PluginDataContext);
+  const [editorData, setEditorData] = React.useState(DEFAULT_DOC_DATA.pages[0]);
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     setActiveTab(newActiveTab);
   };
 
   React.useEffect(() => {
-    for (let i = 0; i < PLUGIN_DATA.currentDocData.length; i++) {
+    for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
       setTabs((currentTabs) => [
         ...currentTabs,
         <Tab
-          label={PLUGIN_DATA.currentDocData[i].blocks[0].data.text}
+          label={pluginContext.currentDocData.pages[i].blocks[0].data.text}
           {...a11yProps(i)}
           key={i}
         />,
       ]);
     }
 
-    console.log(PLUGIN_DATA.currentDocData);
-  }, [PLUGIN_DATA.currentDocData]);
+    console.log('Loaded editor view');
+  }, [pluginContext.currentDocData]);
 
   React.useEffect(() => {
-    setEditorData(PLUGIN_DATA.currentDocData[activeTab]);
+    setEditorData(pluginContext.currentDocData.pages[activeTab]);
   }, [activeTab]);
 
   return (

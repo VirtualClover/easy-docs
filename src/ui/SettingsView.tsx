@@ -4,7 +4,6 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
@@ -15,7 +14,7 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-const Settings = ({ settings }) => {
+export const SettingsView = ({ settings }) => {
   const [showAPIKey, setShowAPIKey] = React.useState(false);
 
   const handleClickShowAPIKey = () => setShowAPIKey((show) => !show);
@@ -87,5 +86,3 @@ const Settings = ({ settings }) => {
     </>
   );
 };
-
-export default Settings;

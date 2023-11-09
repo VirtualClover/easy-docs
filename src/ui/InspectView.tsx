@@ -1,11 +1,13 @@
 import * as React from 'react';
 
-import { Button, Container } from '@mui/material';
-
+import { Button } from '@mui/material';
+import { PluginDataContext } from '../utils/PluginDataContext';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { navigate } from '../utils/navigate';
 
 export const InspectView = () => {
+  let pluginContext = React.useContext(PluginDataContext);
   return (
     <>
       <Stack
@@ -21,7 +23,18 @@ export const InspectView = () => {
           Select a doc frame
         </Typography>
         <Typography align="center">or</Typography>
-        <Button variant="contained">Create new docs</Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            parent.postMessage(
+              { pluginMessage: { type: 'create-new-doc' } },
+              '*'
+            );
+            navigate('EDITOR', pluginContext);
+          }}
+        >
+          Create new docs
+        </Button>
       </Stack>
     </>
   );

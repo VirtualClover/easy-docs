@@ -2,8 +2,6 @@ import { createTheme } from '@mui/material';
 
 const baseTheme = {
   typography: {
-    // In Chinese and Japanese the characters are usually larger,
-    // so a smaller fontsize may be appropriate.
     fontSize: 12,
     fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
     h1: { fontWeight: 600, fontSize: 36 },

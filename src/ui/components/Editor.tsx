@@ -1,4 +1,4 @@
-import { DEFAULT_DOC_DATA, FrameData } from '../../utils/constants';
+import { DEFAULT_DOC_DATA, PageData } from '../../utils/constants';
 import React, { useEffect } from 'react';
 
 import { Box } from '@mui/material';
@@ -6,7 +6,7 @@ import Header from '@editorjs/header';
 import { createReactEditorJS } from 'react-editor-js';
 
 interface ComponentProps {
-  data: FrameData;
+  data: PageData;
 }
 
 const ReactEditorJS = createReactEditorJS();

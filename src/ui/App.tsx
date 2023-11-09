@@ -9,18 +9,18 @@ import {
   Typography,
 } from '@mui/material';
 import { PluginData, PluginViews } from '../utils/constants';
+import { Settings, SettingsOutlined } from '@mui/icons-material';
 import { darkTheme, lightTheme } from '../styles/base';
 
-import Box from '@mui/material/Box';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
 import { PluginDataContext } from '../utils/PluginDataContext';
-import { SettingsOutlined } from '@mui/icons-material';
+import { PluginTopBar } from './components/PluginTopBar';
 import { ThemeProvider } from '@mui/material/styles';
 
 interface ComponentProps {
   themeMode: string;
-  pluginData: PluginData;
+  initialPluginData: PluginData;
 }
 
 function decideView(currentView: PluginViews) {
@@ -31,21 +31,65 @@ function decideView(currentView: PluginViews) {
     case 'EDITOR':
       return <EditorView />;
       break;
+    case 'SETTINGS':
+      return <Settings />;
+      break;
     default:
       return <InspectView />;
       break;
   }
 }
 
-function App({ themeMode, pluginData }: ComponentProps) {
+function decideHeader(currentView: PluginViews, docTitle: string) {
+  switch (currentView) {
+    case 'INSPECT':
+      return 'Inspect';
+      break;
+    case 'EDITOR':
+      return docTitle;
+      break;
+    case 'SETTINGS':
+      return 'Settings';
+      break;
+    default:
+      return 'Inspect';
+      break;
+  }
+}
+
+function App({ themeMode, initialPluginData }: ComponentProps) {
   const [view, setView] = React.useState(<InspectView />);
+  const [pluginHeader, setPluginHeader] = React.useState('Inspect');
+  //Context states
+  const [currentDocData, setCurrentDocData] = React.useState(
+    initialPluginData.currentDocData
+  );
+  const [navigation, setNavigation] = React.useState(
+    initialPluginData.navigation
+  );
+  const [loadingState, setLoadingState] = React.useState(
+    initialPluginData.loadingState
+  );
+  const [settings, setSettings] = React.useState(initialPluginData.settings);
 
   React.useEffect(() => {
-    setView(decideView(pluginData.currentView));
-  }, [pluginData.currentView]);
+    setView(decideView(navigation.currentView));
+    setPluginHeader(decideHeader(navigation.currentView, currentDocData.title));
+  }, [navigation.currentView]);
 
   return (
-    <PluginDataContext.Provider value={pluginData}>
+    <PluginDataContext.Provider
+      value={{
+        currentDocData,
+        setCurrentDocData,
+        navigation,
+        setNavigation,
+        loadingState,
+        setLoadingState,
+        settings,
+        setSettings,
+      }}
+    >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
         <Container
           disableGutters
@@ -55,21 +99,7 @@ function App({ themeMode, pluginData }: ComponentProps) {
             height: '100%',
           }}
         >
-          <AppBar elevation={0} color="inherit">
-            <Toolbar variant="dense">
-              <Typography
-                variant="h4"
-                component="div"
-                sx={{ flexGrow: 1, ml: 16 }}
-              >
-                Inspect
-              </Typography>
-              <IconButton>
-                <SettingsOutlined />
-              </IconButton>
-            </Toolbar>
-            <Divider />
-          </AppBar>
+          <PluginTopBar />
           {view}
         </Container>
       </ThemeProvider>
@@ -78,12 +108,3 @@ function App({ themeMode, pluginData }: ComponentProps) {
 }
 
 export default App;
-
-/*
-
-
-        <Stack style={{ flex: '0 1 auto' }}>
-          <Toolbar />
-        </Stack>
-
-*/

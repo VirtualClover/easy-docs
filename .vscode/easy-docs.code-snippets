@@ -1,0 +1,8 @@
+{
+  "pluginContext": {
+    "prefix": ["pluginContext"],
+    "body": "const pluginContext = React.useContext(PluginDataContext);",
+    "description": "Adds the plugin context",
+    "scope": "javascript,typescript"
+  }
+}

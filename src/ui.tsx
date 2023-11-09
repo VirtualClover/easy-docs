@@ -1,13 +1,9 @@
 import './ui.css';
 
-import {
-  DEFAULT_PLUGIN_DATA,
-  PluginData,
-} from './utils/constants';
+import { DEFAULT_PLUGIN_DATA, PluginData } from './utils/constants';
 
 import App from './ui/App';
 import { createRoot } from 'react-dom/client';
-import { selectMenu } from 'figma-plugin-ds';
 
 let PLUGIN_DATA: PluginData = DEFAULT_PLUGIN_DATA;
 
@@ -16,18 +12,16 @@ window.onload = function () {
   parent.postMessage(
     {
       pluginMessage: {
-        type: 'load-config',
+        type: 'load-data',
       },
     },
     '*'
   );
-
-  selectMenu.init();
 };
 
 // Once settings are loaded, load the UI
 onmessage = (event) => {
-  if (event.data.pluginMessage.type == 'settings') {
+  if (event.data.pluginMessage.type == 'data-loaded') {
     PLUGIN_DATA.settings = event.data.pluginMessage.pluginSettings;
     const themeMode = document.documentElement.className;
     const wrapper = document.getElementById('plugin-wrapper');
@@ -35,12 +29,7 @@ onmessage = (event) => {
 
     // Render your React component instead
     const root = createRoot(document.getElementById('app'));
-    root.render(
-      <App
-        themeMode={themeMode}
-        pluginData={PLUGIN_DATA}
-      />
-    );
+    root.render(<App themeMode={themeMode} initialPluginData={PLUGIN_DATA} />);
   }
 };
 

@@ -1,6 +1,10 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
+import { initComponents } from './utils/figma/components/initComponents';
+import { createNewDoc } from './utils/figma/createNewDoc';
+import { pluginInit } from './utils/figma/pluginInit';
+
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (see documentation).
@@ -19,8 +23,7 @@ figma.ui.onmessage = (msg) => {
     globalThis.firstNode = msg.inspectionType === 'screen' ? true : false;
     globalThis.evaluation = { nodes: [], totalNodes: 0 };
     const selection = <any>figma.currentPage.selection;
-    selection.forEach((element) => {
-    });
+    selection.forEach((element) => {});
 
     figma.ui.postMessage(globalThis.evaluation);
     /*const globalStyles = figma.getLocalPaintStyles();
@@ -38,33 +41,20 @@ figma.ui.onmessage = (msg) => {
     figma.viewport.scrollAndZoomIntoView([id]);
   }
 
-
-  if (msg.type === 'load-config') {
+  if (msg.type === 'load-data') {
     let pluginSettings;
     //Get keys
-    figma.clientStorage.keysAsync().then((keys) => {
-      if (keys[0] == 'settings') {
-        figma.clientStorage
-          .getAsync('settings')
-          .then((res) => {
-            pluginSettings = res;
-            figma.ui.postMessage({ type: 'settings', pluginSettings });
-          })
-          .catch((e) => console.error(e));
-      } else {
-        pluginSettings = {
-          API_KEY: process.env.API_KEY,
-          STYLES_URL: process.env.STYLES_URL,
-          METRICS_URL: process.env.METRICS_URL,
-        };
-        figma.clientStorage
-          .setAsync('settings', pluginSettings)
-          .then((res) =>
-            figma.ui.postMessage({ type: 'settings', pluginSettings })
-          )
-          .catch((e) => console.error(e));
-      }
-    });
+    pluginInit();
+  }
+
+  if (msg.type === 'create-new-doc') {
+    createNewDoc();
+    if (
+      figma.currentPage.selection[0] &&
+      figma.currentPage.selection[0].type == 'COMPONENT'
+    ) {
+      console.log(figma.currentPage.selection[0].key);
+    }
   }
 
   //figma.ui.postMessage(figkeysAsync());
