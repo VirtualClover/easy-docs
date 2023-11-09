@@ -1,6 +1,4 @@
 export function objectIsNotNull(value) {
-  if (Array.isArray(value)) return value.every(objectIsNotNull);
-  if (!value && typeof value === 'object')
-    return Object.values(value).every(objectIsNotNull);
-  return value === null || value === undefined;
+  const nulls = Object.values(value).filter((p) => p === '' || p === null);
+  return nulls.length === 0;
 }

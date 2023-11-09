@@ -41,7 +41,6 @@ export async function initComponents(
   ]).then((values) => {
     componentData.headerID = values[0];
     componentData.paragraphID = values[1];
-    componentData.componentFrameID = frame.id;
     componentData.componentsPageID = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',

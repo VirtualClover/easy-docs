@@ -10,7 +10,6 @@ export interface PageData extends OutputData {
 
 export const BASE_FILE_DATA = {
   componentsPageID: '',
-  componentFrameID: '',
   headerID: '',
   paragraphID: '',
 };

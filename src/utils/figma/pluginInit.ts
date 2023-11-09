@@ -19,15 +19,16 @@ export function pluginInit() {
     : BASE_FILE_DATA;
   console.log(componentData);
   //Check if object exists
-  if (objectIsNotNull(componentData)) {
+  if (!objectIsNotNull(componentData)) {
     initComponents(componentData);
   } else {
     //Check if the components have not been deleted
     for (const key in componentData) {
       if (componentData.hasOwnProperty(key)) {
+        let currentNode = figma.getNodeById(componentData[key]);
         if (
-          !figma.getNodeById(componentData[key]) ||
-          !figma.getNodeById(componentData[key]).parent
+          !currentNode ||
+          (currentNode.type != 'PAGE' && !currentNode.parent)
         ) {
           initComponents(componentData, false);
           console.log('Component missing: ' + key);
