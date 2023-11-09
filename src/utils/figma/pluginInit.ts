@@ -17,7 +17,7 @@ export function pluginInit() {
   let componentData: BaseFileData = stringData
     ? JSON.parse(stringData)
     : BASE_FILE_DATA;
-  console.log('Component data:' + componentData);
+  console.log(componentData);
   //Check if object exists
   if (objectIsNotNull(componentData)) {
     initComponents(componentData);
@@ -27,7 +27,7 @@ export function pluginInit() {
       if (componentData.hasOwnProperty(key)) {
         if (
           !figma.getNodeById(componentData[key]) ||
-          !isInNode(componentData.componentFrameID, componentData[key])
+          !figma.getNodeById(componentData[key]).parent
         ) {
           initComponents(componentData, false);
           console.log('Component missing: ' + key);
