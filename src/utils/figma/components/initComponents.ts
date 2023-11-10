@@ -14,12 +14,12 @@ export async function initComponents(
       timeout: 1500,
     }
   );
-  let currentComponentPage = figma.getNodeById(componentData.componentsPageID);
+  let currentComponentPage = figma.getNodeById(componentData.componentsPage.id);
   if (currentComponentPage) {
     if (figma.currentPage == currentComponentPage) {
       let pages = figma.root.children;
       for (let i = 0; i < pages.length; i++) {
-        if (pages[i].id != componentData.componentsPageID) {
+        if (pages[i].id != componentData.componentsPage.id) {
           figma.currentPage = pages[i];
           break;
         }
@@ -39,9 +39,9 @@ export async function initComponents(
     createHeaderComponent(frame),
     createParagraphComponent(frame),
   ]).then((values) => {
-    componentData.headerID = values[0];
-    componentData.paragraphID = values[1];
-    componentData.componentsPageID = page.id;
+    componentData.header.id = values[0];
+    componentData.paragraph.id = values[1];
+    componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',
       'components',

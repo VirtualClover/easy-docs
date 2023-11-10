@@ -2,7 +2,7 @@ import { BASE_FILE_DATA, BaseFileData } from '../constants';
 
 import { initComponents } from './components/initComponents';
 import { nodeSupportsChildren } from './nodeSupportsChildren';
-import { objectIsNotNull } from '../objectisNotNull';
+import { objectIsNull } from '../objectisNull';
 
 function isInNode(parentID, nodeID) {
   let parentNode = figma.getNodeById(parentID);
@@ -19,13 +19,13 @@ export function pluginInit() {
     : BASE_FILE_DATA;
   console.log(componentData);
   //Check if object exists
-  if (!objectIsNotNull(componentData)) {
+  if (objectIsNull(componentData)) {
     initComponents(componentData);
   } else {
     //Check if the components have not been deleted
     for (const key in componentData) {
       if (componentData.hasOwnProperty(key)) {
-        let currentNode = figma.getNodeById(componentData[key]);
+        let currentNode = figma.getNodeById(componentData[key].id);
         if (
           !currentNode ||
           (currentNode.type != 'PAGE' && !currentNode.parent)

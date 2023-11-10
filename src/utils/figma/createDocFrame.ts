@@ -1,7 +1,6 @@
-import { DEFAULT_SETTINGS, FrameSettings } from '../constants';
+import { DEFAULT_SETTINGS, FrameSettings, PageData } from '../constants';
 
-import { componentIDs } from './componentIDs';
-import { createInstance } from './createIstance';
+import { generateFigmaContentFromJSON } from '../docs/generateFigmaContentFromJSON';
 import { nodeSupportsChildren } from './nodeSupportsChildren';
 
 /**
@@ -14,7 +13,8 @@ import { nodeSupportsChildren } from './nodeSupportsChildren';
 export function createDocFrame(
   frameSettings: FrameSettings = DEFAULT_SETTINGS.frame,
   parent: string,
-  name: string
+  name: string,
+  frameData: PageData
 ) {
   //Create Frame
   const frame: FrameNode = figma.createFrame();
@@ -26,6 +26,7 @@ export function createDocFrame(
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';
   frame.name = name;
+  generateFigmaContentFromJSON(frameData, frame);
   /*createInstance(componentIDs.header).then((mainHeader) => {
     mainHeader.setProperties({ 'value#1:0': name });
     frame.appendChild(mainHeader);

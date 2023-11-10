@@ -28,6 +28,12 @@ export async function createHeaderComponent(
       setNodeFills(textNode, DEFAULT_SETTINGS.palette.heading);
       header.appendChild(textNode);
       textNode.layoutSizingHorizontal = 'FILL';
+      let contentProperty = header.addComponentProperty(
+        'content',
+        'TEXT',
+        'Heading'
+      );
+      textNode.componentPropertyReferences = { characters: contentProperty };
       set.push(header);
     }
 

@@ -9,9 +9,18 @@ export interface PageData extends OutputData {
 }
 
 export const BASE_FILE_DATA = {
-  componentsPageID: '',
-  headerID: '',
-  paragraphID: '',
+  componentsPage: {
+    id: '',
+  },
+  header: {
+    id: '',
+    levelProp: '',
+    contentProp: '',
+  },
+  paragraph: {
+    id: '',
+    contentProp: '',
+  },
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 

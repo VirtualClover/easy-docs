@@ -18,6 +18,7 @@ export function createNewDoc(
   createDocFrame(
     frameSettings,
     parentSection.id,
-    DEFAULT_DOC_DATA.pages[0].blocks[0].data.text
+    DEFAULT_DOC_DATA.pages[0].blocks[0].data.text,
+    DEFAULT_DOC_DATA.pages[0]
   );
 }
