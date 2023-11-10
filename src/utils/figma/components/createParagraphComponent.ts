@@ -20,5 +20,5 @@ export async function createParagraphComponent(parent: FrameNode) {
     textNode.layoutSizingHorizontal = 'FILL';
     parent.appendChild(component);
   });
-  return component.id;
+  return component;
 }

@@ -39,8 +39,12 @@ export async function initComponents(
     createHeaderComponent(frame),
     createParagraphComponent(frame),
   ]).then((values) => {
-    componentData.header.id = values[0];
-    componentData.paragraph.id = values[1];
+    let header = values[0];
+    let paragraph = values[1];
+    componentData.header.id = header.id;
+    componentData.header.contentProp = header.contentProp;
+    componentData.header.levelProp = header.levelProp;
+    componentData.paragraph.id = paragraph.id;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',

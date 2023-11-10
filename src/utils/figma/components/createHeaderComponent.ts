@@ -12,6 +12,8 @@ export async function createHeaderComponent(
 ) {
   let set: ComponentNode[] = [];
   let componentSet: ComponentSetNode;
+  let contentProperty: string;
+  let levelPropKey: string = 'level';
   await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).then(() => {
     for (let i = 0; i < headingSizes.length; i++) {
       const currentSize = headingSizes[i];
@@ -20,7 +22,7 @@ export async function createHeaderComponent(
       header.layoutMode = 'HORIZONTAL';
       header.counterAxisSizingMode = 'AUTO';
       header.primaryAxisSizingMode = 'FIXED';
-      header.name = `level=h${i + 1}`;
+      header.name = `${levelPropKey}=${i + 1}`;
       let textNode = figma.createText();
       textNode.fontName = { family: 'Inter', style: 'Bold' };
       textNode.fontSize = currentSize;
@@ -28,7 +30,7 @@ export async function createHeaderComponent(
       setNodeFills(textNode, DEFAULT_SETTINGS.palette.heading);
       header.appendChild(textNode);
       textNode.layoutSizingHorizontal = 'FILL';
-      let contentProperty = header.addComponentProperty(
+      contentProperty = header.addComponentProperty(
         'content',
         'TEXT',
         'Heading'
@@ -37,14 +39,19 @@ export async function createHeaderComponent(
       set.push(header);
     }
 
-    figma.combineAsVariants(set, parent);
-    if (parent.children[0].type == 'COMPONENT_SET') {
-      componentSet = parent.children[0];
-      componentSet.layoutMode = 'VERTICAL';
-      componentSet.itemSpacing = 90;
-      componentSet.name = `${FIGMA_COMPONENT_PREFIX}Heading`;
-    }
+    componentSet = figma.combineAsVariants(set, parent);
+    componentSet.layoutMode = 'VERTICAL';
+    componentSet.itemSpacing = 90;
+    componentSet.name = `${FIGMA_COMPONENT_PREFIX}Heading`;
   });
-  //console.log(componentSet);
-  return componentSet.id;
+  console.log(componentSet.componentPropertyDefinitions);
+  return {
+    id: componentSet.id,
+    contentProp: Object.keys(componentSet.componentPropertyDefinitions)[0],
+    levelProp: {
+      key: levelPropKey,
+      variables:
+        componentSet.componentPropertyDefinitions[levelPropKey].variantOptions,
+    },
+  };
 }

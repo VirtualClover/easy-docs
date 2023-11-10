@@ -14,7 +14,7 @@ export const BASE_FILE_DATA = {
   },
   header: {
     id: '',
-    levelProp: '',
+    levelProp: { key: '', variables: [] },
     contentProp: '',
   },
   paragraph: {
@@ -32,7 +32,14 @@ const DEFAULT_DOC_PAGES: PageData[] = [
         type: 'header',
         data: {
           text: 'Frame 1',
-          level: 0,
+          level: 1,
+        },
+      },
+      {
+        type: 'header',
+        data: {
+          text: 'Subtitle',
+          level: 2,
         },
       },
       {
