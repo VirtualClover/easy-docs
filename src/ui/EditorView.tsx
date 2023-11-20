@@ -33,7 +33,6 @@ export const EditorView = () => {
   };
 
   React.useEffect(() => {
-    setEditorData(pluginContext.currentDocData.pages[activeTab]);
     if (tabs.length != pluginContext.currentDocData.pages.length) {
       setTabs([]);
       for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
@@ -47,11 +46,11 @@ export const EditorView = () => {
         ]);
       }
     }
-    //console.log('Loaded editor view');
   }, [pluginContext.currentDocData]);
 
   React.useEffect(() => {
     setEditorData(pluginContext.currentDocData.pages[activeTab]);
+    console.log('Loaded editor view');
   }, [activeTab]);
 
   return (
@@ -77,7 +76,7 @@ export const EditorView = () => {
       <Box
         sx={{ flex: 1, overflow: 'auto', alignSelf: 'stretch', padding: 16 }}
       >
-        <Editor data={editorData} />
+        <Editor data={editorData} activeTab={activeTab}/>
       </Box>
     </ViewContainer>
   );

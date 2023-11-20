@@ -65,7 +65,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   );
   const [settings, setSettings] = React.useState(initialPluginData.settings);
 
-  const initalState = 0;
 
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
@@ -73,7 +72,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (navigation.currentView != 'SETTINGS') {
+      if (navigation.currentView != 'SETTINGS' && loadingState == 'NONE') {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           switch (event.data.pluginMessage.type) {
