@@ -1,21 +1,15 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 
-import {
-  AppBar,
-  Container,
-  Divider,
-  IconButton,
-  Toolbar,
-  Typography,
-} from '@mui/material';
-import { PluginData, PluginViews } from '../utils/constants';
-import { Settings, SettingsOutlined } from '@mui/icons-material';
+import { DocData, PluginData, PluginViews } from '../utils/constants';
 import { darkTheme, lightTheme } from '../styles/base';
 
+import { Container } from '@mui/material';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
+import { Settings } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
 
 interface ComponentProps {
@@ -59,7 +53,6 @@ function decideHeader(currentView: PluginViews, docTitle: string) {
 
 function App({ themeMode, initialPluginData }: ComponentProps) {
   const [view, setView] = React.useState(<InspectView />);
-  const [pluginHeader, setPluginHeader] = React.useState('Inspect');
   //Context states
   const [currentDocData, setCurrentDocData] = React.useState(
     initialPluginData.currentDocData
@@ -72,10 +65,48 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   );
   const [settings, setSettings] = React.useState(initialPluginData.settings);
 
+  const initalState = 0;
+
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
-    setPluginHeader(decideHeader(navigation.currentView, currentDocData.title));
   }, [navigation.currentView]);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      if (navigation.currentView != 'SETTINGS') {
+        parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
+        onmessage = (event) => {
+          switch (event.data.pluginMessage.type) {
+            case 'node-data':
+              let data: DocData = event.data.pluginMessage.data;
+              if (data) {
+                if (navigation.currentView == 'INSPECT') {
+                  setNavigation({
+                    currentView: 'EDITOR',
+                    prevView: navigation.currentView,
+                  });
+                }
+                if (!_.isEqual(currentDocData, data)) {
+                  setCurrentDocData(data);
+                }
+              }
+              break;
+            case 'no-node':
+              if (navigation.currentView == 'EDITOR') {
+                setNavigation({
+                  currentView: 'INSPECT',
+                  prevView: navigation.currentView,
+                });
+              }
+              break;
+            default:
+              break;
+          }
+        };
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, [currentDocData, navigation]);
 
   return (
     <PluginDataContext.Provider

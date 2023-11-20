@@ -1,4 +1,4 @@
-import { OutputData } from '@editorjs/editorjs';
+import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
@@ -6,6 +6,11 @@ export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 export interface PageData extends OutputData {
   frameId?: string;
   docId?: string;
+  blocks: BlockData[];
+}
+
+export interface BlockData extends OutputBlockData {
+  figmaNodeId?: string;
 }
 
 export const BASE_FILE_DATA = {
@@ -26,7 +31,6 @@ export type BaseFileData = typeof BASE_FILE_DATA;
 
 const DEFAULT_DOC_PAGES: PageData[] = [
   {
-    time: new Date().getTime(),
     blocks: [
       {
         type: 'header',
@@ -52,7 +56,6 @@ const DEFAULT_DOC_PAGES: PageData[] = [
     ],
   },
   {
-    time: new Date().getTime(),
     blocks: [
       {
         type: 'header',
@@ -126,7 +129,7 @@ export type navigation = typeof initialNavigation;
 
 export const DEFAULT_PLUGIN_DATA = {
   currentDocData: DEFAULT_DOC_DATA,
-  setCurrentDocData: (data) => {},
+  setCurrentDocData: (data: DocData) => {},
   navigation: initialNavigation,
   setNavigation: (view) => {},
   loadingState: LOADING_STATES[0] as LoadingStates,

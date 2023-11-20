@@ -1,8 +1,8 @@
-import { DEFAULT_DOC_DATA, PageData } from '../../utils/constants';
 import React, { useEffect } from 'react';
 
 import { Box } from '@mui/material';
 import Header from '@editorjs/header';
+import { PageData } from '../../utils/constants';
 import { createReactEditorJS } from 'react-editor-js';
 
 interface ComponentProps {
@@ -41,7 +41,7 @@ export const Editor = ({ data }) => {
             class: Header,
             config: {
               placeholder: 'Enter a header',
-              levels: [2, 3, 4, 5, 6],
+              levels: [1, 2, 3, 4, 5, 6],
               defaultLevel: 2,
             },
           },

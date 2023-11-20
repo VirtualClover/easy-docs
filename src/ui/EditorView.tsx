@@ -1,15 +1,17 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 
 import { AppBar, Divider, IconButton, Stack, Toolbar } from '@mui/material';
 
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
-import { DEFAULT_DOC_DATA } from '../utils/constants';
+import { DocData } from '../utils/constants';
 import { Editor } from './components/Editor';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
+import { navigate } from '../utils/navigate';
 
 function a11yProps(index: number) {
   return {
@@ -22,25 +24,30 @@ export const EditorView = () => {
   const [activeTab, setActiveTab] = React.useState(0);
   const [tabs, setTabs] = React.useState([]);
   const pluginContext = React.useContext(PluginDataContext);
-  const [editorData, setEditorData] = React.useState(DEFAULT_DOC_DATA.pages[0]);
+  const [editorData, setEditorData] = React.useState(
+    pluginContext.currentDocData.pages[0]
+  );
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     setActiveTab(newActiveTab);
   };
 
   React.useEffect(() => {
-    for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
-      setTabs((currentTabs) => [
-        ...currentTabs,
-        <Tab
-          label={pluginContext.currentDocData.pages[i].blocks[0].data.text}
-          {...a11yProps(i)}
-          key={i}
-        />,
-      ]);
+    setEditorData(pluginContext.currentDocData.pages[activeTab]);
+    if (tabs.length != pluginContext.currentDocData.pages.length) {
+      setTabs([]);
+      for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
+        setTabs((currentTabs) => [
+          ...currentTabs,
+          <Tab
+            label={pluginContext.currentDocData.pages[i].blocks[0].data.text}
+            {...a11yProps(i)}
+            key={i}
+          />,
+        ]);
+      }
     }
-
-    console.log('Loaded editor view');
+    //console.log('Loaded editor view');
   }, [pluginContext.currentDocData]);
 
   React.useEffect(() => {

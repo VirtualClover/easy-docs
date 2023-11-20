@@ -31,6 +31,7 @@ onmessage = (event) => {
     const root = createRoot(document.getElementById('app'));
     root.render(<App themeMode={themeMode} initialPluginData={PLUGIN_DATA} />);
   }
+  
 };
 
 /*

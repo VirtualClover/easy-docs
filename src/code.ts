@@ -1,6 +1,7 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
+import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
 import { initComponents } from './utils/figma/components/initComponents';
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { pluginInit } from './utils/figma/pluginInit';
@@ -49,12 +50,44 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'create-new-doc') {
     createNewDoc();
-    if (
-      figma.currentPage.selection[0] &&
-      figma.currentPage.selection[0].type == 'COMPONENT'
-    ) {
-      console.log(figma.currentPage.selection[0].key);
+  }
+
+  if (msg.type === 'node-update') {
+    let selection = figma.currentPage.selection[0];
+    if (selection) {
+      switch (selection.type) {
+        case 'SECTION':
+          figma.ui.postMessage({
+            type: 'node-data',
+            data: generateJSONFromFigmaContent(selection),
+          });
+          break;
+        case 'FRAME':
+          if (selection.parent.type == 'SECTION') {
+            figma.ui.postMessage({
+              type: 'node-data',
+              data: generateJSONFromFigmaContent(selection.parent),
+            });
+          }
+          break;
+        case 'INSTANCE':
+          if (selection.parent.type == 'FRAME') {
+            if (selection.parent.parent.type == 'SECTION') {
+              figma.ui.postMessage({
+                type: 'node-data',
+                data: generateJSONFromFigmaContent(selection.parent.parent),
+              });
+            }
+          }
+          break;
+        default:
+          figma.ui.postMessage({ type: 'no-node' });
+          break;
+      }
+    } else {
+      figma.ui.postMessage({ type: 'no-node' });
     }
+    console.log('inspect done');
   }
 
   //figma.ui.postMessage(figkeysAsync());

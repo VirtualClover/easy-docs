@@ -4,6 +4,7 @@ import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
   let component: ComponentNode;
+  let contentProperty: string;
   await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).then(() => {
     component = figma.createComponent();
     component.resizeWithoutConstraints(400, 20);
@@ -18,7 +19,13 @@ export async function createParagraphComponent(parent: FrameNode) {
     setNodeFills(textNode, DEFAULT_SETTINGS.palette.paragraph);
     component.appendChild(textNode);
     textNode.layoutSizingHorizontal = 'FILL';
+    contentProperty = component.addComponentProperty(
+      'content',
+      'TEXT',
+      'Paragraph'
+    );
+    textNode.componentPropertyReferences = { characters: contentProperty };
     parent.appendChild(component);
   });
-  return component;
+  return { id: component.id, contentProp: contentProperty };
 }
