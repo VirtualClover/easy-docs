@@ -41,7 +41,10 @@ function generatePageDataFromFrame(
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
       if (childNode.type == 'INSTANCE') {
-        let mainCompId = childNode.mainComponent.parent.type == 'COMPONENT_SET' ? childNode.mainComponent.parent.id : childNode.mainComponent.id;
+        let mainCompId =
+          childNode.mainComponent.parent.type == 'COMPONENT_SET'
+            ? childNode.mainComponent.parent.id
+            : childNode.mainComponent.id;
         switch (mainCompId) {
           case componentData.header.id:
             pageData.blocks.push({
@@ -50,10 +53,12 @@ function generatePageDataFromFrame(
                 text: childNode.componentProperties[
                   componentData.header.contentProp
                 ].value,
-                level:
+                level: parseInt(
                   childNode.componentProperties[
                     componentData.header.levelProp.key
-                  ].value,
+                  ].value as string,
+                  10
+                ),
               },
             });
             break;
@@ -64,7 +69,6 @@ function generatePageDataFromFrame(
                 text: childNode.componentProperties[
                   componentData.paragraph.contentProp
                 ].value,
-                level: 1,
               },
             });
             break;

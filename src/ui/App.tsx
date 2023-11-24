@@ -85,9 +85,9 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                     prevView: navigation.currentView,
                   });
                 }
-                if (!_.isEqual(currentDocData, data)) {
+                /*if (!_.isEqual(currentDocData, data)) {
                   setCurrentDocData(data);
-                }
+                }*/
               }
               break;
             case 'no-node':

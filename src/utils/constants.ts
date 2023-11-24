@@ -11,6 +11,7 @@ export interface PageData extends OutputData {
 
 export interface BlockData extends OutputBlockData {
   figmaNodeId?: string;
+  editorBlockId?: string;
 }
 
 export const BASE_FILE_DATA = {
@@ -50,7 +51,6 @@ const DEFAULT_DOC_PAGES: PageData[] = [
         type: 'paragraph',
         data: {
           text: 'Click here to start editing!',
-          level: 1,
         },
       },
     ],
@@ -68,7 +68,6 @@ const DEFAULT_DOC_PAGES: PageData[] = [
         type: 'paragraph',
         data: {
           text: 'Click here to start editing! 2',
-          level: 1,
         },
       },
     ],

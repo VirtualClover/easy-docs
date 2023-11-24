@@ -24,7 +24,7 @@ export const Editor = ({ data, activeTab }) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       handleSaveData();
-    }, 1);
+    }, 500);
     return () => {
       console.log('Cleared!');
       clearInterval(interval);
@@ -40,28 +40,44 @@ export const Editor = ({ data, activeTab }) => {
   }, []);
 
   const handleSaveData = async () => {
-    let savedData = await editorCore.current.save();
-    if (
-      !_.isEqual(
-        savedData.blocks,
-        pluginContext.currentDocData.pages[activeTab].blocks
-      )
-    ) {
-      pluginContext.setLoadingState('MINOR');
-      let tempData: DocData = clone(pluginContext.currentDocData);
-      tempData.pages[activeTab] = savedData;
-      pluginContext.setCurrentDocData(tempData);
+    let newData = await editorCore.current.save(); //Page data
+    let currentData = clone(pluginContext.currentDocData.pages[activeTab]); //Data stored in context
+    let changesNumber = 0;
+    for (let i = 0; i < newData.blocks.length; i++) {
+      let newBlock = newData.blocks[i];
+      let currentDataBlock = currentData.blocks[i];
+      if (
+        !_.isEqual(newBlock.data, currentDataBlock.data) ||
+        newBlock.type != currentDataBlock.type
+      ) {
+        console.log('block not equal');
+        console.log(newBlock.data);
+        console.log(currentDataBlock.data);
+        console.log(newBlock.type);
+        console.log(currentDataBlock.type);
+        
+        
+        
+        let tempData = _.merge(currentDataBlock, newBlock);
+        changesNumber++;
+        currentDataBlock = tempData;
+      }
+    }
+    if (changesNumber) {
+      let tempDoc: DocData = clone(pluginContext.currentDocData);
+      tempDoc.pages[activeTab] = currentData;
+      pluginContext.setCurrentDocData(tempDoc);
       parent.postMessage(
         {
           pluginMessage: {
             type: 'update-selected-doc',
-            data: pluginContext.currentDocData,
+            data: tempDoc,
             editedFrame: activeTab,
           },
         },
         '*'
       );
-      console.log(pluginContext.currentDocData.pages[0].blocks);
+
     }
   };
 
@@ -94,3 +110,55 @@ export const Editor = ({ data, activeTab }) => {
     </Box>
   );
 };
+
+/**
+ *       for (let i = 0; i < savedData.blocks.length; i++) {
+        if (
+          !_.isEqual(
+            savedData.blocks[i],
+            currentDocDataPage.blocks[i]
+          )
+        ){
+          let tempDataBlock = {...savedData.blocks[i], id:currentDocDataPage.blocks}
+        }
+        
+      }
+ */
+
+/**
+       * 
+       * 
+       * 
+    if (
+      !_.isEqual(
+        savedData.blocks,
+        pluginContext.currentDocData.pages[activeTab].blocks
+      )
+    ) {
+      console.log('Editor update: data not equal');
+      console.log(savedData.blocks);
+      console.log(pluginContext.currentDocData.pages[activeTab].blocks);
+      console.log(
+        _.merge(
+          pluginContext.currentDocData.pages[activeTab].blocks,
+          savedData.blocks
+        )
+      );
+      pluginContext.setLoadingState('MINOR');
+      let tempData: DocData = clone(pluginContext.currentDocData);
+      tempData.pages[activeTab] = savedData;
+      pluginContext.setCurrentDocData(tempData);
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: 'update-selected-doc',
+            data: pluginContext.currentDocData,
+            editedFrame: activeTab,
+          },
+        },
+        '*'
+      );
+      pluginContext.setLoadingState('NONE');
+    }
+       * 
+       */
