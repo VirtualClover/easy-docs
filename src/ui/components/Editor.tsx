@@ -23,8 +23,12 @@ export const Editor = ({ data, activeTab }) => {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      handleSaveData();
-      console.log(pluginContext.currentDocData.pages[activeTab]);
+      if (!pluginContext.incomingFigmaChanges) {
+        handleSaveData();
+      } else {
+        //console.log('incoming fimga changes');
+        
+      }
     }, 500);
     return () => {
       console.log('Cleared!');
@@ -66,6 +70,7 @@ export const Editor = ({ data, activeTab }) => {
       }
     }
     if (changesNumber) {
+      pluginContext.setIncomingEditorChanges(true);
       let tempDoc: DocData = clone(pluginContext.currentDocData);
       tempDoc.pages[activeTab] = currentData;
       pluginContext.setCurrentDocData(tempDoc);
@@ -79,12 +84,21 @@ export const Editor = ({ data, activeTab }) => {
         },
         '*'
       );
+      pluginContext.setIncomingEditorChanges(false);
     }
   };
 
   React.useEffect(() => {
-    handleUpdateData(data);
-  }, [data]);
+    if (pluginContext.incomingFigmaChanges) {
+      handleUpdateData(pluginContext.currentDocData.pages[activeTab]).then(
+        () => {
+          console.log('new data');
+          console.log(pluginContext.currentDocData);
+          pluginContext.setIncomingFigmaChanges(false);
+        }
+      );
+    }
+  }, [pluginContext.currentDocData]);
 
   return (
     <Box

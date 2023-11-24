@@ -131,9 +131,13 @@ export const DEFAULT_PLUGIN_DATA = {
   navigation: initialNavigation,
   setNavigation: (view) => {},
   loadingState: LOADING_STATES[0] as LoadingStates,
-  setLoadingState: (loadingState) => {},
+  setLoadingState: (loadingState: LoadingStates) => {},
   settings: DEFAULT_SETTINGS,
-  setSettings: (settings) => {},
+  setSettings: (settings: PluginSettings) => {},
+  incomingFigmaChanges: false,
+  setIncomingFigmaChanges: (state: boolean) => {},
+  incomingEditorChanges: false,
+  setIncomingEditorChanges: (state: boolean) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

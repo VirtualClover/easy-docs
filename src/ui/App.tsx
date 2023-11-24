@@ -64,6 +64,12 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
     initialPluginData.loadingState
   );
   const [settings, setSettings] = React.useState(initialPluginData.settings);
+  const [incomingFigmaChanges, setIncomingFigmaChanges] = React.useState(
+    initialPluginData.incomingFigmaChanges
+  );
+  const [incomingEditorChanges, setIncomingEditorChanges] = React.useState(
+    initialPluginData.incomingEditorChanges
+  );
 
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
@@ -84,8 +90,14 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                     prevView: navigation.currentView,
                   });
                 }
-                if (!_.isEqual(currentDocData, data)) {
+                if (
+                  !_.isEqual(currentDocData, data) &&
+                  !incomingEditorChanges
+                ) {
+                  setIncomingFigmaChanges(true);
                   setCurrentDocData(data);
+                  console.log('Data updated from figma');
+                  console.log(data);
                 }
               }
               break;
@@ -117,6 +129,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         setLoadingState,
         settings,
         setSettings,
+        incomingFigmaChanges,
+        setIncomingFigmaChanges,
+        incomingEditorChanges,
+        setIncomingEditorChanges,
       }}
     >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
