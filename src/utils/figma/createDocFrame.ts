@@ -44,5 +44,7 @@ export function createDocFrame(
         ? parentNode.height
         : frame.height + 32
     );
+    figma.currentPage.selection = [frame];
+    figma.viewport.scrollAndZoomIntoView([frame]);
   }
 }

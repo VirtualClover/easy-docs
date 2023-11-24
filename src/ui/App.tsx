@@ -65,7 +65,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   );
   const [settings, setSettings] = React.useState(initialPluginData.settings);
 
-
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
   }, [navigation.currentView]);
@@ -85,9 +84,9 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                     prevView: navigation.currentView,
                   });
                 }
-                /*if (!_.isEqual(currentDocData, data)) {
+                if (!_.isEqual(currentDocData, data)) {
                   setCurrentDocData(data);
-                }*/
+                }
               }
               break;
             case 'no-node':
