@@ -9,7 +9,7 @@ export function generateHeaderInstance(data) {
     let component = componentSet.children[0] as ComponentNode;
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.header.contentProp]: data.text,
+      [componentData.header.contentProp]: data.text.replace('&nbsp;', ' '),
       [componentData.header.levelProp.key]: `${data.level}`,
     });
     return instance;

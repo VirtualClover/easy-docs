@@ -8,7 +8,7 @@ export function generateParagraphInstance(data) {
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.paragraph.contentProp]: data.text,
+      [componentData.paragraph.contentProp]: data.text.replace('&nbsp;', ' '),
     });
     return instance;
     //instance.set

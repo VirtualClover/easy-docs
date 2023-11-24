@@ -24,6 +24,7 @@ export const Editor = ({ data, activeTab }) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       handleSaveData();
+      console.log(pluginContext.currentDocData.pages[activeTab]);
     }, 500);
     return () => {
       console.log('Cleared!');
@@ -40,27 +41,28 @@ export const Editor = ({ data, activeTab }) => {
   }, []);
 
   const handleSaveData = async () => {
-    let newData = await editorCore.current.save(); //Page data
-    let currentData = clone(pluginContext.currentDocData.pages[activeTab]); //Data stored in context
+    let newData: PageData = await editorCore.current.save(); //Page data
+    let currentData: PageData = clone(
+      pluginContext.currentDocData.pages[activeTab]
+    ); //Data stored in context
+    currentData.blocks = currentData.blocks.slice(0, newData.blocks.length);
     let changesNumber = 0;
     for (let i = 0; i < newData.blocks.length; i++) {
       let newBlock = newData.blocks[i];
       let currentDataBlock = currentData.blocks[i];
-      if (
-        !_.isEqual(newBlock.data, currentDataBlock.data) ||
-        newBlock.type != currentDataBlock.type
-      ) {
-        console.log('block not equal');
-        console.log(newBlock.data);
-        console.log(currentDataBlock.data);
-        console.log(newBlock.type);
-        console.log(currentDataBlock.type);
-        
-        
-        
-        let tempData = _.merge(currentDataBlock, newBlock);
+      if (currentDataBlock) {
+        if (
+          !_.isEqual(newBlock.data, currentDataBlock.data) ||
+          newBlock.type != currentDataBlock.type
+        ) {
+          console.log('block not equal');
+          changesNumber++;
+          currentDataBlock.data = newBlock.data;
+          currentDataBlock.type = newBlock.type;
+        }
+      } else {
+        currentData.blocks[i] = newBlock;
         changesNumber++;
-        currentDataBlock = tempData;
       }
     }
     if (changesNumber) {
@@ -77,7 +79,6 @@ export const Editor = ({ data, activeTab }) => {
         },
         '*'
       );
-
     }
   };
 

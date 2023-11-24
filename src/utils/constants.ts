@@ -11,7 +11,6 @@ export interface PageData extends OutputData {
 
 export interface BlockData extends OutputBlockData {
   figmaNodeId?: string;
-  editorBlockId?: string;
 }
 
 export const BASE_FILE_DATA = {
