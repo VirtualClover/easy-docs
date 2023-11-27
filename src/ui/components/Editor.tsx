@@ -26,15 +26,15 @@ export const Editor = ({ activeTab }) => {
       if (!pluginContext.incomingFigmaChanges) {
         handleSaveData();
       } else {
-        console.log('incoming fimga changes');
-        console.log(pluginContext.incomingFigmaChanges);
+        //console.log('incoming fimga changes');
+        //console.log(pluginContext.incomingFigmaChanges);
       }
     }, 500);
     return () => {
       console.log('Cleared!');
       clearInterval(interval);
     };
-  }, [pluginContext.currentDocData,pluginContext.incomingFigmaChanges]);
+  }, [pluginContext.currentDocData, pluginContext.incomingFigmaChanges]);
 
   const handleInitialize = React.useCallback((instance) => {
     editorCore.current = instance;
@@ -52,10 +52,16 @@ export const Editor = ({ activeTab }) => {
     ); //Data stored in context
     currentData.blocks = currentData.blocks.slice(0, newData.blocks.length);
     let changesNumber = 0;
+    let pageTitle;
     for (let i = 0; i < newData.blocks.length; i++) {
       let newBlock = newData.blocks[i];
       let currentDataBlock = currentData.blocks[i];
       if (currentDataBlock) {
+        if (!pageTitle && currentDataBlock.type == 'header') {
+          pageTitle = currentDataBlock.data.text;
+          currentData.title = pageTitle;
+        }
+
         if (
           !_.isEqual(newBlock.data, currentDataBlock.data) ||
           newBlock.type != currentDataBlock.type
@@ -63,6 +69,7 @@ export const Editor = ({ activeTab }) => {
           console.log('block not equal');
           changesNumber++;
           currentDataBlock.data = newBlock.data;
+          currentDataBlock.lastEdited = Date.now();
           currentDataBlock.type = newBlock.type;
         }
       } else {

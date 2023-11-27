@@ -5,12 +5,13 @@ export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 
 export interface PageData extends OutputData {
   frameId?: string;
-  docId?: string;
+  title: string;
   blocks: BlockData[];
 }
 
 export interface BlockData extends OutputBlockData {
   figmaNodeId?: string;
+  lastEdited?: number;
 }
 
 export const BASE_FILE_DATA = {
@@ -53,23 +54,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
         },
       },
     ],
-  },
-  {
-    blocks: [
-      {
-        type: 'header',
-        data: {
-          text: 'Frame 2',
-          level: 1,
-        },
-      },
-      {
-        type: 'paragraph',
-        data: {
-          text: 'Click here to start editing! 2',
-        },
-      },
-    ],
+    title: 'Page 1',
   },
 ];
 export const DEFAULT_DOC_DATA = {
@@ -142,3 +127,5 @@ export const DEFAULT_PLUGIN_DATA = {
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 
 export const FIGMA_COMPONENT_PREFIX = '.[EASY-DOCS]';
+
+export const FIGMA_NAMESPACE = 'EasyDocs';

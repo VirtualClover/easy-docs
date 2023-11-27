@@ -11,7 +11,6 @@ import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
-import { navigate } from '../utils/navigate';
 
 function a11yProps(index: number) {
   return {
@@ -76,7 +75,7 @@ export const EditorView = () => {
       <Box
         sx={{ flex: 1, overflow: 'auto', alignSelf: 'stretch', padding: 16 }}
       >
-        <Editor data={editorData} activeTab={activeTab}/>
+        <Editor activeTab={activeTab}/>
       </Box>
     </ViewContainer>
   );

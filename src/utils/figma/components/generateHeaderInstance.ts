@@ -1,6 +1,6 @@
 import { BaseFileData } from '../../constants';
 
-export function generateHeaderInstance(data) {
+export function generateHeaderInstance(data) : InstanceNode {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
@@ -15,5 +15,6 @@ export function generateHeaderInstance(data) {
     return instance;
     //instance.set
   }
+  
   return null;
 }

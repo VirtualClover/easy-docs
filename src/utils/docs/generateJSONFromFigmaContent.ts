@@ -33,11 +33,11 @@ function generatePageDataFromFrame(
 ): PageData {
   let pageData: PageData = {
     blocks: [],
+    title: '',
   };
 
   if (frame.children) {
     let children = frame.children;
-
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
       if (childNode.type == 'INSTANCE') {
@@ -47,12 +47,13 @@ function generatePageDataFromFrame(
             : childNode.mainComponent.id;
         switch (mainCompId) {
           case componentData.header.id:
+            let headerContent =
+              childNode.componentProperties[componentData.header.contentProp]
+                .value;
             pageData.blocks.push({
               type: 'header',
               data: {
-                text: childNode.componentProperties[
-                  componentData.header.contentProp
-                ].value,
+                text: headerContent,
                 level: parseInt(
                   childNode.componentProperties[
                     componentData.header.levelProp.key
@@ -61,6 +62,9 @@ function generatePageDataFromFrame(
                 ),
               },
             });
+            if (!pageData.title && typeof headerContent === 'string') {
+              pageData.title = headerContent;
+            }
             break;
           case componentData.paragraph.id:
             pageData.blocks.push({

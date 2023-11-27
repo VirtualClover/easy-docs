@@ -44,13 +44,12 @@ figma.ui.onmessage = (msg) => {
   }
 
   if (msg.type === 'load-data') {
-    let pluginSettings;
     //Get keys
     pluginInit();
   }
 
   if (msg.type === 'create-new-doc') {
-    createNewDoc();
+    createNewDoc(DEFAULT_DOC_DATA);
   }
 
   if (msg.type === 'node-update') {
@@ -99,15 +98,7 @@ figma.ui.onmessage = (msg) => {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;
     let section: SectionNode = context.parentSection;
-    let frame =
-    section.children[section.children.length - (msg.editedFrame + 1)];
-  frame.remove();
-    createDocFrame(
-      DEFAULT_SETTINGS.frame,
-      context.parentSection.id,
-      data.title,
-      data.pages[msg.editedFrame]
-    );
+    generateFigmaContentFromJSON(data, section);
     context.stopSendingUpdates = false;
   }
 

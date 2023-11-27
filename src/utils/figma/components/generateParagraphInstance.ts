@@ -1,6 +1,6 @@
 import { BaseFileData } from '../../constants';
 
-export function generateParagraphInstance(data) {
+export function generateParagraphInstance(data): InstanceNode {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
