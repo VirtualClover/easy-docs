@@ -95,9 +95,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                   !incomingEditorChanges
                 ) {
                   setIncomingFigmaChanges(true);
-                  setCurrentDocData(data);
-                  console.log('Loops here');
-                  
+                  setCurrentDocData(data);   
                 }
               }
               break;

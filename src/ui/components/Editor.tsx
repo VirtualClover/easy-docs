@@ -38,6 +38,7 @@ export const Editor = ({ data, activeTab }) => {
 
   const handleInitialize = React.useCallback((instance) => {
     editorCore.current = instance;
+    pluginContext.setIncomingFigmaChanges(false);
   }, []);
 
   const handleUpdateData = React.useCallback(async (data) => {
@@ -87,15 +88,6 @@ export const Editor = ({ data, activeTab }) => {
       pluginContext.setIncomingEditorChanges(false);
     }
   };
-
-  React.useEffect(() => {
-    pluginContext.setIncomingFigmaChanges(false);
-    console.log('Editor mounted');
-    console.log(pluginContext.incomingFigmaChanges);
-    
-    
-    return () => {};
-  }, []);
 
   React.useEffect(() => {
     if (pluginContext.incomingFigmaChanges) {
