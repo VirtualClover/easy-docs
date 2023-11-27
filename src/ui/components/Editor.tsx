@@ -16,7 +16,7 @@ interface ComponentProps {
 
 const ReactEditorJS = createReactEditorJS();
 
-export const Editor = ({ data, activeTab }) => {
+export const Editor = ({ activeTab }) => {
   const editorCore = React.useRef(null);
 
   const pluginContext = React.useContext(PluginDataContext);
@@ -93,8 +93,6 @@ export const Editor = ({ data, activeTab }) => {
     if (pluginContext.incomingFigmaChanges) {
       handleUpdateData(pluginContext.currentDocData.pages[activeTab]).then(
         () => {
-          console.log('new data');
-          console.log(pluginContext.currentDocData);
           pluginContext.setIncomingFigmaChanges(false);
         }
       );
@@ -110,7 +108,7 @@ export const Editor = ({ data, activeTab }) => {
       })}
     >
       <ReactEditorJS
-        defaultValue={data}
+        defaultValue={pluginContext.currentDocData.pages[activeTab]}
         tools={{
           header: {
             class: Header,
@@ -126,55 +124,3 @@ export const Editor = ({ data, activeTab }) => {
     </Box>
   );
 };
-
-/**
- *       for (let i = 0; i < savedData.blocks.length; i++) {
-        if (
-          !_.isEqual(
-            savedData.blocks[i],
-            currentDocDataPage.blocks[i]
-          )
-        ){
-          let tempDataBlock = {...savedData.blocks[i], id:currentDocDataPage.blocks}
-        }
-        
-      }
- */
-
-/**
-       * 
-       * 
-       * 
-    if (
-      !_.isEqual(
-        savedData.blocks,
-        pluginContext.currentDocData.pages[activeTab].blocks
-      )
-    ) {
-      console.log('Editor update: data not equal');
-      console.log(savedData.blocks);
-      console.log(pluginContext.currentDocData.pages[activeTab].blocks);
-      console.log(
-        _.merge(
-          pluginContext.currentDocData.pages[activeTab].blocks,
-          savedData.blocks
-        )
-      );
-      pluginContext.setLoadingState('MINOR');
-      let tempData: DocData = clone(pluginContext.currentDocData);
-      tempData.pages[activeTab] = savedData;
-      pluginContext.setCurrentDocData(tempData);
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: 'update-selected-doc',
-            data: pluginContext.currentDocData,
-            editedFrame: activeTab,
-          },
-        },
-        '*'
-      );
-      pluginContext.setLoadingState('NONE');
-    }
-       * 
-       */
