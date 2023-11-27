@@ -26,15 +26,15 @@ export const Editor = ({ data, activeTab }) => {
       if (!pluginContext.incomingFigmaChanges) {
         handleSaveData();
       } else {
-        //console.log('incoming fimga changes');
-        
+        console.log('incoming fimga changes');
+        console.log(pluginContext.incomingFigmaChanges);
       }
     }, 500);
     return () => {
       console.log('Cleared!');
       clearInterval(interval);
     };
-  }, [pluginContext.currentDocData]);
+  }, [pluginContext.currentDocData,pluginContext.incomingFigmaChanges]);
 
   const handleInitialize = React.useCallback((instance) => {
     editorCore.current = instance;
@@ -87,6 +87,15 @@ export const Editor = ({ data, activeTab }) => {
       pluginContext.setIncomingEditorChanges(false);
     }
   };
+
+  React.useEffect(() => {
+    pluginContext.setIncomingFigmaChanges(false);
+    console.log('Editor mounted');
+    console.log(pluginContext.incomingFigmaChanges);
+    
+    
+    return () => {};
+  }, []);
 
   React.useEffect(() => {
     if (pluginContext.incomingFigmaChanges) {

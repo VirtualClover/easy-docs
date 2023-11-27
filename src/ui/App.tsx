@@ -96,8 +96,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 ) {
                   setIncomingFigmaChanges(true);
                   setCurrentDocData(data);
-                  console.log('Data updated from figma');
-                  console.log(data);
+                  console.log('Loops here');
+                  
                 }
               }
               break;
