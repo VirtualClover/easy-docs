@@ -23,34 +23,31 @@ export const EditorView = () => {
   const [activeTab, setActiveTab] = React.useState(0);
   const [tabs, setTabs] = React.useState([]);
   const pluginContext = React.useContext(PluginDataContext);
-  const [editorData, setEditorData] = React.useState(
-    pluginContext.currentDocData.pages[0]
-  );
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     setActiveTab(newActiveTab);
   };
 
   React.useEffect(() => {
-    if (tabs.length != pluginContext.currentDocData.pages.length) {
-      setTabs([]);
-      for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
-        setTabs((currentTabs) => [
-          ...currentTabs,
-          <Tab
-            label={pluginContext.currentDocData.pages[i].blocks[0].data.text}
-            {...a11yProps(i)}
-            key={i}
-          />,
-        ]);
-      }
+    setTabs([]);
+    for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
+      setTabs(() => [
+        <Tab
+          sx={{
+            maxWidth: 300,
+            overflow: 'hidden',
+            whiteSpace: 'noWrap',
+            textOverflow: 'ellipsis',
+            display: 'block',
+            flexDirection: 'row',
+          }}
+          label={pluginContext.currentDocData.pages[i].title}
+          {...a11yProps(i)}
+          key={i}
+        />,
+      ]);
     }
   }, [pluginContext.currentDocData]);
-
-  React.useEffect(() => {
-    setEditorData(pluginContext.currentDocData.pages[activeTab]);
-    console.log('Loaded editor view');
-  }, [activeTab]);
 
   return (
     <ViewContainer>
@@ -58,8 +55,11 @@ export const EditorView = () => {
         <Stack direction="row">
           <Tabs
             value={activeTab}
+            variant="scrollable"
+            scrollButtons="auto"
             onChange={handleChange}
-            aria-label="basic tabs example"
+            aria-label="Pages on the document"
+            sx={{}}
           >
             {tabs}
           </Tabs>
@@ -75,7 +75,7 @@ export const EditorView = () => {
       <Box
         sx={{ flex: 1, overflow: 'auto', alignSelf: 'stretch', padding: 16 }}
       >
-        <Editor activeTab={activeTab}/>
+        <Editor activeTab={activeTab} />
       </Box>
     </ViewContainer>
   );

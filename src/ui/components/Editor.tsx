@@ -8,6 +8,7 @@ import Header from '@editorjs/header';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import { clone } from '../../utils/clone';
 import { createReactEditorJS } from 'react-editor-js';
+import { formatPageData } from '../../utils/docs/formatPageData';
 
 interface ComponentProps {
   data: PageData;
@@ -70,7 +71,7 @@ export const Editor = ({ activeTab }) => {
           !_.isEqual(newBlock.data, currentDataBlock.data) ||
           newBlock.type != currentDataBlock.type
         ) {
-          console.log('block not equal');
+          //console.log('block not equal');
           changesNumber++;
           currentDataBlock.data = newBlock.data;
           currentDataBlock.lastEdited = Date.now();
@@ -82,6 +83,7 @@ export const Editor = ({ activeTab }) => {
       }
     }
     if (changesNumber) {
+      formatPageData(currentData);
       pluginContext.setIncomingEditorChanges(true);
       let tempDoc: DocData = clone(pluginContext.currentDocData);
       tempDoc.pages[activeTab] = currentData;

@@ -39,6 +39,7 @@ export function generateFigmaContentFromJSON(
 
 function generatePageFrameFromJSON(data: PageData, frame: FrameNode) {
   let blocks = data.blocks;
+  frame.name = data.title;
   let totalLength =
     frame.children.length > blocks.length
       ? frame.children.length
@@ -91,6 +92,7 @@ function generateBlockInstanceFromJSON(
   }
   if (node) {
     frame.insertChild(indexInFrame, node);
+    node.layoutSizingHorizontal = 'FILL';
     node.setSharedPluginData(
       FIGMA_NAMESPACE,
       lastEditedKey,

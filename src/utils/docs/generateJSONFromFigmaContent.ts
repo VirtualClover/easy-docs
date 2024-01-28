@@ -6,6 +6,8 @@ import {
   PageData,
 } from '../constants';
 
+import { formatPageData } from './formatPageData';
+
 export function generateJSONFromFigmaContent(
   section: SectionNode
 ): DocData | false {
@@ -47,10 +49,11 @@ function generatePageDataFromFrame(
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
-      let editedDate = parseInt(
-        childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
-        10
-      ) || Date.now();
+      let editedDate =
+        parseInt(
+          childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
+          10
+        ) || Date.now();
       if (childNode.type == 'INSTANCE') {
         let mainCompId =
           childNode.mainComponent.parent.type == 'COMPONENT_SET'
@@ -94,5 +97,6 @@ function generatePageDataFromFrame(
     }
   }
 
+  formatPageData(pageData);
   return pageData;
 }
