@@ -9,6 +9,7 @@ import {
 import { createDocFrame } from '../figma/createDocFrame';
 import { generateHeaderInstance } from '../figma/components/generateHeaderInstance';
 import { generateParagraphInstance } from '../figma/components/generateParagraphInstance';
+import { setNodeFills } from '../figma/setNodeFills';
 
 let lastEditedKey = 'lastEdited';
 
@@ -18,15 +19,18 @@ export function generateFigmaContentFromJSON(
 ) {
   let pages = data.pages;
   let docTitle = data.title;
-
+  console.log('Gets at least here c:');
   parentSection.name = docTitle;
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     let frame: FrameNode;
+    console.log(page);
     if (page.frameId && parentSection.findOne((n) => n.id === page.frameId)) {
       frame = figma.getNodeById(page.frameId) as FrameNode;
+      console.log('Found page node');
     } else {
+      console.log('Gets here c:');
       frame = createDocFrame(DEFAULT_SETTINGS.frame, parentSection, page.title);
     }
     generatePageFrameFromJSON(page, frame);
@@ -34,19 +38,18 @@ export function generateFigmaContentFromJSON(
 }
 
 function generatePageFrameFromJSON(data: PageData, frame: FrameNode) {
-  console.log('Gets here');
-
   let blocks = data.blocks;
   let totalLength =
     frame.children.length > blocks.length
       ? frame.children.length
       : blocks.length;
+      
   for (let i = 0; i < totalLength; i++) {
     const block = blocks[i];
-    let indexInFrame = frame.children.length - (i + 1);
+    let indexInFrame = i;
     let figmaNode = frame.children[indexInFrame];
     if (figmaNode) {
-      if (i + 1! > totalLength) {
+      if (i < blocks.length) {
         let nodeLastEdited = figmaNode.getSharedPluginData(
           FIGMA_NAMESPACE,
           lastEditedKey
@@ -58,11 +61,11 @@ function generatePageFrameFromJSON(data: PageData, frame: FrameNode) {
           : 0;
 
         if (nodeLastEdited != block.lastEdited) {
-          //figmaNode.remove();
           generateBlockInstanceFromJSON(block, frame, indexInFrame);
+          figmaNode.remove();
         }
       } else {
-        //figmaNode.remove();
+        figmaNode.remove();
       }
     } else {
       generateBlockInstanceFromJSON(block, frame, indexInFrame);
@@ -87,15 +90,11 @@ function generateBlockInstanceFromJSON(
       break;
   }
   if (node) {
-    if (indexInFrame < 0) {
-      frame.appendChild(node);
-    } else {
-      frame.insertChild(indexInFrame, node);
-    }
+    frame.insertChild(indexInFrame, node);
     node.setSharedPluginData(
       FIGMA_NAMESPACE,
       lastEditedKey,
-      Date.now().toString()
+      block.lastEdited.toString()
     );
   }
 }

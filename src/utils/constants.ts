@@ -11,7 +11,7 @@ export interface PageData extends OutputData {
 
 export interface BlockData extends OutputBlockData {
   figmaNodeId?: string;
-  lastEdited?: number;
+  lastEdited: number;
 }
 
 export const BASE_FILE_DATA = {
@@ -35,6 +35,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
     blocks: [
       {
         type: 'header',
+        lastEdited: Date.now(),
         data: {
           text: 'Frame 1',
           level: 1,
@@ -42,6 +43,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
       },
       {
         type: 'header',
+        lastEdited: Date.now(),
         data: {
           text: 'Subtitle',
           level: 2,
@@ -49,6 +51,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
       },
       {
         type: 'paragraph',
+        lastEdited: Date.now(),
         data: {
           text: 'Click here to start editing!',
         },
@@ -129,3 +132,4 @@ export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 export const FIGMA_COMPONENT_PREFIX = '.[EASY-DOCS]';
 
 export const FIGMA_NAMESPACE = 'EasyDocs';
+export const FIGMA_LAST_EDITED_KEY = 'lastEdited';

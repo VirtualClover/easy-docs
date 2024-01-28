@@ -30,6 +30,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.5",
+    "@supernovaio/sdk": "^2.0.11",
     "dotenv": "^16.3.1",
     "figma-plugin-ds": "^1.0.1",
     "lodash": "^4.17.21",

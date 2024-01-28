@@ -24,7 +24,7 @@ export const Editor = ({ activeTab }) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!pluginContext.incomingFigmaChanges) {
-        handleSaveData();
+        handleSaveEditor().then((data) => pushNewDataToFigma(data));
       } else {
         //console.log('incoming fimga changes');
         //console.log(pluginContext.incomingFigmaChanges);
@@ -45,8 +45,12 @@ export const Editor = ({ activeTab }) => {
     await editorCore.current.render(data);
   }, []);
 
-  const handleSaveData = async () => {
+  const handleSaveEditor = async () => {
     let newData: PageData = await editorCore.current.save(); //Page data
+    return newData;
+  };
+
+  const pushNewDataToFigma = async (newData: PageData) => {
     let currentData: PageData = clone(
       pluginContext.currentDocData.pages[activeTab]
     ); //Data stored in context

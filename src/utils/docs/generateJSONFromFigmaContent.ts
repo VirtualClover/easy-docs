@@ -1,4 +1,10 @@
-import { BaseFileData, DocData, PageData } from '../constants';
+import {
+  BaseFileData,
+  DocData,
+  FIGMA_LAST_EDITED_KEY,
+  FIGMA_NAMESPACE,
+  PageData,
+} from '../constants';
 
 export function generateJSONFromFigmaContent(
   section: SectionNode
@@ -34,12 +40,17 @@ function generatePageDataFromFrame(
   let pageData: PageData = {
     blocks: [],
     title: '',
+    frameId: frame.id,
   };
 
   if (frame.children) {
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
+      let editedDate = parseInt(
+        childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
+        10
+      ) || Date.now();
       if (childNode.type == 'INSTANCE') {
         let mainCompId =
           childNode.mainComponent.parent.type == 'COMPONENT_SET'
@@ -52,6 +63,7 @@ function generatePageDataFromFrame(
                 .value;
             pageData.blocks.push({
               type: 'header',
+              lastEdited: editedDate,
               data: {
                 text: headerContent,
                 level: parseInt(
@@ -69,6 +81,7 @@ function generatePageDataFromFrame(
           case componentData.paragraph.id:
             pageData.blocks.push({
               type: 'paragraph',
+              lastEdited: editedDate,
               data: {
                 text: childNode.componentProperties[
                   componentData.paragraph.contentProp

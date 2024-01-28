@@ -96,7 +96,7 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
-    let data: DocData = msg.data;
+    let data: DocData = msg.data;    
     let section: SectionNode = context.parentSection;
     generateFigmaContentFromJSON(data, section);
     context.stopSendingUpdates = false;
