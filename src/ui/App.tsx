@@ -1,10 +1,10 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
+import { Box, Container, Typography } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants';
 import { darkTheme, lightTheme } from '../styles/base';
 
-import { Container } from '@mui/material';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
 import { PluginDataContext } from '../utils/PluginDataContext';
@@ -95,7 +95,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                   !incomingEditorChanges
                 ) {
                   setIncomingFigmaChanges(true);
-                  setCurrentDocData(data);   
+                  setCurrentDocData(data);
                 }
               }
               break;
@@ -113,6 +113,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         };
       }
     }, 500);
+
     return () => clearInterval(interval);
   }, [currentDocData, navigation]);
 
@@ -144,6 +145,20 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         >
           <PluginTopBar />
           {view}
+          {process.env.NODE_ENV == 'development' && (
+            <Box
+              sx={{
+                borderWidth: '1 0 1 0',
+                p: 8,
+                borderColor: `divider`,
+                borderStyle: 'solid',
+              }}
+            >
+              <Typography variant="caption">
+                🚧⚠ Development Build - V{process.env.npm_package_version}
+              </Typography>
+            </Box>
+          )}
         </Container>
       </ThemeProvider>
     </PluginDataContext.Provider>
