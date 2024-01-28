@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { DEFAULT_PLUGIN_DATA, DocData, PageData } from '../../utils/constants';
+import { DocData, PageData } from '../../utils/constants';
 import React, { useEffect } from 'react';
 
 import { Box } from '@mui/material';
@@ -9,15 +9,12 @@ import { PluginDataContext } from '../../utils/PluginDataContext';
 import { clone } from '../../utils/clone';
 import { createReactEditorJS } from 'react-editor-js';
 import { formatPageData } from '../../utils/docs/formatPageData';
-
-interface ComponentProps {
-  data: PageData;
-  activeTab: number;
-}
+import { reconcilePageData } from '../../utils/docs/reconcileData';
 
 const ReactEditorJS = createReactEditorJS();
 
-export const Editor = ({ activeTab }) => {
+export const Editor = () => {
+
   const editorCore = React.useRef(null);
 
   const pluginContext = React.useContext(PluginDataContext);
@@ -32,17 +29,20 @@ export const Editor = ({ activeTab }) => {
       }
     }, 500);
     return () => {
-      console.log('Cleared!');
+      //console.log('Cleared!');
       clearInterval(interval);
     };
   }, [pluginContext.currentDocData, pluginContext.incomingFigmaChanges]);
 
   const handleInitialize = React.useCallback((instance) => {
+    console.log('Initialized');
+    
     editorCore.current = instance;
     pluginContext.setIncomingFigmaChanges(false);
   }, []);
 
   const handleUpdateData = React.useCallback(async (data) => {
+    console.log('Rendered new data');
     await editorCore.current.render(data);
   }, []);
 
@@ -52,48 +52,19 @@ export const Editor = ({ activeTab }) => {
   };
 
   const pushNewDataToFigma = async (newData: PageData) => {
-    let currentData: PageData = clone(
-      pluginContext.currentDocData.pages[activeTab]
-    ); //Data stored in context
-    currentData.blocks = currentData.blocks.slice(0, newData.blocks.length);
-    let changesNumber = 0;
-    let pageTitle;
-    for (let i = 0; i < newData.blocks.length; i++) {
-      let newBlock = newData.blocks[i];
-      let currentDataBlock = currentData.blocks[i];
-      if (currentDataBlock) {
-        if (!pageTitle && currentDataBlock.type == 'header') {
-          pageTitle = currentDataBlock.data.text;
-          currentData.title = pageTitle;
-        }
-
-        if (
-          !_.isEqual(newBlock.data, currentDataBlock.data) ||
-          newBlock.type != currentDataBlock.type
-        ) {
-          //console.log('block not equal');
-          changesNumber++;
-          currentDataBlock.data = newBlock.data;
-          currentDataBlock.lastEdited = Date.now();
-          currentDataBlock.type = newBlock.type;
-        }
-      } else {
-        currentData.blocks[i] = newBlock;
-        changesNumber++;
-      }
-    }
-    if (changesNumber) {
-      formatPageData(currentData);
+    let reconciliation = reconcilePageData(newData, pluginContext.currentDocData.pages[pluginContext.activeTab]);
+    if (reconciliation.changesNumber) {
+      formatPageData(reconciliation.data);
       pluginContext.setIncomingEditorChanges(true);
       let tempDoc: DocData = clone(pluginContext.currentDocData);
-      tempDoc.pages[activeTab] = currentData;
+      tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
       pluginContext.setCurrentDocData(tempDoc);
       parent.postMessage(
         {
           pluginMessage: {
             type: 'update-selected-doc',
             data: tempDoc,
-            editedFrame: activeTab,
+            editedFrame: pluginContext.activeTab,
           },
         },
         '*'
@@ -104,7 +75,7 @@ export const Editor = ({ activeTab }) => {
 
   React.useEffect(() => {
     if (pluginContext.incomingFigmaChanges) {
-      handleUpdateData(pluginContext.currentDocData.pages[activeTab]).then(
+      handleUpdateData(pluginContext.currentDocData.pages[pluginContext.activeTab]).then(
         () => {
           pluginContext.setIncomingFigmaChanges(false);
         }
@@ -121,7 +92,7 @@ export const Editor = ({ activeTab }) => {
       })}
     >
       <ReactEditorJS
-        defaultValue={pluginContext.currentDocData.pages[activeTab]}
+        defaultValue={pluginContext.currentDocData.pages[pluginContext.activeTab]}
         tools={{
           header: {
             class: Header,

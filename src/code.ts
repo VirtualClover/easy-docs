@@ -3,14 +3,9 @@
 
 import {
   DEFAULT_DOC_DATA,
-  DEFAULT_SETTINGS,
   DocData,
-  FrameSettings,
-  PageData,
-  SectionSettings,
 } from './utils/constants';
 
-import { createDocFrame } from './utils/figma/createDocFrame';
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
 import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
@@ -90,7 +85,7 @@ figma.ui.onmessage = (msg) => {
         figma.ui.postMessage({ type: 'no-node' });
         context.parentSection = null;
       }
-      console.log('inspect done');
+      //console.log('inspect done');
     }
   }
 

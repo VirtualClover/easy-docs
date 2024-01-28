@@ -19,18 +19,16 @@ export function generateFigmaContentFromJSON(
 ) {
   let pages = data.pages;
   let docTitle = data.title;
-  console.log('Gets at least here c:');
+  //console.log('Gets at least here c:');
   parentSection.name = docTitle;
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     let frame: FrameNode;
-    console.log(page);
+    //console.log(page);
     if (page.frameId && parentSection.findOne((n) => n.id === page.frameId)) {
       frame = figma.getNodeById(page.frameId) as FrameNode;
-      console.log('Found page node');
     } else {
-      console.log('Gets here c:');
       frame = createDocFrame(DEFAULT_SETTINGS.frame, parentSection, page.title);
     }
     generatePageFrameFromJSON(page, frame);

@@ -71,6 +71,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
     initialPluginData.incomingEditorChanges
   );
 
+  const [activeTab, setActiveTab] = React.useState(initialPluginData.activeTab);
+
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
   }, [navigation.currentView]);
@@ -132,6 +134,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         setIncomingFigmaChanges,
         incomingEditorChanges,
         setIncomingEditorChanges,
+        activeTab,
+        setActiveTab,
       }}
     >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>

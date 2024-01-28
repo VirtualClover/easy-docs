@@ -37,7 +37,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
         type: 'header',
         lastEdited: Date.now(),
         data: {
-          text: 'Frame 1',
+          text: 'Page 1',
           level: 1,
         },
       },
@@ -126,6 +126,8 @@ export const DEFAULT_PLUGIN_DATA = {
   setIncomingFigmaChanges: (state: boolean) => {},
   incomingEditorChanges: false,
   setIncomingEditorChanges: (state: boolean) => {},
+  activeTab: 0 as number,
+  setActiveTab: (state: number) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

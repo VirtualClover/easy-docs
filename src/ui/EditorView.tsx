@@ -5,7 +5,6 @@ import { AppBar, Divider, IconButton, Stack, Toolbar } from '@mui/material';
 
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
-import { DocData } from '../utils/constants';
 import { Editor } from './components/Editor';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
@@ -20,12 +19,11 @@ function a11yProps(index: number) {
 }
 
 export const EditorView = () => {
-  const [activeTab, setActiveTab] = React.useState(0);
   const [tabs, setTabs] = React.useState([]);
   const pluginContext = React.useContext(PluginDataContext);
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
-    setActiveTab(newActiveTab);
+    pluginContext.setActiveTab(newActiveTab);
   };
 
   React.useEffect(() => {
@@ -40,6 +38,7 @@ export const EditorView = () => {
             textOverflow: 'ellipsis',
             display: 'block',
             flexDirection: 'row',
+            flex: 1,
           }}
           label={pluginContext.currentDocData.pages[i].title}
           {...a11yProps(i)}
@@ -54,7 +53,7 @@ export const EditorView = () => {
       <AppBar elevation={0} color="inherit" sx={{ marginTop: 49 }}>
         <Stack direction="row">
           <Tabs
-            value={activeTab}
+            value={pluginContext.activeTab}
             variant="scrollable"
             scrollButtons="auto"
             onChange={handleChange}
@@ -75,7 +74,7 @@ export const EditorView = () => {
       <Box
         sx={{ flex: 1, overflow: 'auto', alignSelf: 'stretch', padding: 16 }}
       >
-        <Editor activeTab={activeTab} />
+        <Editor />
       </Box>
     </ViewContainer>
   );
