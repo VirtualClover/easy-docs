@@ -26,6 +26,8 @@ export function reconcileDocData(newData: DocData, currentData: DocData) {
       changesNumber++;
     }
   }
+
+  return { changesNumber, data: clonedCurrentData };
 }
 
 export function reconcilePageData(newData: PageData, currentData: PageData) {
