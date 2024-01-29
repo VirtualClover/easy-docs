@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { DocData, PageData } from '../constants';
 
 import { clone } from '../clone';
+import { formatPageData } from './formatPageData';
 
 export function reconcileDocData(
   newData: DocData,
@@ -81,6 +82,6 @@ export function reconcilePageData(
     useCurrentDataFrameId && clonedCurrentData.frameId
       ? currentData.frameId
       : newData.frameId;
-
+formatPageData(clonedCurrentData);
   return { changesNumber, data: clonedCurrentData };
 }

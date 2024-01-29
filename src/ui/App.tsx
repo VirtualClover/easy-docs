@@ -87,8 +87,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
             case 'new-node-data':
               let data: DocData = event.data.pluginMessage.data;
               if (data && !incomingEditorChanges) {
-                setIncomingFigmaChanges(true);
                 setCurrentDocData(data);
+                setIncomingFigmaChanges(true);
                 if (navigation.currentView == 'INSPECT') {
                   setNavigation({
                     currentView: 'EDITOR',

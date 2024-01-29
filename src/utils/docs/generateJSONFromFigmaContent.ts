@@ -98,5 +98,6 @@ function generatePageDataFromFrame(
   }
 
   formatPageData(pageData);
+  frame.name = pageData.title;
   return pageData;
 }

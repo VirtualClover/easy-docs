@@ -48,7 +48,6 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'create-new-doc') {
     let section = createNewDoc(DEFAULT_DOC_DATA);
     context.lastFetchDoc = generateJSONFromFigmaContent(section);
-    console.log(context.lastFetchDoc);
     figma.ui.postMessage({
       type: 'new-node-data',
       data: context.lastFetchDoc,

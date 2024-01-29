@@ -43,14 +43,14 @@ export const Editor = () => {
   }, [pluginContext.currentDocData, pluginContext.incomingFigmaChanges]);
 
   const handleInitialize = React.useCallback((instance) => {
-    console.log('Initialized');
-    console.log(pluginContext.currentDocData);
+    //console.log('Initialized');
+    //console.log(pluginContext.currentDocData);
     editorCore.current = instance;
     pluginContext.setIncomingFigmaChanges(false);
   }, []);
 
   const handleUpdateData = React.useCallback(async (data) => {
-    console.log('Rendered new data');
+    //console.log('Rendered new data');
     await editorCore.current.render(data);
   }, []);
 
@@ -68,7 +68,8 @@ export const Editor = () => {
       formatPageData(reconciliation.data);
       pluginContext.setIncomingEditorChanges(true);
       let tempDoc: DocData = clone(pluginContext.currentDocData);
-      tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
+      formatPageData(reconciliation.data);
+      tempDoc.pages[pluginContext.activeTab] =  reconciliation.data;
       pluginContext.setCurrentDocData(tempDoc);
       parent.postMessage(
         {
