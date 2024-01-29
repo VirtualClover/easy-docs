@@ -11,6 +11,7 @@ import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { Settings } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
+import { reconcilePageData } from '../utils/docs/reconcileData';
 
 interface ComponentProps {
   themeMode: string;

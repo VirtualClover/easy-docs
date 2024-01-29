@@ -10,6 +10,7 @@ import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
 import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
 import { pluginInit } from './utils/figma/pluginInit';
+import { reconcilePageData } from './utils/docs/reconcileData';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -22,6 +23,7 @@ let context = {
   parentSection: null,
   stopSendingUpdates: false,
   stopIncomingUpdates: false,
+  lastFetchDoc: DEFAULT_DOC_DATA,
 };
 
 // Calls to "parent.postMessage" from within the HTML page will trigger this
@@ -47,6 +49,7 @@ figma.ui.onmessage = (msg) => {
     createNewDoc(DEFAULT_DOC_DATA);
   }
 
+  //Push updates to figma
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
       let selection = figma.currentPage.selection[0];
@@ -75,6 +78,9 @@ figma.ui.onmessage = (msg) => {
         }
 
         if (parentSection) {
+
+          let generatedDoc = generateJSONFromFigmaContent(parentSection);
+
           figma.ui.postMessage({
             type: 'node-data',
             data: generateJSONFromFigmaContent(parentSection),
@@ -89,6 +95,8 @@ figma.ui.onmessage = (msg) => {
     }
   }
 
+
+  //Get updates from editor
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;    

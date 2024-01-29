@@ -27,7 +27,7 @@ export const Editor = () => {
         //console.log('incoming fimga changes');
         //console.log(pluginContext.incomingFigmaChanges);
       }
-    }, 500);
+    }, 100);
     return () => {
       //console.log('Cleared!');
       clearInterval(interval);
