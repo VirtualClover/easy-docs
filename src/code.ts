@@ -74,6 +74,12 @@ figma.ui.onmessage = (msg) => {
     context.lastFetchDoc = data;
     if (section && section.type === 'SECTION') {
       generateFigmaContentFromJSON(data, section);
+      let selectedFrame = figma.getNodeById(msg.editedFrame);
+      if (selectedFrame && selectedFrame.type === 'FRAME') {
+        figma.currentPage.selection = [selectedFrame];
+      } else {
+        figma.currentPage.selection = [section];
+      }
     }
     context.stopSendingUpdates = false;
   }

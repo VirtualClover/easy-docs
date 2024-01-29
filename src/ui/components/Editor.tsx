@@ -44,7 +44,7 @@ export const Editor = () => {
 
   const handleInitialize = React.useCallback((instance) => {
     console.log('Initialized');
-
+    console.log(pluginContext.currentDocData);
     editorCore.current = instance;
     pluginContext.setIncomingFigmaChanges(false);
   }, []);
@@ -75,7 +75,7 @@ export const Editor = () => {
           pluginMessage: {
             type: 'update-selected-doc',
             data: tempDoc,
-            editedFrame: pluginContext.activeTab,
+            editedFrame: reconciliation.data.frameId,
           },
         },
         '*'
