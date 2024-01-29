@@ -20,7 +20,7 @@ import { pluginInit } from './utils/figma/pluginInit';
 figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 
 let context = {
-  parentSection: null,
+  //parentSection: null,
   stopSendingUpdates: false,
   stopIncomingUpdates: false,
   lastFetchDoc: EMPTY_DOC_OBJECT, // Latest data pulled from editor
@@ -46,10 +46,11 @@ figma.ui.onmessage = (msg) => {
   }
 
   if (msg.type === 'create-new-doc') {
-    context.parentSection = createNewDoc(DEFAULT_DOC_DATA);
-    context.lastFetchDoc = generateJSONFromFigmaContent(context.parentSection);
+    let section = createNewDoc(DEFAULT_DOC_DATA);
+    context.lastFetchDoc = generateJSONFromFigmaContent(section);
+    console.log(context.lastFetchDoc);
     figma.ui.postMessage({
-      type: 'node-data',
+      type: 'new-node-data',
       data: context.lastFetchDoc,
     });
   }
@@ -57,54 +58,9 @@ figma.ui.onmessage = (msg) => {
   //Push updates from figma
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
-      let selection = figma.currentPage.selection[0];
-      let parentSection: SectionNode;
-      if (selection) {
-        switch (selection.type) {
-          case 'SECTION':
-            parentSection = selection;
-            break;
-          case 'FRAME':
-            if (selection.parent.type == 'SECTION') {
-              parentSection = selection.parent;
-            }
-            break;
-          case 'INSTANCE':
-            if (selection.parent.type == 'FRAME') {
-              if (selection.parent.parent.type == 'SECTION') {
-                parentSection = selection.parent.parent;
-              }
-            }
-            break;
-          default:
-            figma.ui.postMessage({ type: 'no-node' });
-            context.parentSection = null;
-            break;
-        }
-
-        if (parentSection) {
-          let generatedDoc = generateJSONFromFigmaContent(parentSection);
-          if (generatedDoc.pages) {
-            let reconciliation = reconcileDocData(
-              generatedDoc,
-              context.lastFetchDoc
-            );
-
-            if (reconciliation.changesNumber) {
-              context.lastFetchDoc = reconciliation.data
-              figma.ui.postMessage({
-                type: 'node-data',
-                data: context.lastFetchDoc
-              });
-              context.parentSection = parentSection;
-
-            }
-          }
-        }
-      } else {
-        figma.ui.postMessage({ type: 'no-node' });
-        context.parentSection = null;
-      }
+      pushFigmaUpdates().then((res) =>
+        figma.ui.postMessage({ type: res.type, data: res.data })
+      );
       //console.log('inspect done');
     }
   }
@@ -113,9 +69,12 @@ figma.ui.onmessage = (msg) => {
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;
-    let section: SectionNode = context.parentSection;
+    console.log(data);
+    let section: BaseNode = data.sectionId && figma.getNodeById(data.sectionId);
     context.lastFetchDoc = data;
-    generateFigmaContentFromJSON(data, section);
+    if (section && section.type === 'SECTION') {
+      generateFigmaContentFromJSON(data, section);
+    }
     context.stopSendingUpdates = false;
   }
 
@@ -143,3 +102,48 @@ figma.ui.onmessage = (msg) => {
   
   */
 };
+
+export async function pushFigmaUpdates() {
+  let selection = figma.currentPage.selection[0];
+  let parentSection: SectionNode;
+  if (selection) {
+    switch (selection.type) {
+      case 'SECTION':
+        parentSection = selection;
+        break;
+      case 'FRAME':
+        if (selection.parent.type == 'SECTION') {
+          parentSection = selection.parent;
+        }
+        break;
+      case 'INSTANCE':
+        if (selection.parent.type == 'FRAME') {
+          if (selection.parent.parent.type == 'SECTION') {
+            parentSection = selection.parent.parent;
+          }
+        }
+        break;
+      default:
+        return { type: 'no-node', data: '' };
+        break;
+    }
+
+    if (parentSection) {
+      let generatedDoc = generateJSONFromFigmaContent(parentSection);
+      if (generatedDoc.pages) {
+        let reconciliation = reconcileDocData(
+          generatedDoc,
+          context.lastFetchDoc
+        );
+
+        if (reconciliation.changesNumber) {
+          context.lastFetchDoc = reconciliation.data;
+          return { type: 'new-node-data', data: context.lastFetchDoc };
+        } else {
+          return { type: 'same-node-data', data: '' };
+        }
+      }
+    }
+  }
+  return { type: 'no-node', data: '' };
+}

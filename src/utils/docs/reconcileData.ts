@@ -4,7 +4,12 @@ import { DocData, PageData } from '../constants';
 
 import { clone } from '../clone';
 
-export function reconcileDocData(newData: DocData, currentData: DocData, useCurrentDataFramesId: boolean = false) {
+export function reconcileDocData(
+  newData: DocData,
+  currentData: DocData,
+  useCurrentDataFramesId: boolean = false,
+  useCurrentDataSectionId: boolean = false
+) {
   let clonedCurrentData: DocData = clone(currentData); //Data stored in context
   clonedCurrentData.pages = clonedCurrentData.pages.slice(
     0,
@@ -16,7 +21,11 @@ export function reconcileDocData(newData: DocData, currentData: DocData, useCurr
     let newPage = newData.pages[i];
     let currentDataPage = clonedCurrentData.pages[i];
     if (currentDataPage) {
-      let pageRecon = reconcilePageData(newPage, currentDataPage, useCurrentDataFramesId);
+      let pageRecon = reconcilePageData(
+        newPage,
+        currentDataPage,
+        useCurrentDataFramesId
+      );
       if (pageRecon.changesNumber) {
         changesNumber += pageRecon.changesNumber;
         currentDataPage = pageRecon.data;
@@ -25,12 +34,21 @@ export function reconcileDocData(newData: DocData, currentData: DocData, useCurr
       currentDataPage = newPage;
       changesNumber++;
     }
+    clonedCurrentData.pages[i] = currentDataPage;
+    clonedCurrentData.sectionId =
+      useCurrentDataSectionId && clonedCurrentData.sectionId
+        ? currentData.sectionId
+        : newData.sectionId;
   }
 
   return { changesNumber, data: clonedCurrentData };
 }
 
-export function reconcilePageData(newData: PageData, currentData: PageData, useCurrentDataFrameId: boolean = false) {
+export function reconcilePageData(
+  newData: PageData,
+  currentData: PageData,
+  useCurrentDataFrameId: boolean = false
+) {
   let clonedCurrentData: PageData = clone(currentData); //Data stored in context
   clonedCurrentData.blocks = clonedCurrentData.blocks.slice(
     0,
@@ -59,7 +77,10 @@ export function reconcilePageData(newData: PageData, currentData: PageData, useC
       changesNumber++;
     }
   }
-  clonedCurrentData.frameId = useCurrentDataFrameId && clonedCurrentData.frameId ? currentData.frameId : newData.frameId;
+  clonedCurrentData.frameId =
+    useCurrentDataFrameId && clonedCurrentData.frameId
+      ? currentData.frameId
+      : newData.frameId;
 
   return { changesNumber, data: clonedCurrentData };
 }

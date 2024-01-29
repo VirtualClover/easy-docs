@@ -84,21 +84,29 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           switch (event.data.pluginMessage.type) {
-            case 'node-data':
+            case 'new-node-data':
               let data: DocData = event.data.pluginMessage.data;
-              if (data) {
+              if (data && !incomingEditorChanges) {
+                setIncomingFigmaChanges(true);
+                setCurrentDocData(data);
                 if (navigation.currentView == 'INSPECT') {
                   setNavigation({
                     currentView: 'EDITOR',
                     prevView: navigation.currentView,
                   });
                 }
-                if (!incomingEditorChanges) {
-                  setIncomingFigmaChanges(true);
-                  setCurrentDocData(data);
-                }
               }
               break;
+
+            case 'same-node-data':
+              if (navigation.currentView == 'INSPECT') {
+                setNavigation({
+                  currentView: 'EDITOR',
+                  prevView: navigation.currentView,
+                });
+              }
+              break;
+
             case 'no-node':
               if (navigation.currentView == 'EDITOR') {
                 setNavigation({

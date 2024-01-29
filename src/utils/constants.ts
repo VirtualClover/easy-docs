@@ -63,6 +63,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
 export const DEFAULT_DOC_DATA = {
   title: 'New document',
   pages: DEFAULT_DOC_PAGES,
+  sectionId: ''
 };
 
 export type DocData = typeof DEFAULT_DOC_DATA;
@@ -70,6 +71,7 @@ export type DocData = typeof DEFAULT_DOC_DATA;
 export const EMPTY_DOC_OBJECT: DocData = {
   title: '',
   pages: [],
+  sectionId:''
 };
 
 const settingsPalette = {

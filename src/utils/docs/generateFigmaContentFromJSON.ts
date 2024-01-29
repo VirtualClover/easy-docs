@@ -15,7 +15,7 @@ let lastEditedKey = 'lastEdited';
 
 export function generateFigmaContentFromJSON(
   data: DocData,
-  parentSection?: SectionNode
+  parentSection: SectionNode
 ) {
   let pages = data.pages;
   let docTitle = data.title;
