@@ -19,4 +19,5 @@ export function createNewDoc(
   parentSection.name = DEFAULT_DOC_DATA.title;
   setNodeFills(parentSection, sectionSettings.backgroundColor);
   generateFigmaContentFromJSON(data, parentSection);
+  return parentSection;
 }

@@ -93,10 +93,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                     prevView: navigation.currentView,
                   });
                 }
-                if (
-                  !_.isEqual(currentDocData, data) &&
-                  !incomingEditorChanges
-                ) {
+                if (!incomingEditorChanges) {
                   setIncomingFigmaChanges(true);
                   setCurrentDocData(data);
                 }

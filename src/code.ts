@@ -1,16 +1,16 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
+import { DEFAULT_DOC_DATA, DocData, EMPTY_DOC_OBJECT } from './utils/constants';
 import {
-  DEFAULT_DOC_DATA,
-  DocData,
-} from './utils/constants';
+  reconcileDocData,
+  reconcilePageData,
+} from './utils/docs/reconcileData';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
 import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
 import { pluginInit } from './utils/figma/pluginInit';
-import { reconcilePageData } from './utils/docs/reconcileData';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -23,7 +23,7 @@ let context = {
   parentSection: null,
   stopSendingUpdates: false,
   stopIncomingUpdates: false,
-  lastFetchDoc: DEFAULT_DOC_DATA,
+  lastFetchDoc: EMPTY_DOC_OBJECT, // Latest data pulled from editor
 };
 
 // Calls to "parent.postMessage" from within the HTML page will trigger this
@@ -46,10 +46,15 @@ figma.ui.onmessage = (msg) => {
   }
 
   if (msg.type === 'create-new-doc') {
-    createNewDoc(DEFAULT_DOC_DATA);
+    context.parentSection = createNewDoc(DEFAULT_DOC_DATA);
+    context.lastFetchDoc = generateJSONFromFigmaContent(context.parentSection);
+    figma.ui.postMessage({
+      type: 'node-data',
+      data: context.lastFetchDoc,
+    });
   }
 
-  //Push updates to figma
+  //Push updates from figma
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
       let selection = figma.currentPage.selection[0];
@@ -78,14 +83,23 @@ figma.ui.onmessage = (msg) => {
         }
 
         if (parentSection) {
-
           let generatedDoc = generateJSONFromFigmaContent(parentSection);
+          if (generatedDoc.pages) {
+            let reconciliation = reconcileDocData(
+              generatedDoc,
+              context.lastFetchDoc
+            );
 
-          figma.ui.postMessage({
-            type: 'node-data',
-            data: generateJSONFromFigmaContent(parentSection),
-          });
-          context.parentSection = parentSection;
+            if (reconciliation.changesNumber) {
+              context.lastFetchDoc = reconciliation.data
+              figma.ui.postMessage({
+                type: 'node-data',
+                data: context.lastFetchDoc
+              });
+              context.parentSection = parentSection;
+
+            }
+          }
         }
       } else {
         figma.ui.postMessage({ type: 'no-node' });
@@ -95,12 +109,12 @@ figma.ui.onmessage = (msg) => {
     }
   }
 
-
   //Get updates from editor
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
-    let data: DocData = msg.data;    
+    let data: DocData = msg.data;
     let section: SectionNode = context.parentSection;
+    context.lastFetchDoc = data;
     generateFigmaContentFromJSON(data, section);
     context.stopSendingUpdates = false;
   }

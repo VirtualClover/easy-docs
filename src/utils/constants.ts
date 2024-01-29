@@ -64,7 +64,13 @@ export const DEFAULT_DOC_DATA = {
   title: 'New document',
   pages: DEFAULT_DOC_PAGES,
 };
+
 export type DocData = typeof DEFAULT_DOC_DATA;
+
+export const EMPTY_DOC_OBJECT: DocData = {
+  title: '',
+  pages: [],
+};
 
 const settingsPalette = {
   heading: '#000000',

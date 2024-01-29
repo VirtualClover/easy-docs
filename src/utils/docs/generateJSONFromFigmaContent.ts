@@ -1,6 +1,7 @@
 import {
   BaseFileData,
   DocData,
+  EMPTY_DOC_OBJECT,
   FIGMA_LAST_EDITED_KEY,
   FIGMA_NAMESPACE,
   PageData,
@@ -10,7 +11,7 @@ import { formatPageData } from './formatPageData';
 
 export function generateJSONFromFigmaContent(
   section: SectionNode
-): DocData | false {
+): DocData {
   let JSONData: DocData = {
     title: section.name,
     pages: [],
@@ -32,7 +33,7 @@ export function generateJSONFromFigmaContent(
     return JSONData;
   }
 
-  return false;
+  return EMPTY_DOC_OBJECT;
 }
 
 function generatePageDataFromFrame(

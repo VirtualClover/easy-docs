@@ -9,8 +9,6 @@ import Typography from '@mui/material/Typography';
 import { navigate } from '../utils/navigate';
 
 export const InspectView = () => {
-  let pluginContext = React.useContext(PluginDataContext);
-
   return (
     <>
       <Stack
@@ -33,7 +31,6 @@ export const InspectView = () => {
               { pluginMessage: { type: 'create-new-doc' } },
               '*'
             );
-            navigate('EDITOR', pluginContext);
           }}
         >
           Create new docs

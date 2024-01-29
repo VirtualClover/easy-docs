@@ -14,7 +14,6 @@ import { reconcilePageData } from '../../utils/docs/reconcileData';
 const ReactEditorJS = createReactEditorJS();
 
 export const Editor = () => {
-
   const editorCore = React.useRef(null);
 
   const pluginContext = React.useContext(PluginDataContext);
@@ -22,12 +21,21 @@ export const Editor = () => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!pluginContext.incomingFigmaChanges) {
-        handleSaveEditor().then((data) => pushNewDataToFigma(data));
+        handleSaveEditor().then((data) => {
+          let reconciliation = reconcilePageData(
+            data,
+            pluginContext.currentDocData.pages[pluginContext.activeTab],
+            true
+          );
+          if (reconciliation.changesNumber) {
+            pushNewDataToFigma(reconciliation.data);
+          }
+        });
       } else {
         //console.log('incoming fimga changes');
         //console.log(pluginContext.incomingFigmaChanges);
       }
-    }, 100);
+    }, 400);
     return () => {
       //console.log('Cleared!');
       clearInterval(interval);
@@ -36,7 +44,7 @@ export const Editor = () => {
 
   const handleInitialize = React.useCallback((instance) => {
     console.log('Initialized');
-    
+
     editorCore.current = instance;
     pluginContext.setIncomingFigmaChanges(false);
   }, []);
@@ -52,7 +60,10 @@ export const Editor = () => {
   };
 
   const pushNewDataToFigma = async (newData: PageData) => {
-    let reconciliation = reconcilePageData(newData, pluginContext.currentDocData.pages[pluginContext.activeTab]);
+    let reconciliation = reconcilePageData(
+      newData,
+      pluginContext.currentDocData.pages[pluginContext.activeTab]
+    );
     if (reconciliation.changesNumber) {
       formatPageData(reconciliation.data);
       pluginContext.setIncomingEditorChanges(true);
@@ -75,13 +86,13 @@ export const Editor = () => {
 
   React.useEffect(() => {
     if (pluginContext.incomingFigmaChanges) {
-      handleUpdateData(pluginContext.currentDocData.pages[pluginContext.activeTab]).then(
-        () => {
-          pluginContext.setIncomingFigmaChanges(false);
-        }
-      );
+      handleUpdateData(
+        pluginContext.currentDocData.pages[pluginContext.activeTab]
+      ).then(() => {
+        pluginContext.setIncomingFigmaChanges(false);
+      });
     }
-  }, [pluginContext.currentDocData]);
+  }, [pluginContext.incomingFigmaChanges]);
 
   return (
     <Box
@@ -92,7 +103,9 @@ export const Editor = () => {
       })}
     >
       <ReactEditorJS
-        defaultValue={pluginContext.currentDocData.pages[pluginContext.activeTab]}
+        defaultValue={
+          pluginContext.currentDocData.pages[pluginContext.activeTab]
+        }
         tools={{
           header: {
             class: Header,
