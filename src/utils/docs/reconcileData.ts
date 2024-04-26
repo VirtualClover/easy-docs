@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 
 import { DocData, PageData } from '../constants';
 
+import { cleanseTextData } from '../cleanseTextData';
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';
 
@@ -68,7 +69,7 @@ export function reconcilePageData(
       ) {
         //console.log('block not equal');
         changesNumber++;
-        currentDataBlock.data = newBlock.data;
+        currentDataBlock.data = cleanseTextData(newBlock.data);
         currentDataBlock.lastEdited = Date.now();
         currentDataBlock.type = newBlock.type;
         currentDataBlock.figmaNodeId = currentDataBlock.figmaNodeId
