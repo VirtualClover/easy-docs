@@ -6,7 +6,7 @@
   "author": "Memo Lopez <memo@virtualclover.ltd>",
   "scripts": {
     "build": "npx webpack --mode=production",
-    "develop": "npx webpack --mode=development --watch"
+    "dev": "npx webpack --mode=development --watch"
   },
   "license": "MIT",
   "devDependencies": {

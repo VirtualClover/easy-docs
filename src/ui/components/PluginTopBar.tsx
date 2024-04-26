@@ -38,7 +38,7 @@ const EditorBar = ({ pluginContext }: BarProps) => (
     {
       <Stack direction={'row'} gap={8}>
         <Button variant="outlined" size="small">
-          Copy as MD
+          Export
         </Button>
         <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
           <SettingsOutlined />

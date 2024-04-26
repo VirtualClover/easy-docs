@@ -11,7 +11,6 @@ import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { Settings } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
-import { reconcilePageData } from '../utils/docs/reconcileData';
 
 interface ComponentProps {
   themeMode: string;
@@ -31,23 +30,6 @@ function decideView(currentView: PluginViews) {
       break;
     default:
       return <InspectView />;
-      break;
-  }
-}
-
-function decideHeader(currentView: PluginViews, docTitle: string) {
-  switch (currentView) {
-    case 'INSPECT':
-      return 'Inspect';
-      break;
-    case 'EDITOR':
-      return docTitle;
-      break;
-    case 'SETTINGS':
-      return 'Settings';
-      break;
-    default:
-      return 'Inspect';
       break;
   }
 }
@@ -86,7 +68,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           switch (event.data.pluginMessage.type) {
             case 'new-node-data':
               let data: DocData = event.data.pluginMessage.data;
-              if (data && !incomingEditorChanges) {
+              if (data) {
                 setCurrentDocData(data);
                 setIncomingFigmaChanges(true);
                 if (navigation.currentView == 'INSPECT') {
@@ -115,6 +97,11 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 });
               }
               break;
+
+            case 'finished-figma-update':
+              setIncomingEditorChanges(false);
+              break;
+
             default:
               break;
           }

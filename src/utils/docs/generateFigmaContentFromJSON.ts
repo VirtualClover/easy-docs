@@ -1,21 +1,22 @@
 import {
   BlockData,
-  DEFAULT_SETTINGS,
   DocData,
   FIGMA_NAMESPACE,
   PageData,
+  PluginSettings,
 } from '../constants';
 
 import { createDocFrame } from '../figma/createDocFrame';
 import { generateHeaderInstance } from '../figma/components/generateHeaderInstance';
 import { generateParagraphInstance } from '../figma/components/generateParagraphInstance';
-import { setNodeFills } from '../figma/setNodeFills';
+import { resizeSection } from '../figma/resizeSection';
 
 let lastEditedKey = 'lastEdited';
 
 export function generateFigmaContentFromJSON(
   data: DocData,
-  parentSection: SectionNode
+  parentSection: SectionNode,
+  settings: PluginSettings
 ) {
   let pages = data.pages;
   let docTitle = data.title;
@@ -29,20 +30,21 @@ export function generateFigmaContentFromJSON(
     if (page.frameId && parentSection.findOne((n) => n.id === page.frameId)) {
       frame = figma.getNodeById(page.frameId) as FrameNode;
     } else {
-      frame = createDocFrame(DEFAULT_SETTINGS.frame, parentSection, page.title);
+      frame = createDocFrame(parentSection, page.title, settings);
     }
-    generatePageFrameFromJSON(page, frame);
+    generateFrameDataFromJSON(page, frame);
+    resizeSection(parentSection);
   }
 }
 
-function generatePageFrameFromJSON(data: PageData, frame: FrameNode) {
+function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
   let blocks = data.blocks;
   frame.name = data.title;
   let totalLength =
     frame.children.length > blocks.length
       ? frame.children.length
       : blocks.length;
-      
+
   for (let i = 0; i < totalLength; i++) {
     const block = blocks[i];
     let indexInFrame = i;

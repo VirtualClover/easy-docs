@@ -42,6 +42,8 @@ export function reconcileDocData(
         : newData.sectionId;
   }
 
+  clonedCurrentData.title = newData.title ?? clonedCurrentData.title;
+
   return { changesNumber, data: clonedCurrentData };
 }
 
@@ -82,6 +84,6 @@ export function reconcilePageData(
     useCurrentDataFrameId && clonedCurrentData.frameId
       ? currentData.frameId
       : newData.frameId;
-formatPageData(clonedCurrentData);
+  formatPageData(clonedCurrentData);
   return { changesNumber, data: clonedCurrentData };
 }

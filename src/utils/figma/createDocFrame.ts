@@ -1,7 +1,12 @@
-import { DEFAULT_SETTINGS, FrameSettings, PageData } from '../constants';
+import {
+  DEFAULT_SETTINGS,
+  FrameSettings,
+  PageData,
+  PluginSettings,
+  SectionSettings,
+} from '../constants';
 
-import { NodeWithChildren } from './ExtendedNodeTypings';
-import { nodeSupportsChildren } from './nodeSupportsChildren';
+import { resizeSection } from './resizeSection';
 
 /**
  * Creates a doc frame
@@ -11,17 +16,17 @@ import { nodeSupportsChildren } from './nodeSupportsChildren';
  * @param logo
  */
 export function createDocFrame(
-  frameSettings: FrameSettings = DEFAULT_SETTINGS.frame,
   parent: SectionNode,
-  name: string
+  name: string,
+  settings: PluginSettings
 ) {
   //Create Frame
   const frame: FrameNode = figma.createFrame();
   frame.layoutMode = 'VERTICAL';
-  frame.horizontalPadding = frameSettings.padding;
+  frame.horizontalPadding = settings.frame.padding;
   frame.minWidth = DEFAULT_SETTINGS.frame.minWidth;
   frame.minHeight = DEFAULT_SETTINGS.frame.minHeight;
-  frame.verticalPadding = frameSettings.padding;
+  frame.verticalPadding = settings.frame.padding;
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';
   frame.name = name;
@@ -31,13 +36,14 @@ export function createDocFrame(
     mainHeader.layoutSizingHorizontal = 'FILL';
   });*/
   //Append frame to parent
+  if (parent.children.length) {
+    let lastChild = parent.children[parent.children.length - 1];
+    frame.x = lastChild.x + lastChild.width + parent.width;
+  } else {
+    frame.x = parent.x + settings.section.padding;
+  }
+  frame.y = parent.y + settings.section.padding;
   parent.appendChild(frame);
-  frame.x = 16;
-  frame.y = 16;
-  parent.resizeWithoutConstraints(
-    parent.width + (frame.width - parent.width) + 32,
-    parent.height > frame.height + 32 ? parent.height : frame.height + 32
-  );
   figma.currentPage.selection = [frame];
   //figma.viewport.scrollAndZoomIntoView([frame]);
   return frame;

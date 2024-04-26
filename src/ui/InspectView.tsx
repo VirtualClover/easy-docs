@@ -1,12 +1,8 @@
-import * as React from 'react';
 import * as _ from 'lodash';
 
 import { Button } from '@mui/material';
-import { DocData } from '../utils/constants';
-import { PluginDataContext } from '../utils/PluginDataContext';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { navigate } from '../utils/navigate';
 
 export const InspectView = () => {
   return (

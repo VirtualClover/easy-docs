@@ -63,7 +63,7 @@ const DEFAULT_DOC_PAGES: PageData[] = [
 export const DEFAULT_DOC_DATA = {
   title: 'New document',
   pages: DEFAULT_DOC_PAGES,
-  sectionId: ''
+  sectionId: '',
 };
 
 export type DocData = typeof DEFAULT_DOC_DATA;
@@ -71,7 +71,7 @@ export type DocData = typeof DEFAULT_DOC_DATA;
 export const EMPTY_DOC_OBJECT: DocData = {
   title: '',
   pages: [],
-  sectionId:''
+  sectionId: '',
 };
 
 const settingsPalette = {
@@ -101,6 +101,8 @@ export const DEFAULT_HEADING_SIZES = [96, 64, 48, 40, 36, 32];
 
 const sectionSettings = {
   backgroundColor: '#E7EEF1',
+  padding: 16,
+  docGap: 16,
 };
 export type SectionSettings = typeof sectionSettings;
 

@@ -17,7 +17,7 @@ export function pluginInit() {
   let componentData: BaseFileData = stringData
     ? JSON.parse(stringData)
     : BASE_FILE_DATA;
-  console.log(componentData);
+  //console.log(componentData);
   //Check if object exists
   if (objectIsNull(componentData)) {
     initComponents(componentData);
@@ -31,7 +31,7 @@ export function pluginInit() {
           (currentNode.type != 'PAGE' && !currentNode.parent)
         ) {
           initComponents(componentData, false);
-          console.log('Component missing: ' + key);
+          //console.log('Component missing: ' + key);
           break;
         }
       }

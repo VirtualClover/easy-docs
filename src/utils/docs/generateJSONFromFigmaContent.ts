@@ -15,7 +15,7 @@ export function generateJSONFromFigmaContent(section: SectionNode): DocData {
     pages: [],
     sectionId: section.id,
   };
-
+  
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
   let componentData: BaseFileData = JSON.parse(stringData);
 

@@ -66,11 +66,11 @@ export const Editor = () => {
     );
     if (reconciliation.changesNumber) {
       formatPageData(reconciliation.data);
-      pluginContext.setIncomingEditorChanges(true);
       let tempDoc: DocData = clone(pluginContext.currentDocData);
       formatPageData(reconciliation.data);
       tempDoc.pages[pluginContext.activeTab] =  reconciliation.data;
       pluginContext.setCurrentDocData(tempDoc);
+      pluginContext.setIncomingEditorChanges(true);
       parent.postMessage(
         {
           pluginMessage: {
@@ -81,7 +81,7 @@ export const Editor = () => {
         },
         '*'
       );
-      pluginContext.setIncomingEditorChanges(false);
+      //pluginContext.setIncomingEditorChanges(false);
     }
   };
 

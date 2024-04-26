@@ -1,16 +1,18 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import { DEFAULT_DOC_DATA, DocData, EMPTY_DOC_OBJECT } from './utils/constants';
 import {
-  reconcileDocData,
-  reconcilePageData,
-} from './utils/docs/reconcileData';
+  DEFAULT_DOC_DATA,
+  DEFAULT_SETTINGS,
+  DocData,
+  EMPTY_DOC_OBJECT,
+} from './utils/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
 import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
 import { pluginInit } from './utils/figma/pluginInit';
+import { reconcileDocData } from './utils/docs/reconcileData';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -21,6 +23,7 @@ figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 
 let context = {
   //parentSection: null,
+  settings: DEFAULT_SETTINGS,
   stopSendingUpdates: false,
   stopIncomingUpdates: false,
   lastFetchDoc: EMPTY_DOC_OBJECT, // Latest data pulled from editor
@@ -46,7 +49,7 @@ figma.ui.onmessage = (msg) => {
   }
 
   if (msg.type === 'create-new-doc') {
-    let section = createNewDoc(DEFAULT_DOC_DATA);
+    let section = createNewDoc(DEFAULT_DOC_DATA, context.settings);
     context.lastFetchDoc = generateJSONFromFigmaContent(section);
     figma.ui.postMessage({
       type: 'new-node-data',
@@ -68,11 +71,11 @@ figma.ui.onmessage = (msg) => {
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;
-    console.log(data);
+    //console.log(data);
     let section: BaseNode = data.sectionId && figma.getNodeById(data.sectionId);
     context.lastFetchDoc = data;
     if (section && section.type === 'SECTION') {
-      generateFigmaContentFromJSON(data, section);
+      generateFigmaContentFromJSON(data, section, context.settings);
       let selectedFrame = figma.getNodeById(msg.editedFrame);
       if (selectedFrame && selectedFrame.type === 'FRAME') {
         figma.currentPage.selection = [selectedFrame];
@@ -81,6 +84,7 @@ figma.ui.onmessage = (msg) => {
       }
     }
     context.stopSendingUpdates = false;
+    figma.ui.postMessage({ type: 'finished-figma-update' });
   }
 
   //figma.ui.postMessage(figkeysAsync());
@@ -125,6 +129,15 @@ export async function pushFigmaUpdates() {
         if (selection.parent.type == 'FRAME') {
           if (selection.parent.parent.type == 'SECTION') {
             parentSection = selection.parent.parent;
+          }
+        }
+        break;
+      case 'TEXT':
+        if (selection.parent.type == 'INSTANCE') {
+          if (selection.parent.parent.type == 'FRAME') {
+            if (selection.parent.parent.parent.type == 'SECTION') {
+              parentSection = selection.parent.parent.parent;
+            }
           }
         }
         break;

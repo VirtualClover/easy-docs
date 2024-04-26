@@ -27,8 +27,6 @@ export const EditorView = () => {
   };
 
   React.useEffect(() => {
-    console.log('Tabs reloaded');  
-    console.log(pluginContext.currentDocData);
     setTabs([]);
     for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
       setTabs(() => [
@@ -47,8 +45,8 @@ export const EditorView = () => {
           key={i}
         />,
       ]);
-    }
-  }, [pluginContext.incomingFigmaChanges]);
+    } 
+  }, [pluginContext.incomingFigmaChanges, pluginContext.incomingEditorChanges]);
 
   return (
     <ViewContainer>
