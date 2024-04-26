@@ -4,15 +4,23 @@ export function resizeSection(
   section: SectionNode,
   sectionSettings: SectionSettings = DEFAULT_SETTINGS.section
 ) {
-  if (section.children.length) {
-    let lastChild = section.children[section.children.length - 1];
-
-    let proposedHeight = lastChild.height + sectionSettings.padding * 2;
-    let proposedWidth = lastChild.x + lastChild.width + sectionSettings.docGap;
-
-    section.resizeWithoutConstraints(
-      section.width + lastChild.width + sectionSettings.docGap,
-      section.height > proposedHeight ? section.height : proposedHeight
-    );
-  }
+  setTimeout(() => {
+    if (section.children.length) {
+      for (let i = 0; i < section.children.length; i++) {
+        let child = section.children[i];
+  
+        if (child.type == 'FRAME') {
+          let proposedHeight = child.height + sectionSettings.padding * 2;
+          console.log(child.height);
+          //console.log(proposedHeight);
+          let proposedWidth = child.x + child.width + sectionSettings.docGap;
+  
+          section.resizeWithoutConstraints(
+            section.width > proposedWidth ? section.width : proposedWidth,
+            section.height > proposedHeight ? section.height : proposedHeight
+          );
+        }
+      }
+    }
+  }, 10);
 }
