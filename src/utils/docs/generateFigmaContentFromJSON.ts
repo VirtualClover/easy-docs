@@ -93,10 +93,11 @@ function generateBlockInstanceFromJSON(
   if (node) {
     frame.insertChild(indexInFrame, node);
     node.layoutSizingHorizontal = 'FILL';
+
     node.setSharedPluginData(
       FIGMA_NAMESPACE,
       lastEditedKey,
-      block.lastEdited.toString()
+      block.lastEdited ? block.lastEdited.toString() : Date.now.toString()
     );
   }
 }
