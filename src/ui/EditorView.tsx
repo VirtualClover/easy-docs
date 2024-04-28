@@ -57,20 +57,15 @@ export const EditorView = () => {
 
   return (
     <ViewContainer>
-      <Snackbar
-        message="Fetching new changes from Figma"
-        open={pluginContext.incomingFigmaChanges}
-        autoHideDuration={6000}
-      />
       <AppBar elevation={0} color="transparent" sx={{ marginTop: 49 }}>
         <Stack direction="row">
           <Tabs
             value={pluginContext.activeTab}
-            variant="scrollable"
-            scrollButtons="auto"
+            variant={
+              tabs ? 'standard' : 'scrollable'
+            } // If we remove this ternary the Tabs component bugs out
             onChange={handleChange}
             aria-label="Pages on the document"
-            sx={{}}
           >
             {tabs}
           </Tabs>
