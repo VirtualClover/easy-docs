@@ -8,6 +8,7 @@ import {
   Snackbar,
   Stack,
   Toolbar,
+  Tooltip,
 } from '@mui/material';
 
 import { Add } from '@mui/icons-material';
@@ -30,13 +31,20 @@ export const EditorView = () => {
   const pluginContext = React.useContext(PluginDataContext);
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
+    console.log('newActiveTab: ' + newActiveTab);
     pluginContext.setActiveTab(newActiveTab);
+    console.log('plugin active tab: ' + pluginContext.activeTab)
+  };
+
+  const handlePageCreation = () => {
+    let tempDoc = {};
   };
 
   React.useEffect(() => {
     setTabs([]);
+    let tempTabs = [];
     for (let i = 0; i < pluginContext.currentDocData.pages.length; i++) {
-      setTabs(() => [
+      tempTabs.push(
         <Tab
           sx={{
             maxWidth: 300,
@@ -50,9 +58,11 @@ export const EditorView = () => {
           label={pluginContext.currentDocData.pages[i].title}
           {...a11yProps(i)}
           key={i}
-        />,
-      ]);
+        />
+      );
     }
+
+    setTabs(tempTabs);
   }, [pluginContext.incomingFigmaChanges, pluginContext.incomingEditorChanges]);
 
   return (
@@ -61,17 +71,20 @@ export const EditorView = () => {
         <Stack direction="row">
           <Tabs
             value={pluginContext.activeTab}
-            variant={
-              tabs ? 'standard' : 'scrollable'
-            } // If we remove this ternary the Tabs component bugs out
+            variant={tabs ? 'standard' : 'scrollable'} // If we remove this ternary the Tabs component bugs out
             onChange={handleChange}
             aria-label="Pages on the document"
           >
             {tabs}
           </Tabs>
-          <IconButton sx={{ margin: 'auto 0' }}>
-            <Add />
-          </IconButton>
+          <Tooltip title={'Add a new page'}>
+            <IconButton
+              sx={{ margin: 'auto 0' }}
+              onClick={() => handlePageCreation()}
+            >
+              <Add />
+            </IconButton>
+          </Tooltip>
         </Stack>
         <Divider />
       </AppBar>

@@ -15,12 +15,14 @@ const ReactEditorJS = createReactEditorJS();
 
 export const Editor = () => {
   const editorCore = React.useRef(null);
+  const [stopUpdates, setStopUpdates] = React.useState(false);
+  const [firstRender, setFirstRender] = React.useState(true);
 
   const pluginContext = React.useContext(PluginDataContext);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (!pluginContext.incomingFigmaChanges) {
+      if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
         handleSaveEditor().then((data) => {
           let reconciliation = reconcilePageData(
             data,
@@ -40,7 +42,11 @@ export const Editor = () => {
       //console.log('Cleared!');
       clearInterval(interval);
     };
-  }, [pluginContext.currentDocData, pluginContext.incomingFigmaChanges]);
+  }, [
+    pluginContext.currentDocData,
+    pluginContext.incomingFigmaChanges,
+    stopUpdates,
+  ]);
 
   const handleInitialize = React.useCallback((instance) => {
     //console.log('Initialized');
@@ -50,7 +56,9 @@ export const Editor = () => {
   }, []);
 
   const handleUpdateData = React.useCallback(async (data) => {
-    //console.log('Rendered new data');
+    if (firstRender) {
+      setFirstRender(false);
+    }
     await editorCore.current.render(data);
   }, []);
 
@@ -60,6 +68,7 @@ export const Editor = () => {
   };
 
   const pushNewDataToFigma = async (newData: PageData) => {
+
     let reconciliation = reconcilePageData(
       newData,
       pluginContext.currentDocData.pages[pluginContext.activeTab]
@@ -85,6 +94,7 @@ export const Editor = () => {
     }
   };
 
+  //New figma changes
   React.useEffect(() => {
     if (pluginContext.incomingFigmaChanges) {
       handleUpdateData(
@@ -94,6 +104,18 @@ export const Editor = () => {
       });
     }
   }, [pluginContext.incomingFigmaChanges]);
+
+  //Changed active
+  React.useEffect(() => {
+    if (!firstRender) {
+      setStopUpdates(true);
+      handleUpdateData(
+        pluginContext.currentDocData.pages[pluginContext.activeTab]
+      ).then(() => {
+        setStopUpdates(false);
+      });
+    }
+  }, [pluginContext.activeTab]);
 
   return (
     <Box
