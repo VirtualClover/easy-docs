@@ -68,7 +68,7 @@ export const Editor = () => {
       formatPageData(reconciliation.data);
       let tempDoc: DocData = clone(pluginContext.currentDocData);
       formatPageData(reconciliation.data);
-      tempDoc.pages[pluginContext.activeTab] =  reconciliation.data;
+      tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
       pluginContext.setCurrentDocData(tempDoc);
       pluginContext.setIncomingEditorChanges(true);
       parent.postMessage(

@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from '../utils/constants';
 import { createTheme } from '@mui/material';
 
 const baseTheme = {
@@ -24,6 +25,15 @@ export const darkTheme = createTheme({
 export const lightTheme = createTheme({
   palette: {
     mode: 'light',
+    text: {
+      primary: DEFAULT_SETTINGS.palette.heading,
+      secondary: DEFAULT_SETTINGS.palette.paragraph,
+    },
+    background: {
+      default: DEFAULT_SETTINGS.palette.background,
+      paper: DEFAULT_SETTINGS.palette.surface,
+    },
+    divider: DEFAULT_SETTINGS.palette.divider,
   },
   ...baseTheme,
 });

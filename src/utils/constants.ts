@@ -1,5 +1,7 @@
 import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
+import { Theme } from '@mui/material';
+
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 
@@ -84,7 +86,9 @@ const settingsPalette = {
   waringCallout: '#FBF4BB',
   infoCallout: '#AFD8FE',
   errorCallout: '#FFA1C9',
-  divider: '#B2B2B2',
+  divider: '#E7EEF1',
+  background: '#FFF',
+  surface: '#F0F5F8'
 };
 export type SettingPalette = typeof settingsPalette;
 

@@ -94,7 +94,7 @@ export const PluginTopBar = () => {
   }, [pluginContext.navigation.currentView]);
 
   return (
-    <AppBar elevation={0} color="inherit">
+    <AppBar elevation={0} color="transparent">
       <Toolbar variant="dense">{barContent}</Toolbar>
       <Divider />
     </AppBar>

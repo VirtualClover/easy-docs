@@ -19,6 +19,11 @@ body {
   top: calc(50% - 24px);
 }
 
+
+.ct {
+  z-index: 1201;
+}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);

@@ -10,7 +10,7 @@ export const ViewContainer = ({ children }) => {
         spacing={1}
         alignItems="center"
         justifyContent={'center'}
-        style={{ flex: '1 1 auto' }}
+        style={{ flex: '1 1 auto', overflow: 'hidden' }}
       >
         {children}
       </Stack>

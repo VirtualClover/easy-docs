@@ -11,6 +11,7 @@ export async function createParagraphComponent(parent: FrameNode) {
     component.layoutMode = 'HORIZONTAL';
     component.counterAxisSizingMode = 'AUTO';
     component.primaryAxisSizingMode = 'FIXED';
+    component.paddingBottom = 16;
     component.name = `${FIGMA_COMPONENT_PREFIX}Paragraph`;
     let textNode = figma.createText();
     textNode.fontName = { family: 'Inter', style: 'Regular' };

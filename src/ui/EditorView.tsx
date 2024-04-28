@@ -1,7 +1,14 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import { AppBar, Divider, IconButton, Stack, Toolbar } from '@mui/material';
+import {
+  AppBar,
+  Divider,
+  IconButton,
+  Snackbar,
+  Stack,
+  Toolbar,
+} from '@mui/material';
 
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
@@ -45,12 +52,17 @@ export const EditorView = () => {
           key={i}
         />,
       ]);
-    } 
+    }
   }, [pluginContext.incomingFigmaChanges, pluginContext.incomingEditorChanges]);
 
   return (
     <ViewContainer>
-      <AppBar elevation={0} color="inherit" sx={{ marginTop: 49 }}>
+      <Snackbar
+        message="Fetching new changes from Figma"
+        open={pluginContext.incomingFigmaChanges}
+        autoHideDuration={6000}
+      />
+      <AppBar elevation={0} color="transparent" sx={{ marginTop: 49 }}>
         <Stack direction="row">
           <Tabs
             value={pluginContext.activeTab}

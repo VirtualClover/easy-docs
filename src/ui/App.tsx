@@ -7,6 +7,7 @@ import { darkTheme, lightTheme } from '../styles/base';
 
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
+import { PluginContainer } from './components/PluginContainer';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { Settings } from '@mui/icons-material';
@@ -132,7 +133,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
       }}
     >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
-        <Container
+        <PluginContainer
           disableGutters
           sx={{
             display: 'flex',
@@ -149,6 +150,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 p: 8,
                 borderColor: `divider`,
                 borderStyle: 'solid',
+                bgcolor: 'background.paper',
               }}
             >
               <Typography variant="caption">
@@ -156,7 +158,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
               </Typography>
             </Box>
           )}
-        </Container>
+        </PluginContainer>
       </ThemeProvider>
     </PluginDataContext.Provider>
   );
