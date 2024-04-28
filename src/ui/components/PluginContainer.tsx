@@ -53,6 +53,10 @@ export const PluginContainer = styled(Container, {
     border: `1px solid ${theme.palette.divider}`,
   },
 
+  '.ce-popover-item--confirmation .ce-popover-item__title': {
+    color: theme.palette.text.primary,
+  },
+
   '.ce-toolbar__plus, .ce-toolbar__settings-btn': {
     background: theme.palette.background.default,
     color: theme.palette.text.primary,
