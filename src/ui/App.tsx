@@ -10,7 +10,7 @@ import { InspectView } from './InspectView';
 import { PluginContainer } from './components/PluginContainer';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
-import { Settings } from '@mui/icons-material';
+import { SettingsView } from './SettingsView';
 import { ThemeProvider } from '@mui/material/styles';
 
 interface ComponentProps {
@@ -27,7 +27,7 @@ function decideView(currentView: PluginViews) {
       return <EditorView />;
       break;
     case 'SETTINGS':
-      return <Settings />;
+      return <SettingsView />;
       break;
     default:
       return <InspectView />;

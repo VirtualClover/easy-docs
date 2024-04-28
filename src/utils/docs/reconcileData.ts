@@ -42,8 +42,10 @@ export function reconcileDocData(
         ? currentData.sectionId
         : newData.sectionId;
   }
-
-  clonedCurrentData.title = newData.title ?? clonedCurrentData.title;
+    if (newData.title != clonedCurrentData.title) {
+      clonedCurrentData.title = newData.title;
+      changesNumber++;
+    }
 
   return { changesNumber, data: clonedCurrentData };
 }

@@ -14,7 +14,7 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-export const SettingsView = ({ settings }) => {
+export const SettingsView = ({}) => {
   const [showAPIKey, setShowAPIKey] = React.useState(false);
 
   const handleClickShowAPIKey = () => setShowAPIKey((show) => !show);
@@ -27,62 +27,12 @@ export const SettingsView = ({ settings }) => {
 
   return (
     <>
-      <section>
-        <Alert severity="info">
-          <AlertTitle>Connect your JSONBin!</AlertTitle>
-          To add track your styles and metrics you’ll need to add a JSONBin URL
-          and an API Key.
-          <br />
-          <Link href="#" underline="always">
-            Learn how to generate them →
-          </Link>
-        </Alert>
-      </section>
-      <section>
-        <Stack spacing={2}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel htmlFor="outlined-adornment-password">
-              API Key
-            </InputLabel>
-            <OutlinedInput
-              value={settings.API_KEY}
-              id="outlined-adornment-password"
-              type={showAPIKey ? 'text' : 'password'}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowAPIKey}
-                    onMouseDown={handleMouseDownAPIKey}
-                    edge="end"
-                  >
-                    {showAPIKey ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              }
-              label="API Key"
-            />
-          </FormControl>
-          <TextField
-            id="styles-url"
-            label="URL to your Styles Bin"
-            variant="outlined"
-            value={settings.STYLES_URL}
-          />
-          <TextField
-            id="metrics-url"
-            label="URL to your Metrics Bin"
-            variant="outlined"
-            value={settings.METRICS_URL}
-          />
-        </Stack>
-      </section>
-      <Button variant="outlined" color="error" disabled>
-        Reset
-      </Button>
-      <Button variant="contained" disabled>
-        Save
-      </Button>
+      <Stack
+        spacing={1}
+        alignItems="center"
+        justifyContent={'center'}
+        style={{ flex: '1 1 auto' }}
+      ></Stack>
     </>
   );
 };
