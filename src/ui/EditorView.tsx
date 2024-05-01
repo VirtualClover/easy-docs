@@ -41,6 +41,7 @@ export const EditorView = () => {
     tempDoc.pages.push(DEFAULT_PAGE_DATA);
     /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
+    pluginContext.setActiveTab(tempDoc.pages.length - 1);
   };
 
   React.useEffect(() => {
