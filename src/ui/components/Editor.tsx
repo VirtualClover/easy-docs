@@ -9,6 +9,7 @@ import { PluginDataContext } from '../../utils/PluginDataContext';
 import { clone } from '../../utils/clone';
 import { createReactEditorJS } from 'react-editor-js';
 import { formatPageData } from '../../utils/docs/formatPageData';
+import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 import { reconcilePageData } from '../../utils/docs/reconcileData';
 
 const ReactEditorJS = createReactEditorJS();
@@ -24,7 +25,9 @@ export const Editor = () => {
     const interval = setInterval(() => {
       if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
         handleSaveEditor().then((data) => {
-          console.log('plugin context for reconciliation with new saved editor data:');
+          console.log(
+            'plugin context for reconciliation with new saved editor data:'
+          );
 
           console.log(pluginContext.currentDocData);
 
@@ -39,7 +42,20 @@ export const Editor = () => {
             true
           );
           if (reconciliation.changesNumber) {
-            pushNewDataToFigma(reconciliation.data);
+            formatPageData(reconciliation.data);
+            console.log('this is pushed to figma:');
+            console.log(reconciliation.data);
+            let tempDoc: DocData = clone(pluginContext.currentDocData);
+            formatPageData(reconciliation.data);
+            tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
+            tempDoc.author = {
+              platform: 'editor',
+            };
+            pushNewDataToFigma(
+              pluginContext,
+              tempDoc,
+              reconciliation.data.frameId
+            );
           }
         });
       } else {
@@ -74,31 +90,6 @@ export const Editor = () => {
   const handleSaveEditor = async () => {
     let newData: PageData = await editorCore.current.save(); //Page data
     return newData;
-  };
-
-  const pushNewDataToFigma = async (newData: PageData) => {
-    formatPageData(newData);
-    console.log('this is pushed to figma:');
-    console.log(newData);
-    let tempDoc: DocData = clone(pluginContext.currentDocData);
-    formatPageData(newData);
-    tempDoc.pages[pluginContext.activeTab] = newData;
-    tempDoc.author = {
-      platform: 'editor',
-    };
-    pluginContext.setCurrentDocData(tempDoc);
-    pluginContext.setIncomingEditorChanges(true);
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: 'update-selected-doc',
-          data: tempDoc,
-          editedFrame: newData.frameId,
-        },
-      },
-      '*'
-    );
-    //pluginContext.setIncomingEditorChanges(false);
   };
 
   //New figma changes
