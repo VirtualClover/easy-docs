@@ -1,12 +1,13 @@
 import * as _ from 'lodash';
 
 import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants';
-import React, { useEffect } from 'react';
 
 import { Box } from '@mui/material';
+import { EDITOR_TOOLS } from '../../utils/editor/editorConfig';
 import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';
 import { PluginDataContext } from '../../utils/PluginDataContext';
+import React from 'react';
 import { clone } from '../../utils/clone';
 import { createReactEditorJS } from 'react-editor-js';
 import { formatPageData } from '../../utils/docs/formatPageData';
@@ -126,20 +127,7 @@ export const Editor = () => {
         defaultValue={
           pluginContext.currentDocData.pages[pluginContext.activeTab]
         }
-        tools={{
-          paragraph: {
-            class: Paragraph,
-            inlineToolbar: false,
-          },
-          header: {
-            class: Header,
-            config: {
-              placeholder: 'Enter a header',
-              levels: [1, 2, 3, 4, 5, 6],
-              defaultLevel: 2,
-            },
-          },
-        }}
+        tools={EDITOR_TOOLS}
         onInitialize={handleInitialize}
       />
     </Box>

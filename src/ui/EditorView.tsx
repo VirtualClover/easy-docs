@@ -13,12 +13,12 @@ import {
 
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
-import { DEFAULT_PAGE_DATA } from '../utils/constants';
 import { Editor } from './components/Editor';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
+import { createNewPageJSON } from '../utils/docs/createNewPageJSON';
 import { pushNewDataToFigma } from '../utils/editor/pushNewDataToFigma';
 
 function a11yProps(index: number) {
@@ -38,7 +38,8 @@ export const EditorView = () => {
 
   const handlePageCreation = () => {
     let tempDoc = pluginContext.currentDocData;
-    tempDoc.pages.push(DEFAULT_PAGE_DATA);
+    let newPage = createNewPageJSON(tempDoc.pages.length+1);
+    tempDoc.pages.push(newPage);
     /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
     pluginContext.setActiveTab(tempDoc.pages.length - 1);

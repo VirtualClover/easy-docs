@@ -58,14 +58,6 @@ export const DEFAULT_PAGE_DATA: PageData = {
       },
     },
     {
-      type: 'header',
-      lastEdited: Date.now(),
-      data: {
-        text: 'Subtitle',
-        level: 2,
-      },
-    },
-    {
       type: 'paragraph',
       lastEdited: Date.now(),
       data: {
