@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { DocData, PageData } from '../constants';
+import { DocData, PageData, Reconciliation } from '../constants';
 
 import { cleanseTextData } from '../cleanseTextData';
 import { clone } from '../clone';
@@ -11,7 +11,7 @@ export function reconcileDocData(
   currentData: DocData,
   useCurrentDataFramesId: boolean = false,
   useCurrentDataSectionId: boolean = false
-) {
+): Reconciliation {
   let clonedCurrentData: DocData = clone(currentData); //Data stored in context
   clonedCurrentData.pages = clonedCurrentData.pages.slice(
     0,

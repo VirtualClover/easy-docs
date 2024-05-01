@@ -8,6 +8,7 @@ import {
 } from '../constants';
 
 import { formatPageData } from './formatPageData';
+import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 
 export function generateJSONFromFigmaContent(section: SectionNode): DocData {
   let JSONData: DocData = {
@@ -15,8 +16,10 @@ export function generateJSONFromFigmaContent(section: SectionNode): DocData {
     pages: [],
     sectionId: section.id,
     author: {
-      platform: 'figma',
+      changesMadeIn: 'figma',
+      user: getUserDetailsInFigma(),
     },
+    lastEdited: Date.now().toString(),
   };
 
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');

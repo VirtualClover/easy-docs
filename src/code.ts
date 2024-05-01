@@ -150,23 +150,21 @@ export async function pushFigmaUpdates() {
       let generatedDoc = generateJSONFromFigmaContent(parentSection);
       //console.log(generatedDoc);
       //console.log('----');
-      
+
       if (generatedDoc.pages) {
         let reconciliation = reconcileDocData(
           generatedDoc,
-          context.lastFetchDoc,
+          context.lastFetchDoc
         );
 
-        console.log("reconciliation data from figma generated doc: ");
+        console.log('reconciliation data from figma generated doc: ');
         console.log(reconciliation.data);
-        
+
         if (reconciliation.changesNumber) {
-          context.lastFetchDoc = reconciliation.data;
+          context.lastFetchDoc = <DocData>reconciliation.data;
           return { type: 'new-node-data', data: context.lastFetchDoc };
-          console.log('New data pushed');
         } else {
           return { type: 'same-node-data', data: '' };
-          
         }
       }
     }

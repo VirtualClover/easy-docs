@@ -23,6 +23,7 @@ window.onload = function () {
 onmessage = (event) => {
   if (event.data.pluginMessage.type == 'data-loaded') {
     PLUGIN_DATA.settings = event.data.pluginMessage.pluginSettings;
+    PLUGIN_DATA.currentUser = event.data.pluginMessage.user;
     const themeMode = document.documentElement.className;
     const wrapper = document.getElementById('plugin-wrapper');
     wrapper.innerHTML = '<main id="app"></main>';

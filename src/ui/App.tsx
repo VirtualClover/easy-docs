@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import { Box, Container, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants';
 import { darkTheme, lightTheme } from '../styles/base';
 
@@ -55,6 +55,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
     initialPluginData.incomingEditorChanges
   );
 
+  const [currentUser, setCurrentUser] = React.useState(
+    initialPluginData.currentUser
+  );
+
   const [activeTab, setActiveTab] = React.useState(initialPluginData.activeTab);
 
   React.useEffect(() => {
@@ -67,6 +71,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           switch (event.data.pluginMessage.type) {
+
             case 'new-node-data':
               let data: DocData = event.data.pluginMessage.data;
               if (data) {
@@ -121,6 +126,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
       value={{
         currentDocData,
         setCurrentDocData,
+        currentUser,
+        setCurrentUser,
         navigation,
         setNavigation,
         loadingState,

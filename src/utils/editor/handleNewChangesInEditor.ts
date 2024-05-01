@@ -1,6 +1,7 @@
 import { clone } from '../clone';
 import { DocData, PageData, PluginData, Reconciliation } from '../constants';
 import { formatPageData } from '../docs/formatPageData';
+import { pushNewDataToFigma } from './pushNewDataToFigma';
 
 export const handleNewChangesInEditor = (
   pluginContext: PluginData,
@@ -18,16 +19,5 @@ export const handleNewChangesInEditor = (
       editedFrame = page.frameId;
     }
   }
-  pluginContext.setCurrentDocData(tempDoc);
-  pluginContext.setIncomingEditorChanges(true);
-  parent.postMessage(
-    {
-      pluginMessage: {
-        type: 'update-selected-doc',
-        data: tempDoc,
-        editedFrame: editedFrame,
-      },
-    },
-    '*'
-  );
+  pushNewDataToFigma(pluginContext, tempDoc, editedFrame);
 };

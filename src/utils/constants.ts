@@ -1,9 +1,24 @@
 import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
-import { Theme } from '@mui/material';
-
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
+
+export type ChangesPlatform = 'figma' | 'editor';
+
+export const EMPTY_USER_AUTHOR_DATA = {
+  id: '',
+  name: '',
+  photoUrl: '',
+};
+
+export type AuthorUser = typeof EMPTY_USER_AUTHOR_DATA;
+
+export const EMPTY_AUTHOR_DATA = {
+  user: EMPTY_USER_AUTHOR_DATA,
+  changesMadeIn: 'editor' as ChangesPlatform,
+};
+
+export type Author = typeof EMPTY_AUTHOR_DATA;
 
 export interface PageData extends OutputData {
   frameId?: string;
@@ -64,9 +79,8 @@ export const DEFAULT_DOC_DATA = {
   title: 'New document',
   pages: [DEFAULT_PAGE_DATA],
   sectionId: '',
-  author: {
-    platform: 'editor',
-  } as Author,
+  author: EMPTY_AUTHOR_DATA,
+  lastEdited: Date.now().toString(),
 };
 
 export type DocData = typeof DEFAULT_DOC_DATA;
@@ -75,9 +89,8 @@ export const EMPTY_DOC_OBJECT: DocData = {
   title: '',
   pages: [],
   sectionId: '',
-  author: {
-    platform: 'editor',
-  },
+  author: EMPTY_AUTHOR_DATA,
+  lastEdited: Date.now().toString(),
 };
 
 const settingsPalette = {
@@ -136,13 +149,10 @@ export interface Reconciliation {
   changesNumber: number;
 }
 
-export interface Author {
-  user?: string;
-  platform: 'figma' | 'editor';
-}
-
 export const DEFAULT_PLUGIN_DATA = {
   currentDocData: DEFAULT_DOC_DATA,
+  currentUser: EMPTY_USER_AUTHOR_DATA,
+  setCurrentUser: (authorUser: AuthorUser) => {},
   setCurrentDocData: (data: DocData) => {},
   navigation: initialNavigation,
   setNavigation: (view) => {},

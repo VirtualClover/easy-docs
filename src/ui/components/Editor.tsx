@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { DocData, PageData } from '../../utils/constants';
+import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants';
 import React, { useEffect } from 'react';
 
 import { Box } from '@mui/material';
@@ -48,9 +48,7 @@ export const Editor = () => {
             let tempDoc: DocData = clone(pluginContext.currentDocData);
             formatPageData(reconciliation.data);
             tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
-            tempDoc.author = {
-              platform: 'editor',
-            };
+            tempDoc.author = EMPTY_AUTHOR_DATA;
             pushNewDataToFigma(
               pluginContext,
               tempDoc,

@@ -1,5 +1,11 @@
-import { BASE_FILE_DATA, BaseFileData } from '../constants';
+import {
+  AuthorUser,
+  BASE_FILE_DATA,
+  BaseFileData,
+  DEFAULT_SETTINGS,
+} from '../constants';
 
+import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { initComponents } from './components/initComponents';
 import { nodeSupportsChildren } from './nodeSupportsChildren';
 import { objectIsNull } from '../objectisNull';
@@ -14,6 +20,7 @@ function isInNode(parentID, nodeID) {
 
 export function pluginInit() {
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
+  let userData: AuthorUser = getUserDetailsInFigma();
   let componentData: BaseFileData = stringData
     ? JSON.parse(stringData)
     : BASE_FILE_DATA;
@@ -37,5 +44,8 @@ export function pluginInit() {
       }
     }
   }
-  figma.ui.postMessage({ type: 'data-loaded' });
+  figma.ui.postMessage({
+    type: 'data-loaded',
+    data: { settings: DEFAULT_SETTINGS, user: userData },
+  });
 }
