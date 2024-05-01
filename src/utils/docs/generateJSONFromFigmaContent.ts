@@ -10,11 +10,13 @@ import {
 import { formatPageData } from './formatPageData';
 
 export function generateJSONFromFigmaContent(section: SectionNode): DocData {
-
   let JSONData: DocData = {
     title: section.name,
     pages: [],
     sectionId: section.id,
+    author: {
+      platform: 'figma',
+    },
   };
 
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
@@ -29,6 +31,9 @@ export function generateJSONFromFigmaContent(section: SectionNode): DocData {
         JSONData.pages.push(generatePageDataFromFrame(child, componentData));
       }
     }
+
+    console.log('generated from figma');
+    console.log(JSONData);
 
     return JSONData;
   }

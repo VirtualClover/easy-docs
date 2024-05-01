@@ -24,8 +24,17 @@ export const Editor = () => {
     const interval = setInterval(() => {
       if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
         handleSaveEditor().then((data) => {
+          console.log('plugin context for reconciliation with new saved editor data:');
+
+          console.log(pluginContext.currentDocData);
+
           let reconciliation = reconcilePageData(
-            data,
+            {
+              ...data,
+              frameId:
+                pluginContext.currentDocData.pages[pluginContext.activeTab]
+                  .frameId,
+            },
             pluginContext.currentDocData.pages[pluginContext.activeTab],
             true
           );
@@ -68,30 +77,28 @@ export const Editor = () => {
   };
 
   const pushNewDataToFigma = async (newData: PageData) => {
-
-    let reconciliation = reconcilePageData(
-      newData,
-      pluginContext.currentDocData.pages[pluginContext.activeTab]
-    );
-    if (reconciliation.changesNumber) {
-      formatPageData(reconciliation.data);
-      let tempDoc: DocData = clone(pluginContext.currentDocData);
-      formatPageData(reconciliation.data);
-      tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
-      pluginContext.setCurrentDocData(tempDoc);
-      pluginContext.setIncomingEditorChanges(true);
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: 'update-selected-doc',
-            data: tempDoc,
-            editedFrame: reconciliation.data.frameId,
-          },
+    formatPageData(newData);
+    console.log('this is pushed to figma:');
+    console.log(newData);
+    let tempDoc: DocData = clone(pluginContext.currentDocData);
+    formatPageData(newData);
+    tempDoc.pages[pluginContext.activeTab] = newData;
+    tempDoc.author = {
+      platform: 'editor',
+    };
+    pluginContext.setCurrentDocData(tempDoc);
+    pluginContext.setIncomingEditorChanges(true);
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: 'update-selected-doc',
+          data: tempDoc,
+          editedFrame: newData.frameId,
         },
-        '*'
-      );
-      //pluginContext.setIncomingEditorChanges(false);
-    }
+      },
+      '*'
+    );
+    //pluginContext.setIncomingEditorChanges(false);
   };
 
   //New figma changes

@@ -13,11 +13,13 @@ import {
 
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
+import { DEFAULT_PAGE_DATA } from '../utils/constants';
 import { Editor } from './components/Editor';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
+import { pushNewDataToFigma } from '../utils/editor/pushNewDataToFigma';
 
 function a11yProps(index: number) {
   return {
@@ -31,13 +33,14 @@ export const EditorView = () => {
   const pluginContext = React.useContext(PluginDataContext);
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
-    console.log('newActiveTab: ' + newActiveTab);
     pluginContext.setActiveTab(newActiveTab);
-    console.log('plugin active tab: ' + pluginContext.activeTab)
   };
 
   const handlePageCreation = () => {
-    let tempDoc = {};
+    let tempDoc = pluginContext.currentDocData;
+    tempDoc.pages.push(DEFAULT_PAGE_DATA);
+    console.log('Page creation');
+    pushNewDataToFigma(pluginContext, tempDoc);
   };
 
   React.useEffect(() => {

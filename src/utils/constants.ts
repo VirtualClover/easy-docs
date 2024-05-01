@@ -32,40 +32,41 @@ export const BASE_FILE_DATA = {
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 
-const DEFAULT_DOC_PAGES: PageData[] = [
-  {
-    blocks: [
-      {
-        type: 'header',
-        lastEdited: Date.now(),
-        data: {
-          text: 'Page 1',
-          level: 1,
-        },
+export const DEFAULT_PAGE_DATA: PageData = {
+  blocks: [
+    {
+      type: 'header',
+      lastEdited: Date.now(),
+      data: {
+        text: 'Page 1',
+        level: 1,
       },
-      {
-        type: 'header',
-        lastEdited: Date.now(),
-        data: {
-          text: 'Subtitle',
-          level: 2,
-        },
+    },
+    {
+      type: 'header',
+      lastEdited: Date.now(),
+      data: {
+        text: 'Subtitle',
+        level: 2,
       },
-      {
-        type: 'paragraph',
-        lastEdited: Date.now(),
-        data: {
-          text: 'Click here to start editing!',
-        },
+    },
+    {
+      type: 'paragraph',
+      lastEdited: Date.now(),
+      data: {
+        text: 'Click here to start editing!',
       },
-    ],
-    title: 'Page 1',
-  },
-];
+    },
+  ],
+  title: 'Page 1',
+};
 export const DEFAULT_DOC_DATA = {
   title: 'New document',
-  pages: DEFAULT_DOC_PAGES,
+  pages: [DEFAULT_PAGE_DATA],
   sectionId: '',
+  author: {
+    platform: 'editor',
+  } as Author,
 };
 
 export type DocData = typeof DEFAULT_DOC_DATA;
@@ -74,6 +75,9 @@ export const EMPTY_DOC_OBJECT: DocData = {
   title: '',
   pages: [],
   sectionId: '',
+  author: {
+    platform: 'editor',
+  },
 };
 
 const settingsPalette = {
@@ -88,7 +92,7 @@ const settingsPalette = {
   errorCallout: '#FFA1C9',
   divider: '#E7EEF1',
   background: '#FFF',
-  surface: '#F0F5F8'
+  surface: '#F0F5F8',
 };
 export type SettingPalette = typeof settingsPalette;
 
@@ -126,6 +130,16 @@ const initialNavigation = {
   prevView: 'INSPECT' as PluginViews,
 };
 export type navigation = typeof initialNavigation;
+
+export interface Reconciliation {
+  data: DocData | PageData;
+  changesNumber: number;
+}
+
+export interface Author {
+  user?: string;
+  platform: 'figma' | 'editor';
+}
 
 export const DEFAULT_PLUGIN_DATA = {
   currentDocData: DEFAULT_DOC_DATA,

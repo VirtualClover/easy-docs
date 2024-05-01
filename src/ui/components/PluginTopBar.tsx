@@ -17,6 +17,7 @@ import { DocData, PluginData } from '../../utils/constants';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 import { navigate } from '../../utils/navigate';
+import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 
 interface BarProps {
   pluginContext: PluginData;
@@ -43,17 +44,7 @@ const EditorBar = ({ pluginContext }: BarProps) => {
       ...pluginContext.currentDocData,
       title: title,
     };
-    pluginContext.setCurrentDocData(tempDoc);
-    pluginContext.setIncomingEditorChanges(true);
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: 'update-selected-doc',
-          data: tempDoc,
-        },
-      },
-      '*'
-    );
+    pushNewDataToFigma(pluginContext, tempDoc);
     setEditDocTitle(false);
   }
 
@@ -173,11 +164,10 @@ export const PluginTopBar = () => {
 
   React.useEffect(() => {
     setBarContent(decideBarContent(pluginContext));
-    console.log(pluginContext.currentDocData);
-    
+    //console.log(pluginContext.currentDocData);
   }, [
     pluginContext.navigation.currentView,
-    pluginContext.currentDocData.title
+    pluginContext.currentDocData.title,
   ]);
 
   return (

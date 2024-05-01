@@ -22,30 +22,40 @@ export function reconcileDocData(
   for (let i = 0; i < newData.pages.length; i++) {
     let newPage = newData.pages[i];
     let currentDataPage = clonedCurrentData.pages[i];
+    let frameId: string = '';
     if (currentDataPage) {
       let pageRecon = reconcilePageData(
         newPage,
         currentDataPage,
         useCurrentDataFramesId
       );
+
+      //console.log(pageRecon.data);
+
       if (pageRecon.changesNumber) {
         changesNumber += pageRecon.changesNumber;
         currentDataPage = pageRecon.data;
+      }
+      if (!useCurrentDataFramesId) {
+        frameId = pageRecon.data.frameId;
       }
     } else {
       currentDataPage = newPage;
       changesNumber++;
     }
-    clonedCurrentData.pages[i] = currentDataPage;
+    clonedCurrentData.pages[i] = { ...currentDataPage, frameId };
+    //console.log(clonedCurrentData.pages[i]);
     clonedCurrentData.sectionId =
       useCurrentDataSectionId && clonedCurrentData.sectionId
         ? currentData.sectionId
         : newData.sectionId;
   }
-    if (newData.title != clonedCurrentData.title) {
-      clonedCurrentData.title = newData.title;
-      changesNumber++;
-    }
+  if (newData.title != clonedCurrentData.title) {
+    clonedCurrentData.title = newData.title;
+    changesNumber++;
+  }
+
+  clonedCurrentData.author = newData.author;
 
   return { changesNumber, data: clonedCurrentData };
 }
@@ -83,10 +93,21 @@ export function reconcilePageData(
       changesNumber++;
     }
   }
+
   clonedCurrentData.frameId =
     useCurrentDataFrameId && clonedCurrentData.frameId
       ? currentData.frameId
       : newData.frameId;
+
+  if (!useCurrentDataFrameId && currentData.frameId != newData.frameId) {
+    changesNumber++;
+  }
+
   formatPageData(clonedCurrentData);
+  if (useCurrentDataFrameId) {
+    /*console.log(newData.frameId);
+    console.log(currentData.frameId);
+    console.log(clonedCurrentData.frameId);*/
+  }
   return { changesNumber, data: clonedCurrentData };
 }
