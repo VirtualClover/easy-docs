@@ -75,9 +75,9 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
             case 'new-node-data':
               let data: DocData = event.data.pluginMessage.data;
               if (data) {
-                console.log('stored in the plugin context from figma data:');
+                /* console.log('stored in the plugin context from figma data:');
 
-                console.log(data);
+               console.log(data);*/
                 setCurrentDocData(data);
                 setIncomingFigmaChanges(true);
                 if (navigation.currentView == 'INSPECT') {

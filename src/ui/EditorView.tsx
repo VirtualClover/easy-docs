@@ -39,7 +39,7 @@ export const EditorView = () => {
   const handlePageCreation = () => {
     let tempDoc = pluginContext.currentDocData;
     tempDoc.pages.push(DEFAULT_PAGE_DATA);
-    console.log('Page creation');
+    /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
   };
 

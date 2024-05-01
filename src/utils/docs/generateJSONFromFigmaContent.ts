@@ -35,8 +35,8 @@ export function generateJSONFromFigmaContent(section: SectionNode): DocData {
       }
     }
 
-    console.log('generated from figma');
-    console.log(JSONData);
+    /*console.log('generated from figma');
+    console.log(JSONData);*/
 
     return JSONData;
   }

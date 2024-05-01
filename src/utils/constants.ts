@@ -123,7 +123,7 @@ export const DEFAULT_HEADING_SIZES = [96, 64, 48, 40, 36, 32];
 const sectionSettings = {
   backgroundColor: '#E7EEF1',
   padding: 16,
-  docGap: 16,
+  docGap: 36,
 };
 export type SectionSettings = typeof sectionSettings;
 

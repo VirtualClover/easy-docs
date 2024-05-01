@@ -25,11 +25,11 @@ export const Editor = () => {
     const interval = setInterval(() => {
       if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
         handleSaveEditor().then((data) => {
-          console.log(
+          /*console.log(
             'plugin context for reconciliation with new saved editor data:'
           );
 
-          console.log(pluginContext.currentDocData);
+          console.log(pluginContext.currentDocData);*/
 
           let reconciliation = reconcilePageData(
             {
@@ -43,8 +43,8 @@ export const Editor = () => {
           );
           if (reconciliation.changesNumber) {
             formatPageData(reconciliation.data);
-            console.log('this is pushed to figma:');
-            console.log(reconciliation.data);
+            /*console.log('this is pushed to figma:');
+            console.log(reconciliation.data);*/
             let tempDoc: DocData = clone(pluginContext.currentDocData);
             formatPageData(reconciliation.data);
             tempDoc.pages[pluginContext.activeTab] = reconciliation.data;

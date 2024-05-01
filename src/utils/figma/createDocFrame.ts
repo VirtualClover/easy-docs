@@ -38,7 +38,7 @@ export function createDocFrame(
   //Append frame to parent
   if (parent.children.length) {
     let lastChild = parent.children[parent.children.length - 1];
-    frame.x = lastChild.x + lastChild.width + parent.width;
+    frame.x = lastChild.x + lastChild.width + settings.section.docGap;
   } else {
     frame.x = parent.x + settings.section.padding;
   }

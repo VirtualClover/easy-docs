@@ -157,8 +157,8 @@ export async function pushFigmaUpdates() {
           context.lastFetchDoc
         );
 
-        console.log('reconciliation data from figma generated doc: ');
-        console.log(reconciliation.data);
+        /*console.log('reconciliation data from figma generated doc: ');
+        console.log(reconciliation.data);*/
 
         if (reconciliation.changesNumber) {
           context.lastFetchDoc = <DocData>reconciliation.data;
