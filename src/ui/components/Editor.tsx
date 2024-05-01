@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 
 import { Box } from '@mui/material';
 import Header from '@editorjs/header';
+import Paragraph from '@editorjs/paragraph';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import { clone } from '../../utils/clone';
 import { createReactEditorJS } from 'react-editor-js';
@@ -126,6 +127,10 @@ export const Editor = () => {
           pluginContext.currentDocData.pages[pluginContext.activeTab]
         }
         tools={{
+          paragraph: {
+            class: Paragraph,
+            inlineToolbar: false,
+          },
           header: {
             class: Header,
             config: {
