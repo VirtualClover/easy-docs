@@ -22,7 +22,7 @@ export async function createHeaderComponent(
       header.layoutMode = 'HORIZONTAL';
       header.counterAxisSizingMode = 'AUTO';
       header.primaryAxisSizingMode = 'FIXED';
-      header.paddingBottom = 16;
+      header.paddingBottom = 32;
       header.name = `${levelPropKey}=${i + 1}`;
       let textNode = figma.createText();
       textNode.fontName = { family: 'Inter', style: 'Bold' };

@@ -104,7 +104,7 @@ export type SettingPalette = typeof settingsPalette;
 const frameSettings = {
   minWidth: 1400,
   minHeight: 50,
-  padding: 40,
+  padding: 56,
   footer: '',
   logo: '',
 };

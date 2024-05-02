@@ -87,6 +87,10 @@ function generateBlockInstanceFromJSON(
     case 'paragraph':
       node = generateParagraphInstance(block.data);
       break;
+    case 'quote':
+      console.log(block.data);
+      //node = generateParagraphInstance(block.data);
+      break;
     default:
       break;
   }

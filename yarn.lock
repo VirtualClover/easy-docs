@@ -85,6 +85,13 @@
   dependencies:
     "@codexteam/icons" "^0.0.4"
 
+"@editorjs/quote@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@editorjs/quote/-/quote-2.6.0.tgz#5ff02b5b3cac1fcea4157c31ac975e3acb3906a8"
+  integrity sha512-8DiCMBT4n4UDV5bgzvfRH26HmL6YWddGC4+twvjhR+PzX0gwrnY8nFifvro79EeSqxwRtFjjlGnu5I0VTfw5aQ==
+  dependencies:
+    "@codexteam/icons" "^0.0.5"
+
 "@emotion/babel-plugin@^11.11.0":
   version "11.11.0"
   resolved "https://registry.npmjs.org/@emotion/babel-plugin/-/babel-plugin-11.11.0.tgz"
