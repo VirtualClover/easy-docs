@@ -101,6 +101,23 @@ function generatePageDataFromFrame(
               },
             });
             break;
+          case componentData.quote.id:
+            pageData.blocks.push({
+              type: 'quote',
+              lastEdited: editedDate,
+              data: {
+                text: childNode.componentProperties[
+                  componentData.quote.contentProp
+                ].value,
+                caption:
+                  childNode.componentProperties[componentData.quote.authorProp]
+                    .value,
+                alignment: 'left',
+              },
+            });
+            console.log(pageData);
+            
+            break;
         }
       }
     }

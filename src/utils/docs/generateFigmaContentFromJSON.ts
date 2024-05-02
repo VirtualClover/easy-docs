@@ -9,6 +9,7 @@ import {
 import { createDocFrame } from '../figma/createDocFrame';
 import { generateHeaderInstance } from '../figma/components/generateHeaderInstance';
 import { generateParagraphInstance } from '../figma/components/generateParagraphInstance';
+import { generateQuoteInstance } from '../figma/components/generateQuoteInstance';
 import { resizeSection } from '../figma/resizeSection';
 
 let lastEditedKey = 'lastEdited';
@@ -88,6 +89,7 @@ function generateBlockInstanceFromJSON(
       node = generateParagraphInstance(block.data);
       break;
     case 'quote':
+      node = generateQuoteInstance(block.data);
       console.log(block.data);
       //node = generateParagraphInstance(block.data);
       break;

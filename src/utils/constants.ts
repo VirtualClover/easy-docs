@@ -44,6 +44,11 @@ export const BASE_FILE_DATA = {
     id: '',
     contentProp: '',
   },
+  quote: {
+    id: '',
+    contentProp: '',
+    authorProp: '',
+  },
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 
