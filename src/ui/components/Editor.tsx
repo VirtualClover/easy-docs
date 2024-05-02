@@ -78,12 +78,12 @@ export const Editor = () => {
     //console.log(pluginContext.currentDocData);
     editorCore.current = instance;
     pluginContext.setIncomingFigmaChanges(false);
-  }, []);
-
-  const handleUpdateData = React.useCallback(async (data) => {
     if (firstRender) {
       setFirstRender(false);
     }
+  }, []);
+
+  const handleUpdateData = React.useCallback(async (data) => {
     await editorCore.current.render(data);
   }, []);
 
