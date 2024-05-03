@@ -1,4 +1,5 @@
 import { BaseFileData } from '../../constants';
+import { createDisplayFrameComponent } from './displayFrameComponent';
 import { createHeaderComponent } from './createHeaderComponent';
 import { createParagraphComponent } from './createParagraphComponent';
 import { createQuoteComponent } from './createQuoteComponent';
@@ -40,13 +41,16 @@ export async function initComponents(
     createHeaderComponent(frame),
     createParagraphComponent(frame),
     createQuoteComponent(frame),
+    createDisplayFrameComponent(frame)
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
     let quote = values[2];
+    let displayFrame = values[3];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
+    componentData.displayFrame = displayFrame;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',

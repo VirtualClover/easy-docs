@@ -13,6 +13,7 @@ export async function createQuoteComponent(parent: FrameNode) {
     component.layoutMode = 'HORIZONTAL';
     component.counterAxisSizingMode = 'AUTO';
     component.primaryAxisSizingMode = 'FIXED';
+    component.name = `${FIGMA_COMPONENT_PREFIX}Quote`;
     component.paddingTop = 8;
     component.paddingBottom = 32;
     //Inner wrapper
@@ -33,7 +34,6 @@ export async function createQuoteComponent(parent: FrameNode) {
       fills[0]
     );
     innerWrapper.strokes = fills;
-    innerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Quote`;
     setNodeFills(innerWrapper, DEFAULT_SETTINGS.palette.surface);
     component.appendChild(innerWrapper);
     innerWrapper.layoutSizingHorizontal = 'FILL';
