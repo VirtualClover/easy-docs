@@ -81,7 +81,6 @@ figma.ui.onmessage = (msg) => {
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;
-    //console.log(data);
     let section: BaseNode = data.sectionId && figma.getNodeById(data.sectionId);
     context.lastFetchDoc = data;
     if (section && section.type === 'SECTION') {

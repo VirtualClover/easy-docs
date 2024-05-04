@@ -34,8 +34,8 @@ export const EditorView = () => {
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     pluginContext.setActiveTab(newActiveTab);
-    console.log('New active tab!');
-    console.log(newActiveTab);
+    //console.log('New active tab!');
+    //console.log(newActiveTab);
     
   };
 

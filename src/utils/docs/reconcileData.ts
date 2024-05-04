@@ -66,11 +66,14 @@ export function reconcilePageData(
   useCurrentDataFrameId: boolean = false
 ) {
   let clonedCurrentData: PageData = clone(currentData); //Data stored in context
-  clonedCurrentData.blocks = clonedCurrentData.blocks.slice(
-    0,
-    newData.blocks.length
-  );
   let changesNumber = 0;
+  if (clonedCurrentData.blocks.length != newData.blocks.length) {
+    clonedCurrentData.blocks = clonedCurrentData.blocks.slice(
+      0,
+      newData.blocks.length
+    );
+    changesNumber++;
+  }
   for (let i = 0; i < newData.blocks.length; i++) {
     let newBlock = newData.blocks[i];
     let currentDataBlock = clonedCurrentData.blocks[i];

@@ -182,3 +182,10 @@ export const FIGMA_COMPONENT_PREFIX = '.[EASY-DOCS]';
 
 export const FIGMA_NAMESPACE = 'EasyDocs';
 export const FIGMA_LAST_EDITED_KEY = 'lastEdited';
+
+
+
+export interface FrameDetailsFromURL {
+  frameId: string;
+  fileId: string;
+}

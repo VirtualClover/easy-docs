@@ -8,6 +8,7 @@ import {
   getDetailsFromFigmaURL,
 } from '../../docs/figmaURLHandlers';
 
+import { cleanseString } from '../../cleanseTextData';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 
@@ -131,10 +132,7 @@ export function generateDisplayFrameInstance(data): FrameNode {
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.displayFrame.captionProp]: data.caption.replace(
-        '&nbsp;',
-        ' '
-      ),
+      [componentData.displayFrame.captionProp]: cleanseString(data.caption),
       [componentData.displayFrame.sourceProp]: sourceURL,
     });
 

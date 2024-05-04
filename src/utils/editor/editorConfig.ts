@@ -26,6 +26,6 @@ export const EDITOR_TOOLS = {
     },
   },
   displayFrame: {
-    class: DisplayFrame,
+    class: <any>DisplayFrame,
   },
 };

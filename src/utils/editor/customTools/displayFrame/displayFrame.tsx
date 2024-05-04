@@ -3,17 +3,20 @@ import {
   getDetailsFromFigmaURL,
 } from '../../../docs/figmaURLHandlers';
 
+import { ToolConstructable } from '@editorjs/editorjs';
 import { createRoot } from 'react-dom/client';
 import { styled } from '@mui/material';
 
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
 //`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
 
-function InputUI({
-  frameId = '1:403',
-  fileId = 'NUYPxZroszCtHkWbkjegma',
-  caption = '',
-}) {
+interface ComponentProps {
+  frameId: string;
+  fileId: string;
+  caption: string;
+}
+
+const InputUI = (blockData: ComponentProps) => {
   let IFrame = styled('iframe')(({ theme }) => ({
     border: `1px solid ${theme.palette.divider}`,
     width: '100%',
@@ -30,6 +33,8 @@ function InputUI({
     gap: 12,
   }));
 
+  let src = generateFigmaURL(blockData.fileId, blockData.frameId, 'embed');
+
   return (
     <BlockWrapper>
       <input
@@ -37,24 +42,34 @@ function InputUI({
         id="cdx-display-frame-frame-url"
         placeholder={'Add Figma link here!'}
         style={{ flex: 1 }}
-        value={generateFigmaURL(fileId, frameId, 'share')}
+        defaultValue={generateFigmaURL(
+          blockData.fileId,
+          blockData.frameId,
+          'share'
+        )}
+        onChange={(e) => {
+          console.log(e.target.value);
+          
+          src = '';
+        }}
       />
-      {frameId && fileId && (
-        <>
-          <IFrame src={generateFigmaURL(fileId, frameId, 'embed')}></IFrame>
-          <input
-            className="cdx-input"
-            id="cdx-display-frame-caption"
-            placeholder={'Enter a caption!'}
-            value={caption}
-          />
-        </>
-      )}
+      <>
+        <IFrame src={src}></IFrame>
+        <input
+          style={{ display: src ? 'visible' : 'hidden' }}
+          className="cdx-input"
+          id="cdx-display-frame-caption"
+          placeholder={'Enter a caption!'}
+          value={blockData.caption}
+        />
+      </>
     </BlockWrapper>
   );
-}
+};
 
 export class DisplayFrame {
+  data: any;
+
   static get toolbox() {
     return {
       title: 'Figma Frame',
@@ -62,10 +77,14 @@ export class DisplayFrame {
     };
   }
 
+  constructor({ data }) {
+    this.data = data;
+  }
+
   render() {
     let ui = document.createElement('div');
     let root = createRoot(ui);
-    root.render(<InputUI />);
+    root.render(<InputUI {...this.data} />);
     ui.classList.add('display-frame');
 
     return ui;
@@ -84,8 +103,17 @@ export class DisplayFrame {
     }
 
     return {
-      ...getDetailsFromFigmaURL(frameUrl,'decode'),
+      ...getDetailsFromFigmaURL(frameUrl, 'decode'),
       caption,
     };
+  }
+
+  validate(savedData) {
+    if (!savedData.fileId || !savedData.frameId) {
+      console.log('Not validated');
+      return false;
+    }
+
+    return true;
   }
 }

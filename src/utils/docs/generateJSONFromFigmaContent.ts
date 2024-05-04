@@ -9,6 +9,7 @@ import {
 
 import { formatPageData } from './formatPageData';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
+import { getDetailsFromFigmaURL } from './figmaURLHandlers';
 
 export function generateJSONFromFigmaContent(section: SectionNode): DocData {
   let JSONData: DocData = {
@@ -116,8 +117,50 @@ function generatePageDataFromFrame(
               },
             });
             //console.log(pageData);
-            
+
             break;
+          default:
+            break;
+        }
+      } // If a comppnent is inside a frame like frame display
+      else if (childNode.type == 'FRAME') {
+        let instInsideAFrame = childNode.findChild((n) => n.type == 'INSTANCE');
+        if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
+          let mainCompId =
+            instInsideAFrame.mainComponent.parent.type == 'COMPONENT_SET'
+              ? instInsideAFrame.mainComponent.parent.id
+              : instInsideAFrame.mainComponent.id;
+
+          switch (mainCompId) {
+            case componentData.displayFrame.id:
+              let url =
+                instInsideAFrame.componentProperties[
+                  componentData.displayFrame.sourceProp
+                ].value;
+              let frameDetails;
+              if (url != '') {
+                frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
+              }
+              pageData.blocks.push({
+                type: 'displayFrame',
+                lastEdited: editedDate,
+                data: {
+                  frameId: frameDetails.frameId,
+                  fileId: frameDetails.fileId,
+                  caption:
+                    instInsideAFrame.componentProperties[
+                      componentData.displayFrame.captionProp
+                    ].value,
+                },
+              });
+              console.log('Page data generated from figma');
+
+              console.log(pageData);
+
+              break;
+            default:
+              break;
+          }
         }
       }
     }

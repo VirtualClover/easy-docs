@@ -1,6 +1,5 @@
 import {
   BlockData,
-  DEFAULT_PAGE_DATA,
   DocData,
   FIGMA_NAMESPACE,
   PageData,
@@ -21,6 +20,8 @@ export function generateFigmaContentFromJSON(
   parentSection: SectionNode,
   settings: PluginSettings
 ) {
+
+
   let pages = data.pages;
   let docTitle = data.title;
   //console.log('Gets at least here c:');
@@ -92,12 +93,10 @@ function generateBlockInstanceFromJSON(
       break;
     case 'quote':
       node = generateQuoteInstance(block.data);
-      console.log(block.data);
       //node = generateParagraphInstance(block.data);
       break;
     case 'displayFrame':
       node = generateDisplayFrameInstance(block.data);
-      //console.log(block.data);
       //node = generateParagraphInstance(block.data);
       break;
     default:

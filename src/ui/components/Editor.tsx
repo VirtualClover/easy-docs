@@ -43,6 +43,11 @@ export const Editor = () => {
             pluginContext.currentDocData.pages[pluginContext.activeTab],
             true
           );
+
+          console.log(data);
+          console.log('Reconciliation generated from editor');
+          console.log(reconciliation.changesNumber);
+          console.log(reconciliation.data);
           if (reconciliation.changesNumber) {
             formatPageData(reconciliation.data);
             /*console.log('this is pushed to figma:');
@@ -89,7 +94,6 @@ export const Editor = () => {
 
   const handleSaveEditor = async () => {
     let newData: PageData = await editorCore.current.save(); //Page data
-    console.log(newData);
     return newData;
   };
 
@@ -104,7 +108,7 @@ export const Editor = () => {
     }
   }, [pluginContext.incomingFigmaChanges]);
 
-  //Changed active
+  //Change tabs
   React.useEffect(() => {
     if (!firstRender) {
       setStopUpdates(true);
