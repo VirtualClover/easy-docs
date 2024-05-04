@@ -43,6 +43,16 @@ figma.ui.onmessage = (msg) => {
     figma.viewport.scrollAndZoomIntoView([id]);
   }
 
+  if (msg.type === 'get-selected-node') {
+    const selection = <any>figma.currentPage.selection[0];
+    //console.log(selection);
+    
+    figma.ui.postMessage({
+      type: 'selected-node-id',
+      data: selection.id,
+    });
+  }
+
   if (msg.type === 'load-data') {
     //Get keys
     pluginInit();

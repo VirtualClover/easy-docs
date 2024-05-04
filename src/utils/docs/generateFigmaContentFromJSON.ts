@@ -1,5 +1,6 @@
 import {
   BlockData,
+  DEFAULT_PAGE_DATA,
   DocData,
   FIGMA_NAMESPACE,
   PageData,
@@ -7,6 +8,7 @@ import {
 } from '../constants';
 
 import { createDocFrame } from '../figma/createDocFrame';
+import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent';
 import { generateHeaderInstance } from '../figma/components/generateHeaderInstance';
 import { generateParagraphInstance } from '../figma/components/generateParagraphInstance';
 import { generateQuoteInstance } from '../figma/components/generateQuoteInstance';
@@ -80,7 +82,7 @@ function generateBlockInstanceFromJSON(
   frame: FrameNode,
   indexInFrame: number
 ) {
-  let node: InstanceNode;
+  let node: InstanceNode | FrameNode;
   switch (block.type) {
     case 'header':
       node = generateHeaderInstance(block.data);
@@ -93,7 +95,13 @@ function generateBlockInstanceFromJSON(
       console.log(block.data);
       //node = generateParagraphInstance(block.data);
       break;
+    case 'displayFrame':
+      node = generateDisplayFrameInstance(block.data);
+      //console.log(block.data);
+      //node = generateParagraphInstance(block.data);
+      break;
     default:
+      //node = generateParagraphInstance(DEFAULT_PAGE_DATA.blocks[0].data);
       break;
   }
   if (node) {

@@ -89,6 +89,7 @@ export const Editor = () => {
 
   const handleSaveEditor = async () => {
     let newData: PageData = await editorCore.current.save(); //Page data
+    console.log(newData);
     return newData;
   };
 

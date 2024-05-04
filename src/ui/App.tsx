@@ -5,6 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants';
 import { darkTheme, lightTheme } from '../styles/base';
 
+import { BottomSheet } from './components/BottomSheet';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
 import { PluginContainer } from './components/PluginContainer';
@@ -59,6 +60,12 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
     initialPluginData.currentUser
   );
 
+  const [sheetOpen, setSheetOpen] = React.useState(initialPluginData.sheetOpen);
+
+  const [sheetContent, setSheetContent] = React.useState(
+    initialPluginData.sheetContent
+  );
+
   const [activeTab, setActiveTab] = React.useState(initialPluginData.activeTab);
 
   React.useEffect(() => {
@@ -71,7 +78,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           switch (event.data.pluginMessage.type) {
-
             case 'new-node-data':
               let data: DocData = event.data.pluginMessage.data;
               if (data) {
@@ -140,6 +146,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         setIncomingEditorChanges,
         activeTab,
         setActiveTab,
+        sheetOpen,
+        setSheetOpen,
+        sheetContent,
+        setSheetContent,
       }}
     >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
@@ -168,6 +178,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
               </Typography>
             </Box>
           )}
+          <BottomSheet />
         </PluginContainer>
       </ThemeProvider>
     </PluginDataContext.Provider>

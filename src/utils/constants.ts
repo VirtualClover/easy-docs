@@ -1,5 +1,8 @@
 import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
+import { ReactNode } from 'react';
+import { Stack } from '@mui/material';
+
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 
@@ -52,6 +55,7 @@ export const BASE_FILE_DATA = {
   displayFrame: {
     id: '',
     captionProp: '',
+    sourceProp: '',
   },
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
@@ -167,6 +171,10 @@ export const DEFAULT_PLUGIN_DATA = {
   setIncomingEditorChanges: (state: boolean) => {},
   activeTab: 0 as number,
   setActiveTab: (state: number) => {},
+  sheetOpen: false,
+  setSheetOpen: (state: boolean) => {},
+  sheetContent: null,
+  setSheetContent: (content: () => JSX.Element) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

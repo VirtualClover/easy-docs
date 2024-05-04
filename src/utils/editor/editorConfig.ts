@@ -1,3 +1,4 @@
+import { DisplayFrame } from './customTools/displayFrame/displayFrame';
 import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
@@ -23,5 +24,8 @@ export const EDITOR_TOOLS = {
       quotePlaceholder: 'Enter a quote',
       captionPlaceholder: "Quote's author",
     },
+  },
+  displayFrame: {
+    class: DisplayFrame,
   },
 };
