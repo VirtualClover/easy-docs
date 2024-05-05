@@ -2,7 +2,6 @@ import {
   AuthorUser,
   ChangesPlatform,
   DocData,
-  EMPTY_AUTHOR_DATA,
 } from '../constants';
 
 export const formatDocData = (

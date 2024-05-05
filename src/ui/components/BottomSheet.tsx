@@ -10,14 +10,13 @@ export const BottomSheet = () => {
       //pluginContext.setLoadingState('MAYOR');
     }
     console.log('Sheet open');
-    
   }, [pluginContext.sheetOpen]);
 
   return (
     <Drawer
       anchor={'bottom'}
       open={pluginContext.sheetOpen}
-      onClose={() => pluginContext.setLoadingState('NONE')}
+      onClose={() => pluginContext.setSheetOpen(false)}
     >
       {pluginContext.sheetContent}
     </Drawer>

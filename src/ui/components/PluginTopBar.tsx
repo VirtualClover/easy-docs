@@ -6,16 +6,16 @@ import {
   IconButton,
   Input,
   Stack,
-  TextField,
   Toolbar,
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Close, Edit, SettingsOutlined } from '@mui/icons-material';
+import { Close, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants';
 
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
+import { exportMarkdown } from '../../utils/docs/exportMarkDown';
 import { navigate } from '../../utils/navigate';
 import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 
@@ -109,7 +109,20 @@ const EditorBar = ({ pluginContext }: BarProps) => {
       )}
       {
         <Stack direction={'row'} gap={8}>
-          <Button variant="outlined" size="small">
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              let markdown = exportMarkdown(
+                pluginContext.currentDocData.pages[pluginContext.activeTab]
+              );
+              pluginContext.setSheetOpen(true);
+              pluginContext.setSheetContent(() => (
+                <p style={{ whiteSpace: 'pre-wrap' }}>{markdown}</p>
+              ));
+              console.log(markdown);
+            }}
+          >
             Export
           </Button>
           <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
