@@ -153,9 +153,6 @@ function generatePageDataFromFrame(
                     ].value,
                 },
               });
-              console.log('Page data generated from figma');
-
-              console.log(pageData);
 
               break;
             default:

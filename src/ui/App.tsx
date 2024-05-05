@@ -77,48 +77,50 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
       if (navigation.currentView != 'SETTINGS' && loadingState == 'NONE') {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
-          switch (event.data.pluginMessage.type) {
-            case 'new-node-data':
-              let data: DocData = event.data.pluginMessage.data;
-              if (data) {
-                /* console.log('stored in the plugin context from figma data:');
+          if (event.data.pluginMessage) {
+            switch (event.data.pluginMessage.type) {
+              case 'new-node-data':
+                let data: DocData = event.data.pluginMessage.data;
+                if (data) {
+                  /* console.log('stored in the plugin context from figma data:');
 
                console.log(data);*/
-                setCurrentDocData(data);
-                setIncomingFigmaChanges(true);
+                  setCurrentDocData(data);
+                  setIncomingFigmaChanges(true);
+                  if (navigation.currentView == 'INSPECT') {
+                    setNavigation({
+                      currentView: 'EDITOR',
+                      prevView: navigation.currentView,
+                    });
+                  }
+                }
+                break;
+
+              case 'same-node-data':
                 if (navigation.currentView == 'INSPECT') {
                   setNavigation({
                     currentView: 'EDITOR',
                     prevView: navigation.currentView,
                   });
                 }
-              }
-              break;
+                break;
 
-            case 'same-node-data':
-              if (navigation.currentView == 'INSPECT') {
-                setNavigation({
-                  currentView: 'EDITOR',
-                  prevView: navigation.currentView,
-                });
-              }
-              break;
+              case 'no-node':
+                if (navigation.currentView == 'EDITOR') {
+                  setNavigation({
+                    currentView: 'INSPECT',
+                    prevView: navigation.currentView,
+                  });
+                }
+                break;
 
-            case 'no-node':
-              if (navigation.currentView == 'EDITOR') {
-                setNavigation({
-                  currentView: 'INSPECT',
-                  prevView: navigation.currentView,
-                });
-              }
-              break;
+              case 'finished-figma-update':
+                setIncomingEditorChanges(false);
+                break;
 
-            case 'finished-figma-update':
-              setIncomingEditorChanges(false);
-              break;
-
-            default:
-              break;
+              default:
+                break;
+            }
           }
         };
       }

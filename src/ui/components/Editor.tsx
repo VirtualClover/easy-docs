@@ -44,10 +44,6 @@ export const Editor = () => {
             true
           );
 
-          console.log(data);
-          console.log('Reconciliation generated from editor');
-          console.log(reconciliation.changesNumber);
-          console.log(reconciliation.data);
           if (reconciliation.changesNumber) {
             formatPageData(reconciliation.data);
             /*console.log('this is pushed to figma:');

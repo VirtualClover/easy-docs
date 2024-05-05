@@ -50,3 +50,22 @@ export function generateFigmaURL(
     }
   }
 }
+
+export function getEmbedURLFromShare(URL: string) {
+  let frameDetails = getDetailsFromFigmaURL(URL, 'encode');
+  return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${frameDetails.fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameDetails.frameId}`;
+}
+
+export function validateFigmaURL(
+  url: string,
+  validationType: FigmaURLType = 'share'
+) {
+  if (validationType == 'share')
+    return url.match(
+      /(https?:\/\/(.+?\.)?figma\.com\/file(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
+    );
+  else
+    return url.match(
+      /(https?:\/\/(.+?\.)?figma\.com\/embed(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
+    );
+}

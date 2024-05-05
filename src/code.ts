@@ -46,7 +46,7 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'get-selected-node') {
     const selection = <any>figma.currentPage.selection[0];
     //console.log(selection);
-    
+
     figma.ui.postMessage({
       type: 'selected-node-id',
       data: selection.id,
@@ -70,9 +70,9 @@ figma.ui.onmessage = (msg) => {
   //Push updates from figma
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
-      pushFigmaUpdates().then((res) =>
-        figma.ui.postMessage({ type: res.type, data: res.data })
-      );
+      pushFigmaUpdates().then((res) => {
+        figma.ui.postMessage({ type: res.type, data: res.data });
+      });
       //console.log('inspect done');
     }
   }

@@ -1,9 +1,11 @@
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
+  getEmbedURLFromShare,
+  validateFigmaURL,
 } from '../../../docs/figmaURLHandlers';
 
-import { ToolConstructable } from '@editorjs/editorjs';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { styled } from '@mui/material';
 
@@ -33,7 +35,14 @@ const InputUI = (blockData: ComponentProps) => {
     gap: 12,
   }));
 
-  let src = generateFigmaURL(blockData.fileId, blockData.frameId, 'embed');
+  let [src, setSrc] = React.useState(
+    generateFigmaURL(blockData.fileId, blockData.frameId, 'share')
+  );
+
+  let [frameDetails, setFrameDetails] = React.useState({
+    frameId: blockData.frameId,
+    fileId: blockData.fileId,
+  });
 
   return (
     <BlockWrapper>
@@ -42,27 +51,31 @@ const InputUI = (blockData: ComponentProps) => {
         id="cdx-display-frame-frame-url"
         placeholder={'Add Figma link here!'}
         style={{ flex: 1 }}
-        defaultValue={generateFigmaURL(
-          blockData.fileId,
-          blockData.frameId,
-          'share'
-        )}
+        value={src}
         onChange={(e) => {
-          console.log(e.target.value);
-          
-          src = '';
+          setSrc(e.target.value);
+          if (validateFigmaURL(e.target.value)) {
+            setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
+          }
         }}
       />
-      <>
-        <IFrame src={src}></IFrame>
-        <input
-          style={{ display: src ? 'visible' : 'hidden' }}
-          className="cdx-input"
-          id="cdx-display-frame-caption"
-          placeholder={'Enter a caption!'}
-          value={blockData.caption}
-        />
-      </>
+      {validateFigmaURL(src) && (
+        <>
+          <IFrame
+            src={generateFigmaURL(
+              frameDetails.fileId,
+              frameDetails.frameId,
+              'embed'
+            )}
+          ></IFrame>
+          <input
+            className="cdx-input"
+            id="cdx-display-frame-caption"
+            placeholder={'Enter a caption!'}
+            defaultValue={blockData.caption}
+          />
+        </>
+      )}
     </BlockWrapper>
   );
 };

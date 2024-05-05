@@ -139,7 +139,6 @@ export function generateDisplayFrameInstance(data): FrameNode {
     let nodeToDisplay;
 
     if (data.frameId) {
-      console.log(data.frameId);
 
       let node = figma.getNodeById(data.frameId);
       if (node.type == 'FRAME') {
