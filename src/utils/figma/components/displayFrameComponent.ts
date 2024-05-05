@@ -104,6 +104,8 @@ function generateOuterWrapper(
   //Node to display
   if (nodeToDisplay) {
     let duplicatedNode = nodeToDisplay.clone();
+    let scaleFactor = (1288 - 32) / nodeToDisplay.width;
+    duplicatedNode.rescale(scaleFactor);
     displayFrame.appendChild(duplicatedNode);
   }
 
@@ -139,7 +141,6 @@ export function generateDisplayFrameInstance(data): FrameNode {
     let nodeToDisplay;
 
     if (data.frameId) {
-
       let node = figma.getNodeById(data.frameId);
       if (node.type == 'FRAME') {
         nodeToDisplay = node;
