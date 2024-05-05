@@ -8,9 +8,9 @@ import {
 
 import { createDocFrame } from '../figma/createDocFrame';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent';
-import { generateHeaderInstance } from '../figma/components/generateHeaderInstance';
-import { generateParagraphInstance } from '../figma/components/generateParagraphInstance';
-import { generateQuoteInstance } from '../figma/components/generateQuoteInstance';
+import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
+import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
+import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
 import { resizeSection } from '../figma/resizeSection';
 
 let lastEditedKey = 'lastEdited';
@@ -20,8 +20,6 @@ export function generateFigmaContentFromJSON(
   parentSection: SectionNode,
   settings: PluginSettings
 ) {
-
-
   let pages = data.pages;
   let docTitle = data.title;
   //console.log('Gets at least here c:');

@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
 
+import { BaseFileData } from '../../constants';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
@@ -29,4 +30,20 @@ export async function createParagraphComponent(parent: FrameNode) {
     parent.appendChild(component);
   });
   return { id: component.id, contentProp: contentProperty };
+}
+
+export function generateParagraphInstance(data): InstanceNode {
+  let componentData: BaseFileData = JSON.parse(
+    figma.root.getSharedPluginData('EasyDocs', 'components')
+  );
+  let component = figma.getNodeById(componentData.paragraph.id);
+  if (component.type == 'COMPONENT') {
+    let instance = component.createInstance();
+    instance.setProperties({
+      [componentData.paragraph.contentProp]: data.text.replace('&nbsp;', ' '),
+    });
+    return instance;
+    //instance.set
+  }
+  return null;
 }

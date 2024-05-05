@@ -1,8 +1,8 @@
 import { BaseFileData } from '../../constants';
 import { createDisplayFrameComponent } from './displayFrameComponent';
-import { createHeaderComponent } from './createHeaderComponent';
-import { createParagraphComponent } from './createParagraphComponent';
-import { createQuoteComponent } from './createQuoteComponent';
+import { createHeaderComponent } from './headerComponent.figma';
+import { createParagraphComponent } from './paragraphComponent.figma';
+import { createQuoteComponent } from './quoteComponent.figma';
 
 export async function initComponents(
   componentData: BaseFileData,
