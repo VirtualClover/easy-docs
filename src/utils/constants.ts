@@ -154,6 +154,8 @@ export interface Reconciliation {
   changesNumber: number;
 }
 
+export interface PageReconciliation {}
+
 export const DEFAULT_PLUGIN_DATA = {
   currentDocData: DEFAULT_DOC_DATA,
   currentUser: EMPTY_USER_AUTHOR_DATA,

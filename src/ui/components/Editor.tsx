@@ -43,18 +43,14 @@ export const Editor = () => {
           );
 
           if (reconciliation.changesNumber) {
-            formatPageData(reconciliation.data);
+            let pageData = reconciliation.data as PageData;
+            formatPageData(pageData);
             /*console.log('this is pushed to figma:');
             console.log(reconciliation.data);*/
             let tempDoc: DocData = clone(pluginContext.currentDocData);
-            formatPageData(reconciliation.data);
-            tempDoc.pages[pluginContext.activeTab] = reconciliation.data;
+            tempDoc.pages[pluginContext.activeTab] = pageData;
             tempDoc.author = EMPTY_AUTHOR_DATA;
-            pushNewDataToFigma(
-              pluginContext,
-              tempDoc,
-              reconciliation.data.frameId
-            );
+            pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
           }
         });
       } else {

@@ -30,14 +30,15 @@ export function reconcileDocData(
         useCurrentDataFramesId
       );
 
+      let pageData = pageRecon.data as PageData;
       //console.log(pageRecon.data);
 
       if (pageRecon.changesNumber) {
         changesNumber += pageRecon.changesNumber;
-        currentDataPage = pageRecon.data;
+        currentDataPage = pageData;
       }
       if (!useCurrentDataFramesId) {
-        frameId = pageRecon.data.frameId;
+        frameId = pageData.frameId;
       }
     } else {
       currentDataPage = newPage;
@@ -64,7 +65,7 @@ export function reconcilePageData(
   newData: PageData,
   currentData: PageData,
   useCurrentDataFrameId: boolean = false
-) {
+): Reconciliation {
   let clonedCurrentData: PageData = clone(currentData); //Data stored in context
   let changesNumber = 0;
   if (clonedCurrentData.blocks.length != newData.blocks.length) {
