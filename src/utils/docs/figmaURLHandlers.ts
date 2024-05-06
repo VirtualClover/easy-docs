@@ -3,10 +3,16 @@ import { FrameDetailsFromURL } from '../constants';
 type FrameIdTreatment = 'encode' | 'decode';
 type FigmaURLType = 'embed' | 'share';
 
+/**
+ * Formats the frame ID for a specific URL
+ * @param id
+ * @param treatment
+ * @returns
+ */
 export function formatFrameIdForURLs(
   id: string,
   treatment: FrameIdTreatment = 'encode'
-) {
+): string {
   if (treatment == 'decode') {
     return id.replace('%3A', ':');
   } else {
@@ -14,6 +20,12 @@ export function formatFrameIdForURLs(
   }
 }
 
+/**
+ * Extracts the frame and file ID from the figma URL
+ * @param url
+ * @param frameIdTreatment
+ * @returns
+ */
 export function getDetailsFromFigmaURL(
   url: string,
   frameIdTreatment: FrameIdTreatment = 'encode'
@@ -34,11 +46,18 @@ export function getDetailsFromFigmaURL(
   };
 }
 
+/**
+ * Generates a figma URL beign a share or embed one from the file ID and frame ID
+ * @param fileId
+ * @param frameId
+ * @param type
+ * @returns
+ */
 export function generateFigmaURL(
   fileId: string,
   frameId: string,
   type: FigmaURLType
-) {
+): string {
   if (!fileId || !frameId) {
     return '';
   } else {
@@ -51,11 +70,22 @@ export function generateFigmaURL(
   }
 }
 
-export function getEmbedURLFromShare(URL: string) {
+/**
+ * Transforms a Figma share URL to and embed one
+ * @param URL
+ * @returns
+ */
+export function getEmbedURLFromShare(URL: string): string {
   let frameDetails = getDetailsFromFigmaURL(URL, 'encode');
   return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${frameDetails.fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameDetails.frameId}`;
 }
 
+/**
+ * A simple validation for Figma URLs
+ * @param url
+ * @param validationType
+ * @returns
+ */
 export function validateFigmaURL(
   url: string,
   validationType: FigmaURLType = 'share'

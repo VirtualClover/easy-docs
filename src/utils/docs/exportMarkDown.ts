@@ -2,7 +2,12 @@ import { DEFAULT_SETTINGS, DocData, PageData } from '../constants';
 
 import { generateFigmaURL } from './figmaURLHandlers';
 
-export function exportMarkdown(data: PageData) {
+/**
+ * Generates markdown from the JSON page doc object
+ * @param data
+ * @returns
+ */
+export function exportMarkdown(data: PageData): string {
   console.log(data);
 
   let markdown = [];
@@ -28,7 +33,9 @@ export function exportMarkdown(data: PageData) {
             block.data.fileId,
             block.data.frameId,
             'embed'
-          )}" allowfullscreen></iframe>  \n\n*${block.data.caption}*`
+          )}" allowfullscreen></iframe>  \n${
+            block.data.caption ? `\n*${block.data.caption}*` : ''
+          }`
         );
         break;
     }

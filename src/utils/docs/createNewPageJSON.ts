@@ -1,4 +1,11 @@
-export const createNewPageJSON = (arrayNumber) => {
+import { PageData } from '../constants';
+
+/**
+ * Creates a new page JSON
+ * @param arrayNumber
+ * @returns
+ */
+export const createNewPageJSON = (arrayNumber: number): PageData => {
   let data = {
     blocks: [
       {

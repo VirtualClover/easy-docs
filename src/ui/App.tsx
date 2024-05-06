@@ -111,6 +111,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                     currentView: 'INSPECT',
                     prevView: navigation.currentView,
                   });
+                  setSheetOpen(false);
                 }
                 break;
 

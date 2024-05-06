@@ -6,6 +6,14 @@ import { cleanseTextData } from '../cleanseTextData';
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';
 
+/**
+ * Evaluates if there are changes between two doc JSONs
+ * @param newData
+ * @param currentData
+ * @param useCurrentDataFramesId
+ * @param useCurrentDataSectionId
+ * @returns
+ */
 export function reconcileDocData(
   newData: DocData,
   currentData: DocData,
@@ -61,6 +69,13 @@ export function reconcileDocData(
   return { changesNumber, data: clonedCurrentData };
 }
 
+/**
+ * Evaluates if there are changes between two page JSONs
+ * @param newData
+ * @param currentData
+ * @param useCurrentDataFrameId
+ * @returns
+ */
 export function reconcilePageData(
   newData: PageData,
   currentData: PageData,

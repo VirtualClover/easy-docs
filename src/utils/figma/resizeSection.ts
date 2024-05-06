@@ -1,5 +1,10 @@
 import { DEFAULT_SETTINGS, SectionSettings } from '../constants';
 
+/**
+ * Resizes a section
+ * @param section 
+ * @param sectionSettings 
+ */
 export function resizeSection(
   section: SectionNode,
   sectionSettings: SectionSettings = DEFAULT_SETTINGS.section

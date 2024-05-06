@@ -1,4 +1,10 @@
-export function objectIsNull(value) {
+
+/**
+ * Checks if an object is null
+ * @param value 
+ * @returns 
+ */
+export function objectIsNull(value): Boolean {
   for (var key in value) {
     if (value[key] == null || value[key] == undefined) return true;
     if (typeof value[key] === 'object' && Object.keys(value[key]).length === 0)

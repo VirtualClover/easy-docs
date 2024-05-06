@@ -4,9 +4,14 @@ import { createHeaderComponent } from './headerComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
 
+/**
+ * Generates the main components in a Figma file
+ * @param componentData
+ * @param wholeObjectisMissing
+ */
 export async function initComponents(
   componentData: BaseFileData,
-  wholeObjectisMissing = true
+  wholeObjectisMissing: Boolean = true
 ) {
   figma.notify(
     wholeObjectisMissing
@@ -41,7 +46,7 @@ export async function initComponents(
     createHeaderComponent(frame),
     createParagraphComponent(frame),
     createQuoteComponent(frame),
-    createDisplayFrameComponent(frame)
+    createDisplayFrameComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];

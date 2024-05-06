@@ -7,17 +7,11 @@ import {
 
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { initComponents } from './components/initComponents';
-import { nodeSupportsChildren } from './nodeSupportsChildren';
 import { objectIsNull } from '../objectisNull';
 
-function isInNode(parentID, nodeID) {
-  let parentNode = figma.getNodeById(parentID);
-  if (nodeSupportsChildren(parentNode)) {
-    return parentNode.findOne((n) => n.id === nodeID);
-  }
-  return false;
-}
-
+/**
+ * The initialization func of the plugin
+ */
 export function pluginInit() {
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
   let userData: AuthorUser = getUserDetailsInFigma();

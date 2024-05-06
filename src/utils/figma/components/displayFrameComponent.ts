@@ -3,12 +3,11 @@ import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
-import {
-  generateFigmaURL,
-  getDetailsFromFigmaURL,
-} from '../../docs/figmaURLHandlers';
 
 import { cleanseString } from '../../cleanseTextData';
+import {
+  generateFigmaURL,
+} from '../../docs/figmaURLHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 

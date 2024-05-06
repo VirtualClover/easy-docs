@@ -1,10 +1,4 @@
-import {
-  DEFAULT_SETTINGS,
-  FrameSettings,
-  PageData,
-  PluginSettings,
-  SectionSettings,
-} from '../constants';
+import { DEFAULT_SETTINGS, PluginSettings } from '../constants';
 
 import { resizeSection } from './resizeSection';
 
@@ -19,7 +13,7 @@ export function createDocFrame(
   parent: SectionNode,
   name: string,
   settings: PluginSettings
-) {
+): FrameNode {
   //Create Frame
   const frame: FrameNode = figma.createFrame();
   frame.layoutMode = 'VERTICAL';

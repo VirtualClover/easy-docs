@@ -3,7 +3,13 @@ import { DocData, PluginSettings } from '../constants';
 import { generateFigmaContentFromJSON } from '../docs/generateFigmaContentFromJSON';
 import { setNodeFills } from './setNodeFills';
 
-export function createNewDoc(data: DocData, settings: PluginSettings) {
+/**
+ * Creates a new doc on the Figma canvas
+ * @param data 
+ * @param settings 
+ * @returns 
+ */
+export function createNewDoc(data: DocData, settings: PluginSettings): SectionNode {
   let parentSection = figma.createSection();
   parentSection.resizeWithoutConstraints(
     settings.section.padding,

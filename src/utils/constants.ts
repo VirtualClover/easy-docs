@@ -1,8 +1,5 @@
 import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
-import { ReactNode } from 'react';
-import { Stack } from '@mui/material';
-
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 

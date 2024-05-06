@@ -3,6 +3,9 @@ import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
 
+/**
+ * The base editor config
+ */
 export const EDITOR_TOOLS = {
   paragraph: {
     class: Paragraph,

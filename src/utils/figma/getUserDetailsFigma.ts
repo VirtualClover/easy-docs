@@ -1,5 +1,9 @@
 import { AuthorUser } from '../constants';
 
+/**
+ * Gets the user details from the Figma to create and authro user obj
+ * @returns 
+ */
 export const getUserDetailsInFigma = (): AuthorUser => {
   return {
     id: figma.currentUser.id,
