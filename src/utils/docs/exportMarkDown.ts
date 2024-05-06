@@ -5,7 +5,7 @@ import { generateFigmaURL } from './figmaURLHandlers';
 export function exportMarkdown(data: PageData) {
   console.log(data);
 
-  let markdown = [''];
+  let markdown = [];
 
   for (let i = 0; i < data.blocks.length; i++) {
     const block = data.blocks[i];
@@ -18,7 +18,7 @@ export function exportMarkdown(data: PageData) {
         markdown.push(`${block.data.text}`);
         break;
       case 'quote':
-        markdown.push(`> ${block.data.text}\n${block.data.caption}`);
+        markdown.push(`> ${block.data.text}  \n> ${block.data.caption}`);
         break;
       case 'displayFrame':
         markdown.push(
@@ -28,7 +28,7 @@ export function exportMarkdown(data: PageData) {
             block.data.fileId,
             block.data.frameId,
             'embed'
-          )}" allowfullscreen></iframe>`
+          )}" allowfullscreen></iframe>  \n\n*${block.data.caption}*`
         );
         break;
     }

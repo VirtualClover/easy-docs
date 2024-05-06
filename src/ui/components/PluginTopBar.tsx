@@ -13,6 +13,7 @@ import {
 import { Close, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants';
 
+import { MarkdownView } from './MarkdownView';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 import { exportMarkdown } from '../../utils/docs/exportMarkDown';
@@ -23,21 +24,25 @@ interface BarProps {
   pluginContext: PluginData;
 }
 
-const InspectBar = ({ pluginContext }: BarProps) => (
-  <>
-    <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
-      Inspect
-    </Typography>
-    {
-      <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
-        <SettingsOutlined />
-      </IconButton>
-    }
-  </>
-);
-const EditorBar = ({ pluginContext }: BarProps) => {
+const InspectBar = () => {
+  const pluginContext = React.useContext(PluginDataContext);
+  return (
+    <>
+      <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
+        Inspect
+      </Typography>
+      {
+        <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
+          <SettingsOutlined />
+        </IconButton>
+      }
+    </>
+  );
+};
+const EditorBar = () => {
   const [editDocTitle, setEditDocTitle] = React.useState(false);
   const [editIconVisible, setEditIconVisible] = React.useState(false);
+  const pluginContext = React.useContext(PluginDataContext);
 
   function handleInputChange(pluginContext: PluginData, title: string) {
     let tempDoc: DocData = {
@@ -113,12 +118,13 @@ const EditorBar = ({ pluginContext }: BarProps) => {
             variant="outlined"
             size="small"
             onClick={() => {
+              console.log(pluginContext);
               let markdown = exportMarkdown(
                 pluginContext.currentDocData.pages[pluginContext.activeTab]
               );
               pluginContext.setSheetOpen(true);
               pluginContext.setSheetContent(() => (
-                <p style={{ whiteSpace: 'pre-wrap' }}>{markdown}</p>
+                <MarkdownView markdown={markdown} />
               ));
               console.log(markdown);
             }}
@@ -134,36 +140,39 @@ const EditorBar = ({ pluginContext }: BarProps) => {
   );
 };
 
-const SettingsBar = ({ pluginContext }: BarProps) => (
-  <>
-    <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
-      Settings
-    </Typography>
-    {
-      <IconButton
-        onClick={() =>
-          navigate(pluginContext.navigation.prevView, pluginContext)
-        }
-      >
-        <Close />
-      </IconButton>
-    }
-  </>
-);
+const SettingsBar = () => {
+  const pluginContext = React.useContext(PluginDataContext);
+  return (
+    <>
+      <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
+        Settings
+      </Typography>
+      {
+        <IconButton
+          onClick={() =>
+            navigate(pluginContext.navigation.prevView, pluginContext)
+          }
+        >
+          <Close />
+        </IconButton>
+      }
+    </>
+  );
+};
 
 function decideBarContent(pluginContext: PluginData) {
   switch (pluginContext.navigation.currentView) {
     case 'INSPECT':
-      return <InspectBar pluginContext={pluginContext} />;
+      return <InspectBar />;
       break;
     case 'EDITOR':
-      return <EditorBar pluginContext={pluginContext} />;
+      return <EditorBar />;
       break;
     case 'SETTINGS':
-      return <SettingsBar pluginContext={pluginContext} />;
+      return <SettingsBar />;
       break;
     default:
-      return <InspectBar pluginContext={pluginContext} />;
+      return <InspectBar />;
       break;
   }
 }
@@ -171,9 +180,7 @@ function decideBarContent(pluginContext: PluginData) {
 export const PluginTopBar = () => {
   const pluginContext = React.useContext(PluginDataContext);
 
-  const [barContent, setBarContent] = React.useState(
-    <InspectBar pluginContext={pluginContext} />
-  );
+  const [barContent, setBarContent] = React.useState(<InspectBar />);
 
   React.useEffect(() => {
     setBarContent(decideBarContent(pluginContext));

@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from '../../utils/constants';
 import { Drawer } from '@mui/material';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
@@ -17,6 +18,7 @@ export const BottomSheet = () => {
       anchor={'bottom'}
       open={pluginContext.sheetOpen}
       onClose={() => pluginContext.setSheetOpen(false)}
+      PaperProps={{ sx: { p: 16 } }}
     >
       {pluginContext.sheetContent}
     </Drawer>

@@ -4,8 +4,6 @@ import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants';
 
 import { Box } from '@mui/material';
 import { EDITOR_TOOLS } from '../../utils/editor/editorConfig';
-import Header from '@editorjs/header';
-import Paragraph from '@editorjs/paragraph';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 import { clone } from '../../utils/clone';
