@@ -18,7 +18,7 @@ export async function createParagraphComponent(parent: FrameNode) {
     textNode.fontName = { family: 'Inter', style: 'Regular' };
     textNode.fontSize = 24;
     textNode.characters = 'Paragraph';
-    setNodeFills(textNode, DEFAULT_SETTINGS.palette.paragraph);
+    setNodeFills(textNode, DEFAULT_SETTINGS.palette.onBackground.mid);
     component.appendChild(textNode);
     textNode.layoutSizingHorizontal = 'FILL';
     contentProperty = component.addComponentProperty(

@@ -4,8 +4,8 @@ import {
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
 
-import { setNodeFills } from '../setNodeFills';
 import { BaseFileData } from '../../constants';
+import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
   parent: FrameNode,
@@ -29,7 +29,7 @@ export async function createHeaderComponent(
       textNode.fontName = { family: 'Inter', style: 'Bold' };
       textNode.fontSize = currentSize;
       textNode.characters = 'Heading';
-      setNodeFills(textNode, DEFAULT_SETTINGS.palette.heading);
+      setNodeFills(textNode, DEFAULT_SETTINGS.palette.onBackground.high);
       header.appendChild(textNode);
       textNode.layoutSizingHorizontal = 'FILL';
       contentProperty = header.addComponentProperty(
@@ -58,8 +58,7 @@ export async function createHeaderComponent(
   };
 }
 
-
-export function generateHeaderInstance(data) : InstanceNode {
+export function generateHeaderInstance(data): InstanceNode {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
@@ -74,6 +73,6 @@ export function generateHeaderInstance(data) : InstanceNode {
     return instance;
     //instance.set
   }
-  
+
   return null;
 }

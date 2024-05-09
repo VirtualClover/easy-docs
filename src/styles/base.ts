@@ -1,10 +1,83 @@
-import { DEFAULT_SETTINGS } from '../utils/constants';
 import { createTheme } from '@mui/material';
+
+const BASE_COLOR_PALETTE = {
+  primary: '#3F98FC',
+  onPrimary: '#FFF',
+  secondary: '#D6E9FF',
+  onSecondary: '#275488',
+  background: '#FFF',
+  onBackground: {
+    high: '#000000',
+    mid: '#626262',
+    low: '#898C93',
+    link: '2C7CD6',
+  },
+  surface: '#F0F5F8',
+  onSurface: {
+    high: '#000000',
+    mid: '#626262',
+    low: '#898C93',
+  },
+  divider: {
+    simple: '#E6E6E6',
+    interactive: '#B9B7B7',
+  },
+  callout: {
+    success: '',
+    info: '',
+    error: '',
+    warning: '',
+    neutral: '',
+  },
+  onCallout: '',
+  guidelines: {
+    do: '',
+    dont: '',
+  },
+  onGuidelines: '',
+};
+
+export type ColorPalette = typeof BASE_COLOR_PALETTE;
+
+export const BASE_STYLE_TOKENS = {
+  fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
+  units: {
+    u1: 1,
+    u2: 2,
+    u4: 4,
+    u6: 6,
+    u8: 8,
+    u12: 12,
+    u14: 14,
+    u16: 16,
+    u18: 18,
+    u20: 20,
+    u22: 22,
+    u24: 24,
+    u28: 28,
+    u32: 32,
+    u36: 36,
+    u42: 42,
+    u56: 56,
+    u64: 64,
+    u96: 96,
+  },
+  palette: BASE_COLOR_PALETTE,
+  opacity: {
+    disabled: 0.5,
+  },
+};
+
+export type BaseStyleTokens = typeof BASE_STYLE_TOKENS;
+
+export const baseCSS = {
+  fontFamily: BASE_STYLE_TOKENS.fontFamily,
+};
 
 const baseTheme = {
   typography: {
-    fontSize: 12,
-    fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
+    fontSize: BASE_STYLE_TOKENS.units.u12,
+    fontFamily: BASE_STYLE_TOKENS.fontFamily,
     h1: { fontWeight: 600, fontSize: 36 },
     h2: { fontWeight: 600, fontSize: 28 },
     h3: { fontWeight: 600, fontSize: 20 },
@@ -12,7 +85,7 @@ const baseTheme = {
     h5: { fontWeight: 600, fontSize: 14 },
     h6: { fontWeight: 600, fontSize: 12 },
   },
-  spacing: 1,
+  spacing: BASE_STYLE_TOKENS.units.u1,
 };
 
 export const darkTheme = createTheme({
@@ -26,14 +99,14 @@ export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     text: {
-      primary: DEFAULT_SETTINGS.palette.heading,
-      secondary: DEFAULT_SETTINGS.palette.paragraph,
+      primary: BASE_STYLE_TOKENS.palette.onBackground.high,
+      secondary: BASE_STYLE_TOKENS.palette.onBackground.mid,
     },
     background: {
-      default: DEFAULT_SETTINGS.palette.background,
-      paper: DEFAULT_SETTINGS.palette.surface,
+      default: BASE_STYLE_TOKENS.palette.background,
+      paper: BASE_STYLE_TOKENS.palette.surface,
     },
-    divider: DEFAULT_SETTINGS.palette.divider,
+    divider: BASE_STYLE_TOKENS.palette.divider.simple,
   },
   ...baseTheme,
 });

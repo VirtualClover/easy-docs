@@ -1,5 +1,7 @@
 import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
+import { BASE_STYLE_TOKENS } from '../styles/base';
+
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 
@@ -95,22 +97,6 @@ export const EMPTY_DOC_OBJECT: DocData = {
   lastEdited: Date.now().toString(),
 };
 
-const settingsPalette = {
-  heading: '#000000',
-  paragraph: '#626262',
-  do: '#BBFFCE',
-  dont: '#FFA1C9',
-  caution: '#FBF4BB',
-  successCallout: '#BBFFCE',
-  waringCallout: '#FBF4BB',
-  infoCallout: '#AFD8FE',
-  errorCallout: '#FFA1C9',
-  divider: '#E7EEF1',
-  background: '#FFF',
-  surface: '#F0F5F8',
-};
-export type SettingPalette = typeof settingsPalette;
-
 const frameSettings = {
   minWidth: 1400,
   minHeight: 50,
@@ -130,8 +116,8 @@ const sectionSettings = {
 export type SectionSettings = typeof sectionSettings;
 
 export const DEFAULT_SETTINGS = {
-  fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
-  palette: settingsPalette,
+  fontFamily: BASE_STYLE_TOKENS.fontFamily,
+  palette: BASE_STYLE_TOKENS.palette,
   frame: frameSettings,
   section: sectionSettings,
 };

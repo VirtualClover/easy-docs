@@ -5,9 +5,7 @@ import {
 } from '../../constants';
 
 import { cleanseString } from '../../cleanseTextData';
-import {
-  generateFigmaURL,
-} from '../../docs/figmaURLHandlers';
+import { generateFigmaURL } from '../../docs/figmaURLHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 
@@ -31,14 +29,14 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       sourceWrapper.layoutMode = 'VERTICAL';
       sourceWrapper.verticalPadding = 8;
       sourceWrapper.horizontalPadding = 8;
-      setNodeFills(sourceWrapper, DEFAULT_SETTINGS.palette.divider);
+      setNodeFills(sourceWrapper, DEFAULT_SETTINGS.palette.divider.simple);
       component.appendChild(sourceWrapper);
       sourceWrapper.layoutSizingHorizontal = 'FILL';
       let sourceNode = figma.createText();
       sourceNode.fontName = { family: 'Inter', style: 'Medium Italic' };
       sourceNode.fontSize = 12;
       sourceNode.characters = 'Source here';
-      setNodeFills(sourceNode, DEFAULT_SETTINGS.palette.paragraph);
+      setNodeFills(sourceNode, DEFAULT_SETTINGS.palette.onBackground.mid);
       sourceWrapper.appendChild(sourceNode);
       sourceNode.layoutSizingHorizontal = 'FILL';
       sourceProperty = component.addComponentProperty(
@@ -53,7 +51,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       captionNode.fontName = { family: 'Inter', style: 'Regular' };
       captionNode.fontSize = 16;
       captionNode.characters = 'Frame caption';
-      setNodeFills(captionNode, DEFAULT_SETTINGS.palette.paragraph);
+      setNodeFills(captionNode, DEFAULT_SETTINGS.palette.onBackground.mid);
       component.appendChild(captionNode);
       captionNode.layoutSizingHorizontal = 'FILL';
       captionProperty = component.addComponentProperty(
