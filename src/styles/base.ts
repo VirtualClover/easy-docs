@@ -57,6 +57,7 @@ export const BASE_STYLE_TOKENS = {
     u32: 32,
     u36: 36,
     u42: 42,
+    u48: 48,
     u56: 56,
     u64: 64,
     u96: 96,

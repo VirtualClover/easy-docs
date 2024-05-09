@@ -99,19 +99,26 @@ export const EMPTY_DOC_OBJECT: DocData = {
 
 const frameSettings = {
   minWidth: 1400,
-  minHeight: 50,
-  padding: 56,
+  minHeight: BASE_STYLE_TOKENS.units.u56,
+  padding: BASE_STYLE_TOKENS.units.u56,
   footer: '',
   logo: '',
 };
 export type FrameSettings = typeof frameSettings;
 
-export const DEFAULT_HEADING_SIZES = [96, 64, 48, 40, 36, 32];
+export const DEFAULT_HEADING_SIZES = [
+  BASE_STYLE_TOKENS.units.u96,
+  BASE_STYLE_TOKENS.units.u64,
+  BASE_STYLE_TOKENS.units.u48,
+  BASE_STYLE_TOKENS.units.u42,
+  BASE_STYLE_TOKENS.units.u36,
+  BASE_STYLE_TOKENS.units.u32,
+];
 
 const sectionSettings = {
-  backgroundColor: '#E7EEF1',
-  padding: 16,
-  docGap: 36,
+  backgroundColor: BASE_STYLE_TOKENS.palette.surface,
+  padding: BASE_STYLE_TOKENS.units.u16,
+  docGap: BASE_STYLE_TOKENS.units.u36,
 };
 export type SectionSettings = typeof sectionSettings;
 
@@ -167,8 +174,6 @@ export const FIGMA_COMPONENT_PREFIX = '.[EASY-DOCS]';
 
 export const FIGMA_NAMESPACE = 'EasyDocs';
 export const FIGMA_LAST_EDITED_KEY = 'lastEdited';
-
-
 
 export interface FrameDetailsFromURL {
   frameId: string;
