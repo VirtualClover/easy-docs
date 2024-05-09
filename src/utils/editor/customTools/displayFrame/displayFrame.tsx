@@ -115,6 +115,8 @@ export class DisplayFrame {
       caption = blockContent.querySelector('#cdx-display-frame-caption').value;
     }
 
+    console.log(frameUrl);
+
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),
       caption,

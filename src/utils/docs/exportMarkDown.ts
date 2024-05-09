@@ -28,8 +28,8 @@ export function exportMarkdown(data: PageData): string {
       case 'displayFrame':
         markdown.push(
           `<iframe style="border: 1px solid ${
-            DEFAULT_SETTINGS.palette.divider
-          }" src="${generateFigmaURL(
+            DEFAULT_SETTINGS.palette.divider.simple
+          };" src="${generateFigmaURL(
             block.data.fileId,
             block.data.frameId,
             'embed'
