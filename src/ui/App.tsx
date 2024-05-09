@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { Box, Typography } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants';
-import { darkTheme, lightTheme } from '../styles/base';
+import { darkTheme, lightTheme } from '../styles/themes';
 
 import { BottomSheet } from './components/BottomSheet';
 import { EditorView } from './EditorView';

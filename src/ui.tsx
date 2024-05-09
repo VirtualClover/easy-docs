@@ -3,6 +3,8 @@ import './ui.css';
 import { DEFAULT_PLUGIN_DATA, PluginData } from './utils/constants';
 
 import App from './ui/App';
+import { BASE_STYLE_TOKENS } from './styles/base';
+import { convertToPx } from './styles/converToPx';
 import { createRoot } from 'react-dom/client';
 
 let PLUGIN_DATA: PluginData = DEFAULT_PLUGIN_DATA;
@@ -27,12 +29,13 @@ onmessage = (event) => {
     const themeMode = document.documentElement.className;
     const wrapper = document.getElementById('plugin-wrapper');
     wrapper.innerHTML = '<main id="app"></main>';
+    document.body.style.fontFamily = BASE_STYLE_TOKENS.fontFamily;
+    document.body.style.margin = convertToPx(BASE_STYLE_TOKENS.units.u0);
 
     // Render your React component instead
     const root = createRoot(document.getElementById('app'));
     root.render(<App themeMode={themeMode} initialPluginData={PLUGIN_DATA} />);
   }
-  
 };
 
 /*

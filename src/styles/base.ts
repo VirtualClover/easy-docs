@@ -1,5 +1,3 @@
-import { createTheme } from '@mui/material';
-
 const BASE_COLOR_PALETTE = {
   primary: '#3F98FC',
   onPrimary: '#FFF',
@@ -42,6 +40,7 @@ export type ColorPalette = typeof BASE_COLOR_PALETTE;
 export const BASE_STYLE_TOKENS = {
   fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
   units: {
+    u0: 0,
     u1: 1,
     u2: 2,
     u4: 4,
@@ -69,44 +68,3 @@ export const BASE_STYLE_TOKENS = {
 };
 
 export type BaseStyleTokens = typeof BASE_STYLE_TOKENS;
-
-export const baseCSS = {
-  fontFamily: BASE_STYLE_TOKENS.fontFamily,
-};
-
-const baseTheme = {
-  typography: {
-    fontSize: BASE_STYLE_TOKENS.units.u12,
-    fontFamily: BASE_STYLE_TOKENS.fontFamily,
-    h1: { fontWeight: 600, fontSize: 36 },
-    h2: { fontWeight: 600, fontSize: 28 },
-    h3: { fontWeight: 600, fontSize: 20 },
-    h4: { fontWeight: 600, fontSize: 16 },
-    h5: { fontWeight: 600, fontSize: 14 },
-    h6: { fontWeight: 600, fontSize: 12 },
-  },
-  spacing: BASE_STYLE_TOKENS.units.u1,
-};
-
-export const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-  ...baseTheme,
-});
-
-export const lightTheme = createTheme({
-  palette: {
-    mode: 'light',
-    text: {
-      primary: BASE_STYLE_TOKENS.palette.onBackground.high,
-      secondary: BASE_STYLE_TOKENS.palette.onBackground.mid,
-    },
-    background: {
-      default: BASE_STYLE_TOKENS.palette.background,
-      paper: BASE_STYLE_TOKENS.palette.surface,
-    },
-    divider: BASE_STYLE_TOKENS.palette.divider.simple,
-  },
-  ...baseTheme,
-});
