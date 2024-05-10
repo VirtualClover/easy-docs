@@ -88,6 +88,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                   setCurrentDocData(data);
                   setIncomingFigmaChanges(true);
                   if (navigation.currentView == 'INSPECT') {
+                    /*let selectedFrame = event.data.pluginMessage.selectedFrame;
+                    setActiveTab(selectedFrame != -1 ? selectedFrame : 0);*/
                     setNavigation({
                       currentView: 'EDITOR',
                       prevView: navigation.currentView,
@@ -98,6 +100,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
               case 'same-node-data':
                 if (navigation.currentView == 'INSPECT') {
+                  /*let selectedFrame = event.data.pluginMessage.selectedFrame;
+                  setActiveTab(selectedFrame != -1 ? selectedFrame : 0);*/
                   setNavigation({
                     currentView: 'EDITOR',
                     prevView: navigation.currentView,

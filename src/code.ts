@@ -71,7 +71,11 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
       pushFigmaUpdates().then((res) => {
-        figma.ui.postMessage({ type: res.type, data: res.data });
+        figma.ui.postMessage({
+          type: res.type,
+          data: res.data,
+          selectedFrame: res.selectedFrame,
+        });
       });
       //console.log('inspect done');
     }
@@ -122,6 +126,7 @@ figma.ui.onmessage = (msg) => {
 };
 
 export async function pushFigmaUpdates() {
+  let selectedFrame: number = -1;
   let selection = figma.currentPage.selection[0];
   let parentSection: SectionNode;
   if (selection) {
@@ -132,6 +137,9 @@ export async function pushFigmaUpdates() {
       case 'FRAME':
         if (selection.parent.type == 'SECTION') {
           parentSection = selection.parent;
+          selectedFrame = parentSection.children
+            .map((node) => node.id)
+            .indexOf(selection.id);
         }
         break;
       case 'INSTANCE':
@@ -151,7 +159,7 @@ export async function pushFigmaUpdates() {
         }
         break;
       default:
-        return { type: 'no-node', data: '' };
+        return { type: 'no-node', data: '', selectedFrame };
         break;
     }
 
