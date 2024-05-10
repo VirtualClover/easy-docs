@@ -17,7 +17,7 @@ const BASE_COLOR_PALETTE = {
     low: '#898C93',
   },
   divider: {
-    simple: '#E6E6E6',
+    simple: '#DFE3EC',
     interactive: '#B9B7B7',
   },
   callout: {

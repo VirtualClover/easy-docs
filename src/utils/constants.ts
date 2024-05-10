@@ -179,3 +179,5 @@ export interface FrameDetailsFromURL {
   frameId: string;
   fileId: string;
 }
+
+export type ExportFileFormat = 'md' | 'html' | 'json';

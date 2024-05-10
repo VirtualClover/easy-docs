@@ -10,7 +10,12 @@ import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 
-const options = ['Export MD', 'Export HTML', 'Export JSON'];
+const options = [
+  'Export current page',
+  'Export current document',
+  'Export all docs in file',
+  'Generate doc site',
+];
 
 export const ExportButton = () => {
   const [open, setOpen] = React.useState(false);
@@ -47,13 +52,12 @@ export const ExportButton = () => {
   return (
     <React.Fragment>
       <ButtonGroup
-        variant="outlined"
+        variant="contained"
         ref={anchorRef}
         aria-label="Button group with a nested menu"
       >
         <Button onClick={handleClick}>{options[selectedIndex]}</Button>
         <Button
-          size="small"
           aria-controls={open ? 'split-button-menu' : undefined}
           aria-expanded={open ? 'true' : undefined}
           aria-label="select merge strategy"

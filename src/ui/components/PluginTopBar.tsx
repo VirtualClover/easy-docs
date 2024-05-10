@@ -13,8 +13,7 @@ import {
 import { Close, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants';
 
-import { ExportButton } from './ExportButton';
-import { MarkdownView } from './MarkdownView';
+import { ExportView } from './ExportView';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 import { exportMarkdown } from '../../utils/docs/exportMarkDown';
@@ -125,7 +124,7 @@ const EditorBar = () => {
               );
               pluginContext.setSheetOpen(true);
               pluginContext.setSheetContent(() => (
-                <MarkdownView markdown={markdown} />
+                <ExportView pageData={markdown} />
               ));
               //console.log(markdown);
             }}
@@ -211,7 +210,7 @@ export const PluginTopBar = () => {
               );
               pluginContext.setSheetOpen(true);
               pluginContext.setSheetContent(() => (
-                <MarkdownView markdown={markdown} />
+                <ExportView markdown={markdown} />
               ));
               //console.log(markdown);
             }}
