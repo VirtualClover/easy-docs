@@ -8,7 +8,7 @@ import { generateFigmaURL } from './figmaURLHandlers';
  * @returns
  */
 export function exportMarkdown(data: PageData): string {
-  console.log(data);
+  //console.log(data);
 
   let markdown = [];
 

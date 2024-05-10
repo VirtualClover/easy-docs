@@ -36,8 +36,8 @@ export function getDetailsFromFigmaURL(
     )[0];
     let frameId = url.match(/(?<=node-id=)(.*?)(?=&)/)[0];
 
-    console.log(fileId);
-    console.log(frameId);
+    //console.log(fileId);
+    //console.log(frameId);
 
     return {
       fileId: fileId,

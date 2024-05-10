@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS, PluginSettings } from '../constants';
 
+import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { resizeSection } from './resizeSection';
 
 /**
@@ -24,6 +25,7 @@ export function createDocFrame(
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';
   frame.name = name;
+  frame.cornerRadius = BASE_STYLE_TOKENS.units.u16;
   /*createInstance(componentIDs.header).then((mainHeader) => {
     mainHeader.setProperties({ 'value#1:0': name });
     frame.appendChild(mainHeader);

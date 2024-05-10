@@ -118,7 +118,7 @@ const EditorBar = () => {
             variant="outlined"
             size="small"
             onClick={() => {
-              console.log(pluginContext);
+              //console.log(pluginContext);
               let markdown = exportMarkdown(
                 pluginContext.currentDocData.pages[pluginContext.activeTab]
               );
@@ -126,7 +126,7 @@ const EditorBar = () => {
               pluginContext.setSheetContent(() => (
                 <MarkdownView markdown={markdown} />
               ));
-              console.log(markdown);
+              //console.log(markdown);
             }}
           >
             Export
