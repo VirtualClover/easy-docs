@@ -13,6 +13,7 @@ import {
 import { Close, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants';
 
+import { ExportButton } from './ExportButton';
 import { MarkdownView } from './MarkdownView';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
@@ -114,23 +115,7 @@ const EditorBar = () => {
       )}
       {
         <Stack direction={'row'} gap={8}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              //console.log(pluginContext);
-              let markdown = exportMarkdown(
-                pluginContext.currentDocData.pages[pluginContext.activeTab]
-              );
-              pluginContext.setSheetOpen(true);
-              pluginContext.setSheetContent(() => (
-                <MarkdownView markdown={markdown} />
-              ));
-              //console.log(markdown);
-            }}
-          >
-            Export
-          </Button>
+          <ExportButton />
           <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
             <SettingsOutlined />
           </IconButton>
@@ -197,3 +182,28 @@ export const PluginTopBar = () => {
     </AppBar>
   );
 };
+
+/*
+
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              //console.log(pluginContext);
+              let markdown = exportMarkdown(
+                pluginContext.currentDocData.pages[pluginContext.activeTab]
+              );
+              pluginContext.setSheetOpen(true);
+              pluginContext.setSheetContent(() => (
+                <MarkdownView markdown={markdown} />
+              ));
+              //console.log(markdown);
+            }}
+          >
+            Export
+          </Button>
+
+
+
+
+*/
