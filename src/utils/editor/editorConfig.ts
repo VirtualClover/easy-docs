@@ -1,4 +1,5 @@
 import { DisplayFrame } from './customTools/displayFrame/displayFrame';
+import { DosAndDonts } from './customTools/dosAndDonts';
 import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
@@ -29,5 +30,8 @@ export const EDITOR_TOOLS = {
   },
   displayFrame: {
     class: <any>DisplayFrame,
+  },
+  dosAndDonts: {
+    class: <any>DosAndDonts,
   },
 };

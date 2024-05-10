@@ -31,6 +31,7 @@ const BASE_COLOR_PALETTE = {
   guidelines: {
     do: '',
     dont: '',
+    warning: '',
   },
   onGuidelines: '',
 };
