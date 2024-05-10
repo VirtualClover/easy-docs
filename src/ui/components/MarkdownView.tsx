@@ -8,7 +8,15 @@ interface componentProps {
 
 export const MarkdownView = ({ markdown }: componentProps): JSX.Element => {
   return (
-    <Box sx={{ bgcolor: 'grey.900', minHeight: 300, p: 16, borderRadius: 1, overflow:'auto' }}>
+    <Box
+      sx={{
+        bgcolor: 'grey.900',
+        maxHeight: 300,
+        p: 16,
+        borderRadius: 1,
+        overflow: 'auto',
+      }}
+    >
       <Typography
         variant="body1"
         sx={{ whiteSpace: 'pre-wrap', color: 'grey.100' }}

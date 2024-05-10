@@ -115,7 +115,23 @@ const EditorBar = () => {
       )}
       {
         <Stack direction={'row'} gap={8}>
-          <ExportButton />
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              //console.log(pluginContext);
+              let markdown = exportMarkdown(
+                pluginContext.currentDocData.pages[pluginContext.activeTab]
+              );
+              pluginContext.setSheetOpen(true);
+              pluginContext.setSheetContent(() => (
+                <MarkdownView markdown={markdown} />
+              ));
+              //console.log(markdown);
+            }}
+          >
+            Export
+          </Button>
           <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
             <SettingsOutlined />
           </IconButton>

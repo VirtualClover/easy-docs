@@ -18,7 +18,15 @@ export const BottomSheet = () => {
       anchor={'bottom'}
       open={pluginContext.sheetOpen}
       onClose={() => pluginContext.setSheetOpen(false)}
-      PaperProps={{ sx: { p: 16 } }}
+      PaperProps={{
+        sx: {
+          p: 16,
+          width: `calc(95vw - 12px)`,
+          margin: '0 auto',
+          bottom: 6,
+          borderRadius: 2,
+        },
+      }}
     >
       {pluginContext.sheetContent}
     </Drawer>
