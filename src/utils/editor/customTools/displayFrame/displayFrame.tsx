@@ -1,13 +1,12 @@
+import { Alert, styled } from '@mui/material';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
-  getEmbedURLFromShare,
   validateFigmaURL,
 } from '../../../docs/figmaURLHandlers';
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { styled } from '@mui/material';
 
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
 //`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
@@ -15,6 +14,7 @@ import { styled } from '@mui/material';
 interface ComponentProps {
   frameId: string;
   fileId: string;
+  frameExistsInFile: boolean;
   caption: string;
 }
 
@@ -39,6 +39,10 @@ const InputUI = (blockData: ComponentProps) => {
     generateFigmaURL(blockData.fileId, blockData.frameId, 'share')
   );
 
+  let [frameExistsInFile, setFrameExistsInFile] = React.useState(
+    blockData.frameExistsInFile
+  );
+
   let [frameDetails, setFrameDetails] = React.useState({
     frameId: blockData.frameId,
     fileId: blockData.fileId,
@@ -61,6 +65,11 @@ const InputUI = (blockData: ComponentProps) => {
       />
       {validateFigmaURL(src) && (
         <>
+          {typeof frameExistsInFile != 'undefined' && !frameExistsInFile && (
+            <Alert severity="error">
+              The frame referenced in this block was possibly deleted.
+            </Alert>
+          )}
           <IFrame
             src={generateFigmaURL(
               frameDetails.fileId,
@@ -115,17 +124,20 @@ export class DisplayFrame {
       caption = blockContent.querySelector('#cdx-display-frame-caption').value;
     }
 
-    console.log(frameUrl);
+    //console.log(frameUrl);
+    //console.log(this.data);
 
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),
+      frameExistsInFile:
+        typeof this.data.frameExistsInFile != 'undefined' ?? true,
       caption,
     };
   }
 
   validate(savedData) {
     if (!savedData.fileId || !savedData.frameId) {
-      console.log('Not validated');
+      //console.log('Not validated');
       return false;
     }
 

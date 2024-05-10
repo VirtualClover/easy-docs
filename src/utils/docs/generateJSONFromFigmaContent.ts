@@ -141,12 +141,14 @@ function generatePageDataFromFrame(
               if (url != '') {
                 frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
               }
+              let frameExistsInFile: boolean = figma.getNodeById(frameDetails.frameId) ? true : false;
               pageData.blocks.push({
                 type: 'displayFrame',
                 lastEdited: editedDate,
                 data: {
                   frameId: frameDetails.frameId,
                   fileId: frameDetails.fileId,
+                  frameExistsInFile,
                   caption:
                     instInsideAFrame.componentProperties[
                       componentData.displayFrame.captionProp

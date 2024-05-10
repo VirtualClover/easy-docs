@@ -118,12 +118,13 @@ export function generateDisplayFrameInstance(data): FrameNode {
   );
   let component = figma.getNodeById(componentData.displayFrame.id);
   let sourceURL = generateFigmaURL(data.fileId, data.frameId, 'share');
+  let referenceNode = figma.getNodeById(data.frameId);
 
   if (nodeSupportsChildren(component)) {
     let sourceWrapper = component.children[0];
     if (nodeSupportsChildren(sourceWrapper)) {
       let sourceNode = sourceWrapper.children[0];
-      if (sourceNode.type == 'TEXT') {
+      if (sourceNode.type == 'TEXT' && referenceNode) {
         sourceNode.hyperlink = { type: 'URL', value: sourceURL };
       }
     }
@@ -138,9 +139,8 @@ export function generateDisplayFrameInstance(data): FrameNode {
     let nodeToDisplay;
 
     if (data.frameId) {
-      let node = figma.getNodeById(data.frameId);
-      if (node.type == 'FRAME') {
-        nodeToDisplay = node;
+      if (referenceNode && referenceNode.type == 'FRAME') {
+        nodeToDisplay = referenceNode;
       }
     }
 
