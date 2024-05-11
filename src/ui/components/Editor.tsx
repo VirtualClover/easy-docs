@@ -90,11 +90,16 @@ export const Editor = () => {
   //New figma changes
   React.useEffect(() => {
     if (pluginContext.incomingFigmaChanges) {
-      handleUpdateData(
-        pluginContext.currentDocData.pages[pluginContext.activeTab]
-      ).then(() => {
+      if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
+        pluginContext.setActiveTab(0);
         pluginContext.setIncomingFigmaChanges(false);
-      });
+      } else {
+        handleUpdateData(
+          pluginContext.currentDocData.pages[pluginContext.activeTab]
+        ).then(() => {
+          pluginContext.setIncomingFigmaChanges(false);
+        });
+      }
     }
   }, [pluginContext.incomingFigmaChanges]);
 

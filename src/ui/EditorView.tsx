@@ -33,7 +33,11 @@ export const EditorView = () => {
   const pluginContext = React.useContext(PluginDataContext);
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
-    pluginContext.setActiveTab(newActiveTab);
+    if (newActiveTab < tabs.length) {
+      pluginContext.setActiveTab(newActiveTab);
+    } else {
+      pluginContext.setActiveTab(0);
+    }
     //console.log('New active tab!');
     //console.log(newActiveTab);
   };
@@ -79,7 +83,11 @@ export const EditorView = () => {
       <AppBar elevation={0} color="transparent" sx={{ marginTop: 49 }}>
         <Stack direction="row">
           <Tabs
-            value={pluginContext.activeTab}
+            value={
+              tabs.length > pluginContext.activeTab
+                ? pluginContext.activeTab
+                : 0
+            }
             variant={tabs ? 'standard' : 'scrollable'} // If we remove this ternary the Tabs component bugs out
             onChange={handleChange}
             aria-label="Pages on the document"

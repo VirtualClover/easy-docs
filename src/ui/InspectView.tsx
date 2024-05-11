@@ -8,15 +8,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 export const InspectView = () => {
-  const pluginContext = React.useContext(PluginDataContext);
-
-  React.useEffect(() => {
-    if (pluginContext.navigation.currentView == 'INSPECT') {
-      pluginContext.setActiveTab(0);
-      pluginContext.setCurrentDocData(EMPTY_DOC_OBJECT);
-      console.log('Erased temp data');
-    }
-  }, [pluginContext.navigation]);
 
   return (
     <>

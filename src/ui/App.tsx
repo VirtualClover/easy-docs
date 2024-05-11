@@ -73,6 +73,12 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   }, [navigation.currentView]);
 
   React.useEffect(() => {
+    if (!currentDocData.pages[activeTab]) {
+      setActiveTab(0);
+    }
+  }, [activeTab]);
+
+  React.useEffect(() => {
     const interval = setInterval(() => {
       if (navigation.currentView != 'SETTINGS' && loadingState == 'NONE') {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
