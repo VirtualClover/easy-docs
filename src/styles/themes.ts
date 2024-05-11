@@ -18,6 +18,10 @@ const baseTheme = {
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: BASE_STYLE_TOKENS.palette.primary,
+      contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
+    },
   },
   ...baseTheme,
 });
@@ -25,6 +29,10 @@ export const darkTheme = createTheme({
 export const lightTheme = createTheme({
   palette: {
     mode: 'light',
+    primary: {
+      main: BASE_STYLE_TOKENS.palette.primary,
+      contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
+    },
     text: {
       primary: BASE_STYLE_TOKENS.palette.onBackground.high,
       secondary: BASE_STYLE_TOKENS.palette.onBackground.mid,
