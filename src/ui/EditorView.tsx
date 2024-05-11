@@ -36,16 +36,17 @@ export const EditorView = () => {
     pluginContext.setActiveTab(newActiveTab);
     //console.log('New active tab!');
     //console.log(newActiveTab);
-    
   };
 
   const handlePageCreation = () => {
     let tempDoc = pluginContext.currentDocData;
-    let newPage = createNewPageJSON(tempDoc.pages.length+1);
+    let newPage = createNewPageJSON(tempDoc.pages.length + 1);
     tempDoc.pages.push(newPage);
     /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
-    pluginContext.setActiveTab(tempDoc.pages.length - 1);
+    setTimeout(() => {
+      pluginContext.setActiveTab(tempDoc.pages.length - 1);
+    }, 100);
   };
 
   React.useEffect(() => {
