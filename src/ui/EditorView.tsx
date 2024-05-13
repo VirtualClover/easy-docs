@@ -37,8 +37,9 @@ export const EditorView = () => {
       pluginContext.setActiveTab(newActiveTab);
     } else {
       pluginContext.setActiveTab(0);
+      console.log('New active tab!');
     }
-    //console.log('New active tab!');
+    
     //console.log(newActiveTab);
   };
 

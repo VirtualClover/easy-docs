@@ -40,7 +40,7 @@ figma.ui.onmessage = (msg) => {
     let id: SceneNode | any = { id: msg.id };
     let pn = figma.currentPage;
     pn.selection = [id];
-    figma.viewport.scrollAndZoomIntoView([id]);
+    //figma.viewport.scrollAndZoomIntoView([id]);
   }
 
   if (msg.type === 'get-selected-node') {
@@ -179,12 +179,16 @@ export async function pushFigmaUpdates() {
 
         if (reconciliation.changesNumber) {
           context.lastFetchDoc = <DocData>reconciliation.data;
-          return { type: 'new-node-data', data: context.lastFetchDoc };
+          return {
+            type: 'new-node-data',
+            data: context.lastFetchDoc,
+            selectedFrame,
+          };
         } else {
-          return { type: 'same-node-data', data: '' };
+          return { type: 'same-node-data', data: '', selectedFrame };
         }
       }
     }
   }
-  return { type: 'no-node', data: '' };
+  return { type: 'no-node', data: '', selectedFrame };
 }

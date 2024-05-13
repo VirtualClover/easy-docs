@@ -87,15 +87,18 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
             switch (event.data.pluginMessage.type) {
               case 'new-node-data':
                 let data: DocData = event.data.pluginMessage.data;
-                if (data) {
+                if (data && data.pages) {
+                  console.log('data');
+
                   /* console.log('stored in the plugin context from figma data:');
 
                console.log(data);*/
                   setCurrentDocData(data);
                   setIncomingFigmaChanges(true);
                   if (navigation.currentView == 'INSPECT') {
-                    /*let selectedFrame = event.data.pluginMessage.selectedFrame;
-                    setActiveTab(selectedFrame != -1 ? selectedFrame : 0);*/
+                    let selectedFrame = event.data.pluginMessage.selectedFrame;
+                    setActiveTab(selectedFrame != -1 ? selectedFrame : 0);
+                    console.log(selectedFrame);
                     setNavigation({
                       currentView: 'EDITOR',
                       prevView: navigation.currentView,
@@ -106,8 +109,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
               case 'same-node-data':
                 if (navigation.currentView == 'INSPECT') {
-                  /*let selectedFrame = event.data.pluginMessage.selectedFrame;
-                  setActiveTab(selectedFrame != -1 ? selectedFrame : 0);*/
+                  let selectedFrame = event.data.pluginMessage.selectedFrame;
+                  console.log(selectedFrame);
+                  
+                  setActiveTab(selectedFrame != -1 ? selectedFrame : 0);
                   setNavigation({
                     currentView: 'EDITOR',
                     prevView: navigation.currentView,
