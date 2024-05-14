@@ -34,12 +34,30 @@ export const EditorView = () => {
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     if (newActiveTab < tabs.length) {
-      pluginContext.setActiveTab(newActiveTab);
+      //pluginContext.setActiveTab(newActiveTab);
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: 'select-node',
+            id: pluginContext.currentDocData.pages[newActiveTab].frameId,
+          },
+        },
+        '*'
+      );
     } else {
-      pluginContext.setActiveTab(0);
+      //pluginContext.setActiveTab(0);
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: 'select-node',
+            id: pluginContext.currentDocData.pages[0].frameId,
+          },
+        },
+        '*'
+      );
       console.log('New active tab!');
     }
-    
+
     //console.log(newActiveTab);
   };
 
