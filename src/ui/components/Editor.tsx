@@ -25,7 +25,9 @@ export const Editor = () => {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
+
       if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
+        console.log('interval');
         handleSaveEditor().then((data) => {
           /*console.log(
             'plugin context for reconciliation with new saved editor data:'
@@ -55,7 +57,26 @@ export const Editor = () => {
               tempDoc.author = EMPTY_AUTHOR_DATA;
               pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
             }
-          }
+          } else {
+        //New figma changes
+        if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: 'select-node',
+                id: pluginContext.currentDocData.pages[0].frameId,
+              },
+            },
+            '*'
+          );
+        } else {
+          handleUpdateData(
+            pluginContext.currentDocData.pages[pluginContext.activeTab]
+          ).then(() => {
+            pluginContext.setIncomingFigmaChanges(false);
+          });
+        }
+      }
         });
       } else {
         //New figma changes
@@ -84,6 +105,7 @@ export const Editor = () => {
     };
   }, [
     pluginContext.currentDocData,
+    pluginContext.activeTab,
     pluginContext.incomingFigmaChanges,
     stopUpdates,
   ]);
@@ -99,10 +121,13 @@ export const Editor = () => {
   }, []);
 
   const handleUpdateData = React.useCallback(async (data: OutputData) => {
+    console.log('renders');
+
     await editorCore.current
       .render(data)
       .then(() => {
         setStopUpdates(false);
+        console.log(data);
         console.log('set false on render');
       })
       .catch((e) => {
@@ -154,13 +179,7 @@ export const Editor = () => {
           <EditorSkeleton />
         </Box>
       )}
-      <ReactEditorJS
-        tools={EDITOR_TOOLS}
-        onInitialize={handleInitialize}
-        defaultValue={
-          pluginContext.currentDocData.pages[pluginContext.activeTab]
-        }
-      />
+      <ReactEditorJS tools={EDITOR_TOOLS} onInitialize={handleInitialize} />
     </Box>
   );
 };
