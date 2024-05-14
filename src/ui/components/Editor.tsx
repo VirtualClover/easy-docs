@@ -4,6 +4,7 @@ import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants';
 
 import { Box } from '@mui/material';
 import { EDITOR_TOOLS } from '../../utils/editor/editorConfig';
+import { OutputData } from '@editorjs/editorjs';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 import { clone } from '../../utils/clone';
@@ -45,8 +46,10 @@ export const Editor = () => {
           if (reconciliation.changesNumber) {
             let pageData = reconciliation.data as PageData;
             formatPageData(pageData);
-            /*console.log('this is pushed to figma:');
-            console.log(reconciliation.data);*/
+            console.log('Pre reconciliation current editor data');
+            console.log(data);
+            console.log('Pre reconciliation CURRENT CONTEXT DATA');
+            console.log(pluginContext.currentDocData);
             let tempDoc: DocData = clone(pluginContext.currentDocData);
             tempDoc.pages[pluginContext.activeTab] = pageData;
             tempDoc.author = EMPTY_AUTHOR_DATA;
@@ -54,8 +57,19 @@ export const Editor = () => {
           }
         });
       } else {
-        //console.log('incoming fimga changes');
-        //console.log(pluginContext.incomingFigmaChanges);
+        //New figma changes
+        if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
+          pluginContext.setActiveTab(0);
+          handleUpdateData(pluginContext.currentDocData.pages[0]).then(() => {
+            pluginContext.setIncomingFigmaChanges(false);
+          });
+        } else {
+          handleUpdateData(
+            pluginContext.currentDocData.pages[pluginContext.activeTab]
+          ).then(() => {
+            pluginContext.setIncomingFigmaChanges(false);
+          });
+        }
       }
     }, 400);
     return () => {
@@ -69,7 +83,7 @@ export const Editor = () => {
   ]);
 
   const handleInitialize = React.useCallback((instance) => {
-    //console.log('Initialized');
+    console.log('Initialized');
     //console.log(pluginContext.currentDocData);
     editorCore.current = instance;
     pluginContext.setIncomingFigmaChanges(false);
@@ -78,7 +92,12 @@ export const Editor = () => {
     }
   }, []);
 
-  const handleUpdateData = React.useCallback(async (data) => {
+  const handleUpdateData = React.useCallback(async (data: OutputData) => {
+    console.log('render');
+    console.log(pluginContext.currentDocData);
+
+    console.log(editorCore.current);
+    console.log(firstRender);
     await editorCore.current.render(data);
   }, []);
 
@@ -86,22 +105,6 @@ export const Editor = () => {
     let newData: PageData = await editorCore.current.save(); //Page data
     return newData;
   };
-
-  //New figma changes
-  React.useEffect(() => {
-    if (pluginContext.incomingFigmaChanges) {
-      if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
-        pluginContext.setActiveTab(0);
-        pluginContext.setIncomingFigmaChanges(false);
-      } else {
-        handleUpdateData(
-          pluginContext.currentDocData.pages[pluginContext.activeTab]
-        ).then(() => {
-          pluginContext.setIncomingFigmaChanges(false);
-        });
-      }
-    }
-  }, [pluginContext.incomingFigmaChanges]);
 
   //Change tabs
   React.useEffect(() => {

@@ -64,6 +64,10 @@ function generatePageDataFromFrame(
           childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
           10
         ) || Date.now();
+      let objEssentials = {
+        lastEdited: editedDate,
+        figmaNodeId: childNode.id,
+      };
       if (childNode.type == 'INSTANCE') {
         let mainCompId =
           childNode.mainComponent.parent.type == 'COMPONENT_SET'
@@ -76,7 +80,7 @@ function generatePageDataFromFrame(
                 .value;
             pageData.blocks.push({
               type: 'header',
-              lastEdited: editedDate,
+              ...objEssentials,
               data: {
                 text: headerContent,
                 level: parseInt(
@@ -94,7 +98,7 @@ function generatePageDataFromFrame(
           case componentData.paragraph.id:
             pageData.blocks.push({
               type: 'paragraph',
-              lastEdited: editedDate,
+              ...objEssentials,
               data: {
                 text: childNode.componentProperties[
                   componentData.paragraph.contentProp
@@ -105,7 +109,7 @@ function generatePageDataFromFrame(
           case componentData.quote.id:
             pageData.blocks.push({
               type: 'quote',
-              lastEdited: editedDate,
+              ...objEssentials,
               data: {
                 text: childNode.componentProperties[
                   componentData.quote.contentProp
@@ -141,10 +145,14 @@ function generatePageDataFromFrame(
               if (url != '') {
                 frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
               }
-              let frameExistsInFile: boolean = figma.getNodeById(frameDetails.frameId) ? true : false;
+              let frameExistsInFile: boolean = figma.getNodeById(
+                frameDetails.frameId
+              )
+                ? true
+                : false;
               pageData.blocks.push({
                 type: 'displayFrame',
-                lastEdited: editedDate,
+                ...objEssentials,
                 data: {
                   frameId: frameDetails.frameId,
                   fileId: frameDetails.fileId,

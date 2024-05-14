@@ -22,7 +22,8 @@ export function generateFigmaContentFromJSON(
 ) {
   let pages = data.pages;
   let docTitle = data.title;
-  //console.log('Gets at least here c:');
+  console.log('Doc data in figma');
+  console.log(data);
   parentSection.name = docTitle;
 
   for (let i = 0; i < pages.length; i++) {

@@ -29,7 +29,7 @@ export interface PageData extends OutputData {
 }
 
 export interface BlockData extends OutputBlockData {
-  figmaNodeId?: string;
+  figmaNodeId: string;
   lastEdited: number;
 }
 
@@ -68,6 +68,7 @@ export const DEFAULT_PAGE_DATA: PageData = {
         text: 'Page 1',
         level: 1,
       },
+      figmaNodeId: '',
     },
     {
       type: 'paragraph',
@@ -75,6 +76,7 @@ export const DEFAULT_PAGE_DATA: PageData = {
       data: {
         text: 'Click here to start editing!',
       },
+      figmaNodeId: '',
     },
   ],
   title: 'Page 1',
