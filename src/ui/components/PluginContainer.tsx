@@ -1,7 +1,5 @@
 import { Container, styled } from '@mui/material';
 
-import zIndex from '@mui/material/styles/zIndex';
-
 export const PluginContainer = styled(Container, {
   name: 'PluginContainer',
   slot: 'root',

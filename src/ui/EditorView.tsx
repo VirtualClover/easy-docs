@@ -14,6 +14,7 @@ import {
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { Editor } from './components/Editor';
+import { EditorSkeleton } from './components/skeletons/EditorSkeleton';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -127,7 +128,12 @@ export const EditorView = () => {
         <Toolbar variant="dense" />
       </Stack>
       <Box
-        sx={{ flex: 1, overflow: 'auto', alignSelf: 'stretch', padding: 16 }}
+        sx={{
+          overflow: 'auto',
+          flex: 1,
+          alignSelf: 'stretch',
+          padding: '16px 16px 0 16px',
+        }}
       >
         <Editor />
       </Box>

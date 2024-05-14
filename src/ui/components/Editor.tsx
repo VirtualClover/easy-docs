@@ -4,6 +4,7 @@ import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants';
 
 import { Box } from '@mui/material';
 import { EDITOR_TOOLS } from '../../utils/editor/editorConfig';
+import { EditorSkeleton } from './skeletons/EditorSkeleton';
 import { OutputData } from '@editorjs/editorjs';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
@@ -135,9 +136,31 @@ export const Editor = () => {
       sx={(theme) => ({
         ...theme.typography,
         fontSize: 14,
+        position: 'relative',
+        height: '100%',
+        width: '100%',
       })}
     >
-      <ReactEditorJS tools={EDITOR_TOOLS} onInitialize={handleInitialize} />
+      {pluginContext.incomingFigmaChanges && (
+        <Box
+          sx={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            zIndex: 1300,
+            bgcolor: 'background.default',
+          }}
+        >
+          <EditorSkeleton />
+        </Box>
+      )}
+      <ReactEditorJS
+        tools={EDITOR_TOOLS}
+        onInitialize={handleInitialize}
+        defaultValue={
+          pluginContext.currentDocData.pages[pluginContext.activeTab]
+        }
+      />
     </Box>
   );
 };
