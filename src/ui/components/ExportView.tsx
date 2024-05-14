@@ -6,11 +6,13 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   Stack,
   Typography,
 } from '@mui/material';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
+import { CopyToClipboard } from 'react-copy-to-clipboard'; // Using a library because for the life of me I cannot find a native workaround
 import { ExportButton } from './ExportButton';
 import { ExportFileFormat } from '../../utils/constants';
 import React from 'react';
@@ -21,6 +23,7 @@ interface componentProps {
 
 export const ExportView = ({ pageData }: componentProps): JSX.Element => {
   const [format, setFormat] = React.useState('md');
+  const [open, setOpen] = React.useState(false);
 
   return (
     <>
@@ -74,7 +77,16 @@ export const ExportView = ({ pageData }: componentProps): JSX.Element => {
         gap={8}
       >
         <ExportButton />
-        <Button>Copy to clipboard</Button>
+        <CopyToClipboard text={pageData} onCopy={() => setOpen(true)}>
+          <Button>Copy to clipboard</Button>
+        </CopyToClipboard>
+        <Snackbar
+          open={open}
+          autoHideDuration={1000}
+          onClose={() => setOpen(false)}
+          message="Copied to clipboard!"
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        />
       </Stack>
     </>
   );

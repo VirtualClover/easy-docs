@@ -75,7 +75,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   React.useEffect(() => {
     if (!currentDocData.pages[activeTab]) {
       setActiveTab(0);
-      console.log('Reseted active tab on app.tsx');
+      //console.log('Reseted active tab on app.tsx');
     }
   }, [activeTab]);
 
@@ -89,16 +89,16 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
               case 'new-node-data':
                 let data: DocData = event.data.pluginMessage.data;
                 if (data && data.pages) {
-                  console.log('New data from figma');
+                  //console.log('New data from figma');
 
-                  console.log(data);
+                  //console.log(data);
                   setIncomingFigmaChanges(true);
                   setCurrentDocData(data);
                   let selectedFrame = event.data.pluginMessage.selectedFrame;
                   setActiveTab(selectedFrame);
-                  console.log(
+                  /*console.log(
                     `selectedFrame in new node data: ${selectedFrame}`
-                  );
+                  );*/
                   if (navigation.currentView == 'INSPECT') {
                     setNavigation({
                       currentView: 'EDITOR',
@@ -110,16 +110,16 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
               case 'same-node-data':
                 let selectedFrame = event.data.pluginMessage.selectedFrame;
-                console.log(
+                /*console.log(
                   `selectedFrame in same node data: ${selectedFrame}`
-                );
-                console.log(`activetab PRE-CHANGE: ${activeTab}`);
+                );*/
+                //console.log(`activetab PRE-CHANGE: ${activeTab}`);
                 if (selectedFrame != activeTab) {
-                  console.log(`set active tab to: ${selectedFrame}`);
+                  //console.log(`set active tab to: ${selectedFrame}`);
                   setActiveTab(selectedFrame);
-                  console.log(`activetab: ${activeTab}`);
+                  //console.log(`activetab: ${activeTab}`);
                 }
-                console.log('------');
+                //console.log('------');
                 if (navigation.currentView == 'INSPECT') {
                   setNavigation({
                     currentView: 'EDITOR',
