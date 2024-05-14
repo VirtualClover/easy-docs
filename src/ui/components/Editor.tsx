@@ -59,6 +59,7 @@ export const Editor = () => {
       } else {
         //New figma changes
         if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
+          console.log('reseted to zero');
           pluginContext.setActiveTab(0);
           handleUpdateData(pluginContext.currentDocData.pages[0]).then(() => {
             pluginContext.setIncomingFigmaChanges(false);

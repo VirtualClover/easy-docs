@@ -125,10 +125,14 @@ figma.ui.onmessage = (msg) => {
   */
 };
 
+const getSelectedFrame = (parentSection: SectionNode, selection: SceneNode) =>
+  parentSection.children.map((node) => node.id).indexOf(selection.id);
+
 export async function pushFigmaUpdates() {
   let selectedFrame: number = -1;
   let selection = figma.currentPage.selection[0];
   let parentSection: SectionNode;
+  let parentFrame: FrameNode;
   if (selection) {
     switch (selection.type) {
       case 'SECTION':
@@ -137,15 +141,14 @@ export async function pushFigmaUpdates() {
       case 'FRAME':
         if (selection.parent.type == 'SECTION') {
           parentSection = selection.parent;
-          selectedFrame = parentSection.children
-            .map((node) => node.id)
-            .indexOf(selection.id);
+          parentFrame = selection;
         }
         break;
       case 'INSTANCE':
         if (selection.parent.type == 'FRAME') {
           if (selection.parent.parent.type == 'SECTION') {
             parentSection = selection.parent.parent;
+            parentFrame = selection.parent;
           }
         }
         break;
@@ -154,6 +157,7 @@ export async function pushFigmaUpdates() {
           if (selection.parent.parent.type == 'FRAME') {
             if (selection.parent.parent.parent.type == 'SECTION') {
               parentSection = selection.parent.parent.parent;
+              parentFrame = selection.parent.parent;
             }
           }
         }
@@ -165,8 +169,13 @@ export async function pushFigmaUpdates() {
 
     if (parentSection) {
       let generatedDoc = generateJSONFromFigmaContent(parentSection);
-      //console.log(generatedDoc);
-      //console.log('----');
+      selectedFrame = parentSection.children
+        .map((node) => node.id)
+        .indexOf(parentFrame.id);
+      console.log(parentSection);
+      console.log('----');
+      console.log(selectedFrame);
+      console.log(selection);
 
       if (generatedDoc.pages) {
         let reconciliation = reconcileDocData(
