@@ -15,6 +15,7 @@ export const createNewPageJSON = (arrayNumber: number): PageData => {
           text: `Page ${arrayNumber}`,
           level: 1,
         },
+        figmaNodeId: '',
       },
       {
         type: 'paragraph',
@@ -22,6 +23,7 @@ export const createNewPageJSON = (arrayNumber: number): PageData => {
         data: {
           text: 'Click here to start editing!',
         },
+        figmaNodeId: '',
       },
     ],
     title: `Page ${arrayNumber}`,

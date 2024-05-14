@@ -29,41 +29,45 @@ export const Editor = () => {
           /*console.log(
             'plugin context for reconciliation with new saved editor data:'
           );
-
           console.log(pluginContext.currentDocData);*/
+          if (data.blocks.length) {
+            let reconciliation = reconcilePageData(
+              {
+                ...data,
+                frameId:
+                  pluginContext.currentDocData.pages[pluginContext.activeTab]
+                    .frameId,
+              },
+              pluginContext.currentDocData.pages[pluginContext.activeTab],
+              true
+            );
 
-          let reconciliation = reconcilePageData(
-            {
-              ...data,
-              frameId:
-                pluginContext.currentDocData.pages[pluginContext.activeTab]
-                  .frameId,
-            },
-            pluginContext.currentDocData.pages[pluginContext.activeTab],
-            true
-          );
-
-          if (reconciliation.changesNumber) {
-            let pageData = reconciliation.data as PageData;
-            formatPageData(pageData);
-            console.log('Pre reconciliation current editor data');
-            console.log(data);
-            console.log('Pre reconciliation CURRENT CONTEXT DATA');
-            console.log(pluginContext.currentDocData);
-            let tempDoc: DocData = clone(pluginContext.currentDocData);
-            tempDoc.pages[pluginContext.activeTab] = pageData;
-            tempDoc.author = EMPTY_AUTHOR_DATA;
-            pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
+            if (reconciliation.changesNumber) {
+              let pageData = reconciliation.data as PageData;
+              formatPageData(pageData);
+              console.log('Pre reconciliation current editor data');
+              console.log(data);
+              console.log('Pre reconciliation CURRENT CONTEXT DATA');
+              console.log(pluginContext.currentDocData);
+              let tempDoc: DocData = clone(pluginContext.currentDocData);
+              tempDoc.pages[pluginContext.activeTab] = pageData;
+              tempDoc.author = EMPTY_AUTHOR_DATA;
+              pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
+            }
           }
         });
       } else {
         //New figma changes
         if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
-          console.log('reseted to zero');
-          pluginContext.setActiveTab(0);
-          handleUpdateData(pluginContext.currentDocData.pages[0]).then(() => {
-            pluginContext.setIncomingFigmaChanges(false);
-          });
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: 'select-node',
+                id: pluginContext.currentDocData.pages[0].frameId,
+              },
+            },
+            '*'
+          );
         } else {
           handleUpdateData(
             pluginContext.currentDocData.pages[pluginContext.activeTab]
@@ -94,12 +98,15 @@ export const Editor = () => {
   }, []);
 
   const handleUpdateData = React.useCallback(async (data: OutputData) => {
-    console.log('render');
-    console.log(pluginContext.currentDocData);
-
-    console.log(editorCore.current);
-    console.log(firstRender);
-    await editorCore.current.render(data);
+    await editorCore.current
+      .render(data)
+      .then(() => {
+        setStopUpdates(false);
+        console.log('set false on render');
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }, []);
 
   const handleSaveEditor = async () => {
@@ -109,12 +116,15 @@ export const Editor = () => {
 
   //Change tabs
   React.useEffect(() => {
+    console.log(`axtive tab on editor render: ${pluginContext.activeTab}`);
+
     if (!firstRender) {
       setStopUpdates(true);
       handleUpdateData(
         pluginContext.currentDocData.pages[pluginContext.activeTab]
       ).then(() => {
         setStopUpdates(false);
+        console.log('set false');
       });
     }
   }, [pluginContext.activeTab]);
@@ -127,13 +137,7 @@ export const Editor = () => {
         fontSize: 14,
       })}
     >
-      <ReactEditorJS
-        defaultValue={
-          pluginContext.currentDocData.pages[pluginContext.activeTab]
-        }
-        tools={EDITOR_TOOLS}
-        onInitialize={handleInitialize}
-      />
+      <ReactEditorJS tools={EDITOR_TOOLS} onInitialize={handleInitialize} />
     </Box>
   );
 };

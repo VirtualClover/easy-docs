@@ -35,6 +35,8 @@ export const EditorView = () => {
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     if (newActiveTab < tabs.length) {
       //pluginContext.setActiveTab(newActiveTab);
+      console.log(`clicked to change tab to : ${newActiveTab}`);
+
       parent.postMessage(
         {
           pluginMessage: {
@@ -67,9 +69,6 @@ export const EditorView = () => {
     tempDoc.pages.push(newPage);
     /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
-    setTimeout(() => {
-      pluginContext.setActiveTab(tempDoc.pages.length - 1);
-    }, 100);
   };
 
   React.useEffect(() => {

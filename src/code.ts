@@ -13,6 +13,7 @@ import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentF
 import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
 import { pluginInit } from './utils/figma/pluginInit';
 import { reconcileDocData } from './utils/docs/reconcileData';
+import { selectNode } from './utils/figma/selectNode';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -38,8 +39,7 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'select-node') {
     let id: SceneNode | any = { id: msg.id };
-    let pn = figma.currentPage;
-    pn.selection = [id];
+    selectNode(id);
     //figma.viewport.scrollAndZoomIntoView([id]);
   }
 
@@ -126,7 +126,7 @@ figma.ui.onmessage = (msg) => {
 };
 
 export async function pushFigmaUpdates() {
-  let selectedFrame: number = -1;
+  let selectedFrame: number = 0;
   let selection = figma.currentPage.selection[0];
   let parentSection: SectionNode;
   let parentFrame: FrameNode;
