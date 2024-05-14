@@ -125,9 +125,6 @@ figma.ui.onmessage = (msg) => {
   */
 };
 
-const getSelectedFrame = (parentSection: SectionNode, selection: SceneNode) =>
-  parentSection.children.map((node) => node.id).indexOf(selection.id);
-
 export async function pushFigmaUpdates() {
   let selectedFrame: number = -1;
   let selection = figma.currentPage.selection[0];
@@ -169,13 +166,11 @@ export async function pushFigmaUpdates() {
 
     if (parentSection) {
       let generatedDoc = generateJSONFromFigmaContent(parentSection);
-      selectedFrame = parentSection.children
-        .map((node) => node.id)
-        .indexOf(parentFrame.id);
-      console.log(parentSection);
-      console.log('----');
-      console.log(selectedFrame);
-      console.log(selection);
+      if (parentFrame) {
+        selectedFrame = parentSection.children
+          .map((node) => node.id)
+          .indexOf(parentFrame.id);
+      }
 
       if (generatedDoc.pages) {
         let reconciliation = reconcileDocData(

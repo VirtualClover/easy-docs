@@ -106,11 +106,14 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 break;
 
               case 'same-node-data':
+                let selectedFrame = event.data.pluginMessage.selectedFrame;
+                console.log(selectedFrame);
+                if (selectedFrame != activeTab) {
+                  setActiveTab(
+                    selectedFrame != -1 && selectedFrame ? selectedFrame : 0
+                  );
+                }
                 if (navigation.currentView == 'INSPECT') {
-                  let selectedFrame = event.data.pluginMessage.selectedFrame;
-                  console.log(selectedFrame);
-
-                  setActiveTab(selectedFrame != -1 ? selectedFrame : 0);
                   setNavigation({
                     currentView: 'EDITOR',
                     prevView: navigation.currentView,
