@@ -79,6 +79,7 @@ export const Editor = () => {
               handleUpdateData(
                 pluginContext.currentDocData.pages[pluginContext.activeTab]
               ).then(() => {
+                setStopUpdates(false);
                 pluginContext.setIncomingFigmaChanges(false);
               });
             }
@@ -103,6 +104,7 @@ export const Editor = () => {
           handleUpdateData(
             pluginContext.currentDocData.pages[pluginContext.activeTab]
           ).then(() => {
+            setStopUpdates(false);
             pluginContext.setIncomingFigmaChanges(false);
           });
         }
@@ -135,7 +137,6 @@ export const Editor = () => {
     await editorCore.current
       .render(data)
       .then(() => {
-        setStopUpdates(false);
         console.log(data);
         console.log('set false on render');
       })
