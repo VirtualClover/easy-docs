@@ -25,7 +25,6 @@ export const Editor = () => {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-
       if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
         console.log('interval');
         handleSaveEditor().then((data) => {
@@ -58,25 +57,32 @@ export const Editor = () => {
               pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
             }
           } else {
-        //New figma changes
-        if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: 'select-node',
-                id: pluginContext.currentDocData.pages[0].frameId,
-              },
-            },
-            '*'
-          );
-        } else {
-          handleUpdateData(
-            pluginContext.currentDocData.pages[pluginContext.activeTab]
-          ).then(() => {
-            pluginContext.setIncomingFigmaChanges(false);
-          });
-        }
-      }
+            //New figma changes
+            if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
+              console.log(
+                ' if no blocks length. render when active tab does not exist in doc'
+              );
+              parent.postMessage(
+                {
+                  pluginMessage: {
+                    type: 'select-node',
+                    id: pluginContext.currentDocData.pages[0].frameId,
+                  },
+                },
+                '*'
+              );
+            } else {
+              console.log(
+                'if no blocks length. render when active tab exists in doc'
+              );
+
+              handleUpdateData(
+                pluginContext.currentDocData.pages[pluginContext.activeTab]
+              ).then(() => {
+                pluginContext.setIncomingFigmaChanges(false);
+              });
+            }
+          }
         });
       } else {
         //New figma changes
@@ -91,6 +97,9 @@ export const Editor = () => {
             '*'
           );
         } else {
+          console.log(
+            'if no incoming figma changes. render when active tab exists in doc'
+          );
           handleUpdateData(
             pluginContext.currentDocData.pages[pluginContext.activeTab]
           ).then(() => {
@@ -146,6 +155,7 @@ export const Editor = () => {
 
     if (!firstRender) {
       setStopUpdates(true);
+      console.log('change of tabs. render when active tab exists in doc');
       handleUpdateData(
         pluginContext.currentDocData.pages[pluginContext.activeTab]
       ).then(() => {
