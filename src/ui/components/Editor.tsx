@@ -160,7 +160,7 @@ export const Editor = () => {
       handleUpdateData(
         pluginContext.currentDocData.pages[pluginContext.activeTab]
       ).then(() => {
-        setStopUpdates(false);
+        setStopUpdates(false); 
         console.log('set false');
       });
     }
