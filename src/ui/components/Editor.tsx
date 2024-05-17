@@ -64,6 +64,8 @@ export const Editor = () => {
                 tempDoc.author = EMPTY_AUTHOR_DATA;
                 pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
               }
+            } else {
+              pluginContext.setIncomingFigmaChanges(false);
             }
           } else {
             //New figma changes

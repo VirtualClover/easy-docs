@@ -150,9 +150,6 @@ async function generatePageDataFromFrame(
               await figma
                 .getNodeByIdAsync(frameDetails.frameId)
                 .then((node) => {
-                  console.log('find displayed frame');
-                  console.log(node);
-
                   frameExistsInFile = node != null ? true : false;
                   pageData.blocks.push({
                     type: 'displayFrame',

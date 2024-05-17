@@ -89,9 +89,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
               case 'new-node-data':
                 let data: DocData = event.data.pluginMessage.data;
                 if (data && data.pages) {
-                  //console.log('New data from figma');
-
-                  //console.log(data);
                   setIncomingFigmaChanges(true);
                   setCurrentDocData(data);
                   let selectedFrame = event.data.pluginMessage.selectedFrame;
