@@ -94,8 +94,6 @@ export const Editor = () => {
       }
     }, 400);
     return () => {
-      console.log(pluginContext.incomingFigmaChanges);
-      setSkeleton(false);
       setStopUpdates(false);
       clearInterval(interval);
     };
@@ -109,6 +107,7 @@ export const Editor = () => {
   const handleInitialize = React.useCallback((instance) => {
     console.log('Initialized');
     //console.log(pluginContext.currentDocData);
+    setSkeleton(true);
     editorCore.current = instance;
     if (firstRender) {
       setFirstRender(false);
@@ -117,21 +116,17 @@ export const Editor = () => {
 
   const handleUpdateData = React.useCallback(async (data: OutputData) => {
     console.log('renders');
-    setSkeleton(true);
     await editorCore.current
       .render(data)
       .then(() => {
-        console.log(data);
         console.log('set false on render');
-        console.log(firstRender);
-        console.log(skeleton);
-        console.log(pluginContext.incomingFigmaChanges);
+        setSkeleton(false);
+        pluginContext.setIncomingFigmaChanges(false);
+        console.log('set figma changes on false');
       })
       .catch((e) => {
         console.error(e);
       });
-    pluginContext.setIncomingFigmaChanges(false);
-    console.log('set figma changes on false');
   }, []);
 
   const handleSaveEditor = async () => {
@@ -142,6 +137,7 @@ export const Editor = () => {
   //Change tabs
   React.useEffect(() => {
     if (!firstRender) {
+      setSkeleton(true);
       setStopUpdates(true);
       console.log(`axtive tab on editor render: ${pluginContext.activeTab}`);
       console.log('change of tabs. render when active tab exists in doc');
@@ -156,7 +152,7 @@ export const Editor = () => {
 
   return (
     <>
-      {pluginContext.incomingFigmaChanges && (
+      {(pluginContext.incomingFigmaChanges || skeleton) && (
         <Box
           sx={{
             position: 'absolute',

@@ -61,8 +61,6 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'create-new-doc') {
     let section = createNewDoc(DEFAULT_DOC_DATA, context.settings);
     context.lastFetchDoc = generateJSONFromFigmaContent(section);
-    console.log('edited fetch doc on create doc');
-    console.log(context.lastFetchDoc);
 
     figma.ui.postMessage({
       type: 'new-node-data',
@@ -90,8 +88,6 @@ figma.ui.onmessage = (msg) => {
     let data: DocData = msg.data;
     let section: BaseNode = data.sectionId && figma.getNodeById(data.sectionId);
     context.lastFetchDoc = data;
-    console.log('edited fetch doc on update selected doc');
-    console.log(context.lastFetchDoc);
     if (section && section.type === 'SECTION') {
       generateFigmaContentFromJSON(data, section, context.settings);
       let selectedFrame = figma.getNodeById(msg.editedFrame);
@@ -182,14 +178,9 @@ export async function pushFigmaUpdates() {
           generatedDoc,
           context.lastFetchDoc
         );
-        console.log(generatedDoc);
-        console.log('reconciliation data from figma generated doc: ');
-        console.log(reconciliation);
 
         if (reconciliation.changesNumber) {
           context.lastFetchDoc = <DocData>reconciliation.data;
-          console.log('edited fetch doc on node update');
-          console.log(context.lastFetchDoc);
           return {
             type: 'new-node-data',
             data: context.lastFetchDoc,
