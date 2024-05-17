@@ -139,6 +139,8 @@ export const Editor = () => {
       .render(data)
       .then(() => {
         setSkeleton(false);
+        console.log(data);
+        console.log('set false on render');
       })
       .catch((e) => {
         console.error(e);
