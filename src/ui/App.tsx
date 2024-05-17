@@ -81,7 +81,11 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (navigation.currentView != 'SETTINGS' && loadingState == 'NONE') {
+      if (
+        navigation.currentView != 'SETTINGS' &&
+        loadingState == 'NONE' &&
+        !incomingEditorChanges
+      ) {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           if (event.data.pluginMessage) {
