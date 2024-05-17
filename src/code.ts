@@ -93,8 +93,6 @@ figma.ui.onmessage = (msg) => {
       let selectedFrame = figma.getNodeById(msg.editedFrame);
       if (selectedFrame && selectedFrame.type === 'FRAME') {
         figma.currentPage.selection = [selectedFrame];
-      } else {
-        figma.currentPage.selection = [section];
       }
     }
     context.stopSendingUpdates = false;

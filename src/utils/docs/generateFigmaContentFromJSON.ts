@@ -12,6 +12,7 @@ import { generateHeaderInstance } from '../figma/components/headerComponent.figm
 import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
 import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
 import { resizeSection } from '../figma/resizeSection';
+import { selectNode } from '../figma/selectNode';
 
 let lastEditedKey = 'lastEdited';
 
@@ -32,6 +33,7 @@ export function generateFigmaContentFromJSON(
       frame = figma.getNodeById(page.frameId) as FrameNode;
     } else {
       frame = createDocFrame(parentSection, page.title, settings);
+      selectNode(frame);
     }
     generateFrameDataFromJSON(page, frame);
     resizeSection(parentSection);

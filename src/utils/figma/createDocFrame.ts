@@ -40,7 +40,6 @@ export function createDocFrame(
   }
   parent.appendChild(frame);
   frame.y = settings.section.padding;
-  figma.currentPage.selection = [frame];
   //figma.viewport.scrollAndZoomIntoView([frame]);
   return frame;
 }
