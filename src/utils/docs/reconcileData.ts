@@ -30,7 +30,6 @@ export function reconcileDocData(
   for (let i = 0; i < newData.pages.length; i++) {
     let newPage = newData.pages[i];
     let currentDataPage = clonedCurrentData.pages[i];
-    let frameId: string = '';
     if (currentDataPage) {
       let pageRecon = reconcilePageData(
         newPage,
@@ -45,14 +44,11 @@ export function reconcileDocData(
         changesNumber += pageRecon.changesNumber;
         currentDataPage = pageData;
       }
-      if (!useCurrentDataFramesId) {
-        frameId = pageData.frameId;
-      }
     } else {
       currentDataPage = newPage;
       changesNumber++;
     }
-    clonedCurrentData.pages[i] = { ...currentDataPage, frameId };
+    clonedCurrentData.pages[i] = { ...currentDataPage };
     //console.log(clonedCurrentData.pages[i]);
     clonedCurrentData.sectionId =
       useCurrentDataSectionId && clonedCurrentData.sectionId

@@ -20,19 +20,21 @@ export const Editor = () => {
   const editorCore = React.useRef(null);
   const [stopUpdates, setStopUpdates] = React.useState(false);
   const [firstRender, setFirstRender] = React.useState(true);
-  const [skeleton, setSkeleton] = React.useState(false);
+  const [skeleton, setSkeleton] = React.useState(true);
 
   const pluginContext = React.useContext(PluginDataContext);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (!pluginContext.incomingFigmaChanges && !stopUpdates) {
+      if (!stopUpdates) {
+        setStopUpdates(true);
         console.log('interval');
         handleSaveEditor().then((data) => {
           /*console.log(
             'plugin context for reconciliation with new saved editor data:'
           );
           console.log(pluginContext.currentDocData);*/
+
           if (data.blocks.length) {
             let reconciliation = reconcilePageData(
               {
@@ -46,16 +48,22 @@ export const Editor = () => {
             );
 
             if (reconciliation.changesNumber) {
-              let pageData = reconciliation.data as PageData;
-              formatPageData(pageData);
-              console.log('Pre reconciliation current editor data');
-              console.log(data);
-              console.log('Pre reconciliation CURRENT CONTEXT DATA');
-              console.log(pluginContext.currentDocData);
-              let tempDoc: DocData = clone(pluginContext.currentDocData);
-              tempDoc.pages[pluginContext.activeTab] = pageData;
-              tempDoc.author = EMPTY_AUTHOR_DATA;
-              pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
+              if (pluginContext.incomingFigmaChanges) {
+                handleUpdateData(
+                  pluginContext.currentDocData.pages[pluginContext.activeTab]
+                );
+              } else {
+                let pageData = reconciliation.data as PageData;
+                formatPageData(pageData);
+                console.log('Pre reconciliation current editor data');
+                console.log(data);
+                console.log('Pre reconciliation CURRENT CONTEXT DATA');
+                console.log(pluginContext.currentDocData);
+                let tempDoc: DocData = clone(pluginContext.currentDocData);
+                tempDoc.pages[pluginContext.activeTab] = pageData;
+                tempDoc.author = EMPTY_AUTHOR_DATA;
+                pushNewDataToFigma(pluginContext, tempDoc, pageData.frameId);
+              }
             }
           } else {
             //New figma changes
@@ -79,40 +87,16 @@ export const Editor = () => {
 
               handleUpdateData(
                 pluginContext.currentDocData.pages[pluginContext.activeTab]
-              ).then(() => {
-                setStopUpdates(false);
-                pluginContext.setIncomingFigmaChanges(false);
-              });
+              );
             }
           }
         });
-      } else {
-        //New figma changes
-        if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: 'select-node',
-                id: pluginContext.currentDocData.pages[0].frameId,
-              },
-            },
-            '*'
-          );
-        } else {
-          console.log(
-            'if incoming figma changes. render when active tab exists in doc'
-          );
-          handleUpdateData(
-            pluginContext.currentDocData.pages[pluginContext.activeTab]
-          ).then(() => {
-            setStopUpdates(false);
-            pluginContext.setIncomingFigmaChanges(false);
-          });
-        }
       }
     }, 400);
     return () => {
-      //console.log('Cleared!');
+      console.log(pluginContext.incomingFigmaChanges);
+      setSkeleton(false);
+      setStopUpdates(false);
       clearInterval(interval);
     };
   }, [
@@ -126,7 +110,6 @@ export const Editor = () => {
     console.log('Initialized');
     //console.log(pluginContext.currentDocData);
     editorCore.current = instance;
-    pluginContext.setIncomingFigmaChanges(false);
     if (firstRender) {
       setFirstRender(false);
     }
@@ -138,13 +121,17 @@ export const Editor = () => {
     await editorCore.current
       .render(data)
       .then(() => {
-        setSkeleton(false);
         console.log(data);
         console.log('set false on render');
+        console.log(firstRender);
+        console.log(skeleton);
+        console.log(pluginContext.incomingFigmaChanges);
       })
       .catch((e) => {
         console.error(e);
       });
+    pluginContext.setIncomingFigmaChanges(false);
+    console.log('set figma changes on false');
   }, []);
 
   const handleSaveEditor = async () => {
@@ -154,10 +141,9 @@ export const Editor = () => {
 
   //Change tabs
   React.useEffect(() => {
-    console.log(`axtive tab on editor render: ${pluginContext.activeTab}`);
-
     if (!firstRender) {
       setStopUpdates(true);
+      console.log(`axtive tab on editor render: ${pluginContext.activeTab}`);
       console.log('change of tabs. render when active tab exists in doc');
       handleUpdateData(
         pluginContext.currentDocData.pages[pluginContext.activeTab]
@@ -170,7 +156,7 @@ export const Editor = () => {
 
   return (
     <>
-      {(firstRender || skeleton || pluginContext.incomingFigmaChanges) && (
+      {pluginContext.incomingFigmaChanges && (
         <Box
           sx={{
             position: 'absolute',
