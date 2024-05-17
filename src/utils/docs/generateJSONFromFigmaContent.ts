@@ -60,6 +60,7 @@ async function generatePageDataFromFrame(
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
+      console.log(childNode.name);
       let editedDate =
         parseInt(
           childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
@@ -129,7 +130,9 @@ async function generatePageDataFromFrame(
         }
       } // If a comppnent is inside a frame like frame display
       else if (childNode.type == 'FRAME') {
-        let instInsideAFrame = childNode.findChild((n) => n.type == 'INSTANCE');
+        let instInsideAFrame: InstanceNode = childNode.findChild(
+          (n) => n.type == 'INSTANCE'
+        ) as InstanceNode;
         if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
           let mainCompId =
             instInsideAFrame.mainComponent.parent.type == 'COMPONENT_SET'
@@ -175,7 +178,8 @@ async function generatePageDataFromFrame(
       }
     }
   }
-
+  console.log('format on the figma side');
+  console.log(pageData);
   formatPageData(pageData);
   frame.name = pageData.title;
   return pageData;

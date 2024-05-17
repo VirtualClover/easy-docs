@@ -97,7 +97,11 @@ async function generateBlockInstanceFromJSON(
   let node: InstanceNode | FrameNode;
   switch (block.type) {
     case 'header':
-      node = generateHeaderInstance(block.data);
+      await generateHeaderInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
       break;
     case 'paragraph':
       node = generateParagraphInstance(block.data);

@@ -58,11 +58,20 @@ export async function createHeaderComponent(
   };
 }
 
-export function generateHeaderInstance(data): InstanceNode {
+export async function generateHeaderInstance(data): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
-  let componentSet = figma.getNodeById(componentData.header.id);
+  let componentSet: BaseNode;
+  await figma
+    .getNodeByIdAsync(componentData.header.id)
+    .then((node) => {
+      componentSet = node;
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
   if (componentSet.type == 'COMPONENT_SET') {
     let component = componentSet.children[0] as ComponentNode;
     let instance = component.createInstance();

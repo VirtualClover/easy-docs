@@ -180,6 +180,9 @@ export async function pushFigmaUpdates() {
       await generateJSONFromFigmaContent(parentSection).then(
         (data) => (generatedDoc = data)
       );
+      console.log('Generated doc');
+      console.log(generatedDoc);
+
       if (parentFrame) {
         selectedFrame = parentSection.children
           .map((node) => node.id)

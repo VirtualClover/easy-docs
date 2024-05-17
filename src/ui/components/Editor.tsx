@@ -54,6 +54,8 @@ export const Editor = () => {
                 );
               } else {
                 let pageData = reconciliation.data as PageData;
+                console.log('format on the editor side');
+
                 formatPageData(pageData);
                 console.log('Pre reconciliation current editor data');
                 console.log(data);
