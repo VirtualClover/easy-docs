@@ -20,6 +20,7 @@ export const Editor = () => {
   const editorCore = React.useRef(null);
   const [stopUpdates, setStopUpdates] = React.useState(false);
   const [firstRender, setFirstRender] = React.useState(true);
+  const [skeleton, setSkeleton] = React.useState(false);
 
   const pluginContext = React.useContext(PluginDataContext);
 
@@ -99,7 +100,7 @@ export const Editor = () => {
           );
         } else {
           console.log(
-            'if no incoming figma changes. render when active tab exists in doc'
+            'if incoming figma changes. render when active tab exists in doc'
           );
           handleUpdateData(
             pluginContext.currentDocData.pages[pluginContext.activeTab]
@@ -133,12 +134,11 @@ export const Editor = () => {
 
   const handleUpdateData = React.useCallback(async (data: OutputData) => {
     console.log('renders');
-
+    setSkeleton(true);
     await editorCore.current
       .render(data)
       .then(() => {
-        console.log(data);
-        console.log('set false on render');
+        setSkeleton(false);
       })
       .catch((e) => {
         console.error(e);
@@ -160,24 +160,15 @@ export const Editor = () => {
       handleUpdateData(
         pluginContext.currentDocData.pages[pluginContext.activeTab]
       ).then(() => {
-        setStopUpdates(false); 
+        setStopUpdates(false);
         console.log('set false');
       });
     }
   }, [pluginContext.activeTab]);
 
   return (
-    <Box
-      id="editorjs"
-      sx={(theme) => ({
-        ...theme.typography,
-        fontSize: 14,
-        position: 'relative',
-        height: '100%',
-        width: '100%',
-      })}
-    >
-      {pluginContext.incomingFigmaChanges && (
+    <>
+      {(firstRender || skeleton || pluginContext.incomingFigmaChanges) && (
         <Box
           sx={{
             position: 'absolute',
@@ -190,7 +181,18 @@ export const Editor = () => {
           <EditorSkeleton />
         </Box>
       )}
-      <ReactEditorJS tools={EDITOR_TOOLS} onInitialize={handleInitialize} />
-    </Box>
+      <Box
+        id="editorjs"
+        sx={(theme) => ({
+          ...theme.typography,
+          fontSize: 14,
+          position: 'relative',
+          height: '100%',
+          width: '100%',
+        })}
+      >
+        <ReactEditorJS tools={EDITOR_TOOLS} onInitialize={handleInitialize} />
+      </Box>
+    </>
   );
 };
