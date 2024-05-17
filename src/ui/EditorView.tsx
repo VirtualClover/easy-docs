@@ -99,7 +99,7 @@ export const EditorView = () => {
 
   return (
     <ViewContainer>
-      <AppBar elevation={0} color="transparent" sx={{ marginTop: 49 }}>
+      <AppBar elevation={0} color="transparent" sx={{ top: 49 }}>
         <Stack direction="row">
           <Tabs
             value={

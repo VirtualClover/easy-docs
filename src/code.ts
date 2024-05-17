@@ -86,17 +86,22 @@ figma.ui.onmessage = (msg) => {
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;
-    let section: BaseNode = data.sectionId && figma.getNodeById(data.sectionId);
-    context.lastFetchDoc = data;
-    if (section && section.type === 'SECTION') {
-      generateFigmaContentFromJSON(data, section, context.settings);
-      let selectedFrame = figma.getNodeById(msg.editedFrame);
-      if (selectedFrame && selectedFrame.type === 'FRAME') {
-        figma.currentPage.selection = [selectedFrame];
+    let section: BaseNode;
+    figma.getNodeByIdAsync(data.sectionId).then((node) => {
+      if (data.sectionId) {
+        section = node;
       }
-    }
-    context.stopSendingUpdates = false;
-    figma.ui.postMessage({ type: 'finished-figma-update' });
+      context.lastFetchDoc = data;
+      if (section && section.type === 'SECTION') {
+        generateFigmaContentFromJSON(data, section, context.settings);
+        let selectedFrame = figma.getNodeById(msg.editedFrame);
+        if (selectedFrame && selectedFrame.type === 'FRAME') {
+          figma.currentPage.selection = [selectedFrame];
+        }
+      }
+      context.stopSendingUpdates = false;
+      figma.ui.postMessage({ type: 'finished-figma-update' });
+    });
   }
 
   //figma.ui.postMessage(figkeysAsync());
