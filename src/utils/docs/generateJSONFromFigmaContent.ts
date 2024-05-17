@@ -11,7 +11,9 @@ import { formatPageData } from './formatPageData';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 import { getDetailsFromFigmaURL } from './figmaURLHandlers';
 
-export function generateJSONFromFigmaContent(section: SectionNode): DocData {
+export async function generateJSONFromFigmaContent(
+  section: SectionNode
+): Promise<DocData> {
   let JSONData: DocData = {
     title: section.name,
     pages: [],
@@ -32,7 +34,9 @@ export function generateJSONFromFigmaContent(section: SectionNode): DocData {
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
       if (child.type == 'FRAME') {
-        JSONData.pages.push(generatePageDataFromFrame(child, componentData));
+        JSONData.pages.push(
+          await generatePageDataFromFrame(child, componentData)
+        );
       }
     }
 
@@ -42,10 +46,10 @@ export function generateJSONFromFigmaContent(section: SectionNode): DocData {
   return EMPTY_DOC_OBJECT;
 }
 
-function generatePageDataFromFrame(
+async function generatePageDataFromFrame(
   frame: FrameNode,
   componentData: BaseFileData
-): PageData {
+): Promise<PageData> {
   let pageData: PageData = {
     blocks: [],
     title: '',
@@ -142,24 +146,29 @@ function generatePageDataFromFrame(
               if (url != '') {
                 frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
               }
-              let frameExistsInFile: boolean = figma.getNodeById(
-                frameDetails.frameId
-              )
-                ? true
-                : false;
-              pageData.blocks.push({
-                type: 'displayFrame',
-                ...objEssentials,
-                data: {
-                  frameId: frameDetails.frameId,
-                  fileId: frameDetails.fileId,
-                  frameExistsInFile,
-                  caption:
-                    instInsideAFrame.componentProperties[
-                      componentData.displayFrame.captionProp
-                    ].value,
-                },
-              });
+              let frameExistsInFile: boolean;
+              await figma
+                .getNodeByIdAsync(frameDetails.frameId)
+                .then((node) => {
+                  console.log('find displayed frame');
+                  console.log(node);
+
+                  frameExistsInFile = node != null ? true : false;
+                  pageData.blocks.push({
+                    type: 'displayFrame',
+                    ...objEssentials,
+                    data: {
+                      frameId: frameDetails.frameId,
+                      fileId: frameDetails.fileId,
+                      frameExistsInFile,
+                      caption:
+                        instInsideAFrame.componentProperties[
+                          componentData.displayFrame.captionProp
+                        ].value,
+                    },
+                  });
+                })
+                .catch((e) => console.error(e));
 
               break;
             default:

@@ -60,11 +60,12 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'create-new-doc') {
     let section = createNewDoc(DEFAULT_DOC_DATA, context.settings);
-    context.lastFetchDoc = generateJSONFromFigmaContent(section);
-
-    figma.ui.postMessage({
-      type: 'new-node-data',
-      data: context.lastFetchDoc,
+    generateJSONFromFigmaContent(section).then((data) => {
+      context.lastFetchDoc = data;
+      figma.ui.postMessage({
+        type: 'new-node-data',
+        data: context.lastFetchDoc,
+      });
     });
   }
 
@@ -90,17 +91,23 @@ figma.ui.onmessage = (msg) => {
     figma.getNodeByIdAsync(data.sectionId).then((node) => {
       if (data.sectionId) {
         section = node;
-      }
-      context.lastFetchDoc = data;
-      if (section && section.type === 'SECTION') {
-        generateFigmaContentFromJSON(data, section, context.settings);
-        let selectedFrame = figma.getNodeById(msg.editedFrame);
-        if (selectedFrame && selectedFrame.type === 'FRAME') {
-          figma.currentPage.selection = [selectedFrame];
+        context.lastFetchDoc = data;
+        if (section && section.type === 'SECTION') {
+          console.log('generate');
+
+          generateFigmaContentFromJSON(data, section, context.settings).then(
+            (m) => {
+              let selectedFrame = figma.getNodeById(msg.editedFrame);
+              if (selectedFrame && selectedFrame.type === 'FRAME') {
+                figma.currentPage.selection = [selectedFrame];
+              }
+
+              context.stopSendingUpdates = false;
+              figma.ui.postMessage({ type: 'finished-figma-update' });
+            }
+          );
         }
       }
-      context.stopSendingUpdates = false;
-      figma.ui.postMessage({ type: 'finished-figma-update' });
     });
   }
 
@@ -169,7 +176,10 @@ export async function pushFigmaUpdates() {
     }
 
     if (parentSection) {
-      let generatedDoc = generateJSONFromFigmaContent(parentSection);
+      let generatedDoc: DocData;
+      await generateJSONFromFigmaContent(parentSection).then(
+        (data) => (generatedDoc = data)
+      );
       if (parentFrame) {
         selectedFrame = parentSection.children
           .map((node) => node.id)

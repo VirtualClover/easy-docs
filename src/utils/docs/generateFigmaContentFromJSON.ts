@@ -16,7 +16,7 @@ import { selectNode } from '../figma/selectNode';
 
 let lastEditedKey = 'lastEdited';
 
-export function generateFigmaContentFromJSON(
+export async function generateFigmaContentFromJSON(
   data: DocData,
   parentSection: SectionNode,
   settings: PluginSettings
@@ -30,17 +30,28 @@ export function generateFigmaContentFromJSON(
     let frame: FrameNode;
     //console.log(page);
     if (page.frameId && parentSection.findOne((n) => n.id === page.frameId)) {
-      frame = figma.getNodeById(page.frameId) as FrameNode;
+      await figma
+        .getNodeByIdAsync(page.frameId)
+        .then(async (node) => {
+          if (node.type === 'FRAME') {
+            frame = node;
+            await generateFrameDataFromJSON(page, frame);
+            resizeSection(parentSection);
+          }
+        })
+        .catch((e) => console.error(e));
     } else {
       frame = createDocFrame(parentSection, page.title, settings);
       selectNode(frame);
+      await generateFrameDataFromJSON(page, frame);
+      resizeSection(parentSection);
     }
-    generateFrameDataFromJSON(page, frame);
-    resizeSection(parentSection);
   }
+
+  return 'done!';
 }
 
-function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
+async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
   let blocks = data.blocks;
   frame.name = data.title;
   let totalLength =
@@ -65,19 +76,20 @@ function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
           : 0;
 
         if (nodeLastEdited != block.lastEdited) {
-          generateBlockInstanceFromJSON(block, frame, indexInFrame);
-          figmaNode.remove();
+          await generateBlockInstanceFromJSON(block, frame, indexInFrame).then(
+            () => figmaNode.remove()
+          );
         }
       } else {
         figmaNode.remove();
       }
     } else {
-      generateBlockInstanceFromJSON(block, frame, indexInFrame);
+      await generateBlockInstanceFromJSON(block, frame, indexInFrame);
     }
   }
 }
 
-function generateBlockInstanceFromJSON(
+async function generateBlockInstanceFromJSON(
   block: BlockData,
   frame: FrameNode,
   indexInFrame: number
@@ -95,9 +107,13 @@ function generateBlockInstanceFromJSON(
       //node = generateParagraphInstance(block.data);
       break;
     case 'displayFrame':
-      node = generateDisplayFrameInstance(block.data);
-      //node = generateParagraphInstance(block.data);
+      await generateDisplayFrameInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
       break;
+    //node = generateParagraphInstance(block.data);
     default:
       //node = generateParagraphInstance(DEFAULT_PAGE_DATA.blocks[0].data);
       break;

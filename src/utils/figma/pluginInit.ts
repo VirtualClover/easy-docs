@@ -12,7 +12,7 @@ import { objectIsNull } from '../objectisNull';
 /**
  * The initialization func of the plugin
  */
-export function pluginInit() {
+export async function pluginInit() {
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
   let userData: AuthorUser = getUserDetailsInFigma();
   let componentData: BaseFileData = stringData
@@ -26,15 +26,18 @@ export function pluginInit() {
     //Check if the components have not been deleted
     for (const key in componentData) {
       if (componentData.hasOwnProperty(key)) {
-        let currentNode = figma.getNodeById(componentData[key].id);
-        if (
-          !currentNode ||
-          (currentNode.type != 'PAGE' && !currentNode.parent)
-        ) {
-          initComponents(componentData, false);
-          //console.log('Component missing: ' + key);
-          break;
-        }
+        let currentNode: BaseNode;
+        await figma.getNodeByIdAsync(componentData[key].id).then((node) => {
+          currentNode = node;
+          if (
+            !currentNode ||
+            (currentNode.type != 'PAGE' && !currentNode.parent)
+          ) {
+            initComponents(componentData, false);
+            //console.log('Component missing: ' + key);
+          }
+        });
+        break;
       }
     }
   }

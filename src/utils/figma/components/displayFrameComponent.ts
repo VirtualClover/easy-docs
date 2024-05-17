@@ -112,13 +112,28 @@ function generateOuterWrapper(
   return outerWrapper;
 }
 
-export function generateDisplayFrameInstance(data): FrameNode {
+export async function generateDisplayFrameInstance(
+  data
+): Promise<FrameNode | null> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
-  let component = figma.getNodeById(componentData.displayFrame.id);
+  let component: BaseNode;
+
+  await figma
+    .getNodeByIdAsync(componentData.displayFrame.id)
+    .then((node) => {
+      component = node;
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
   let sourceURL = generateFigmaURL(data.fileId, data.frameId, 'share');
-  let referenceNode = figma.getNodeById(data.frameId);
+  let referenceNode: BaseNode;
+  await figma.getNodeByIdAsync(data.frameId).then((node) => {
+    referenceNode = node;
+  });
 
   if (nodeSupportsChildren(component)) {
     let sourceWrapper = component.children[0];
