@@ -59,8 +59,10 @@ figma.ui.onmessage = (msg) => {
   }
 
   if (msg.type === 'create-new-doc') {
+    context.stopSendingUpdates = true;
     let section = createNewDoc(DEFAULT_DOC_DATA, context.settings);
     generateJSONFromFigmaContent(section).then((data) => {
+      context.stopSendingUpdates = false;
       context.lastFetchDoc = data;
       figma.ui.postMessage({
         type: 'new-node-data',
@@ -73,6 +75,11 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
       pushFigmaUpdates().then((res) => {
+        if (res.type === 'new-node-data') {
+          console.log('push figma updates');
+          console.log(res.type);
+          console.log(res.data);
+        }
         figma.ui.postMessage({
           type: res.type,
           data: res.data,
@@ -180,8 +187,8 @@ export async function pushFigmaUpdates() {
       await generateJSONFromFigmaContent(parentSection).then(
         (data) => (generatedDoc = data)
       );
-      console.log('Generated doc');
-      console.log(generatedDoc);
+      //console.log('Generated doc');
+      //console.log(generatedDoc);
 
       if (parentFrame) {
         selectedFrame = parentSection.children

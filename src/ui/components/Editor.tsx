@@ -54,13 +54,13 @@ export const Editor = () => {
                 );
               } else {
                 let pageData = reconciliation.data as PageData;
-                console.log('format on the editor side');
-
                 formatPageData(pageData);
                 console.log('Pre reconciliation current editor data');
                 console.log(data);
                 console.log('Pre reconciliation CURRENT CONTEXT DATA');
                 console.log(pluginContext.currentDocData);
+                console.log('Recon data');
+                console.log(reconciliation.data);
                 let tempDoc: DocData = clone(pluginContext.currentDocData);
                 tempDoc.pages[pluginContext.activeTab] = pageData;
                 tempDoc.author = EMPTY_AUTHOR_DATA;
@@ -96,7 +96,7 @@ export const Editor = () => {
           }
         });
       }
-    }, 400);
+    }, 600);
     return () => {
       setStopUpdates(false);
       clearInterval(interval);

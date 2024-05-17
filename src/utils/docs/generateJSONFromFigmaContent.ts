@@ -60,7 +60,7 @@ async function generatePageDataFromFrame(
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
-      console.log(childNode.name);
+      //console.log(childNode.name);
       let editedDate =
         parseInt(
           childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
@@ -178,8 +178,6 @@ async function generatePageDataFromFrame(
       }
     }
   }
-  console.log('format on the figma side');
-  console.log(pageData);
   formatPageData(pageData);
   frame.name = pageData.title;
   return pageData;

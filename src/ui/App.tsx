@@ -81,18 +81,16 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (
-        navigation.currentView != 'SETTINGS' &&
-        loadingState == 'NONE' &&
-        !incomingEditorChanges
-      ) {
+      if (navigation.currentView != 'SETTINGS' && loadingState == 'NONE') {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           if (event.data.pluginMessage) {
             switch (event.data.pluginMessage.type) {
               case 'new-node-data':
+                console.log('new doc data');
+                console.log(incomingEditorChanges);
                 let data: DocData = event.data.pluginMessage.data;
-                if (data && data.pages) {
+                if (data && data.pages && !incomingEditorChanges) {
                   setIncomingFigmaChanges(true);
                   setCurrentDocData(data);
                   let selectedFrame = event.data.pluginMessage.selectedFrame;
@@ -140,6 +138,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 break;
 
               case 'finished-figma-update':
+                console.log('set editor changes false');
+
                 setIncomingEditorChanges(false);
                 break;
 
@@ -149,10 +149,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           }
         };
       }
-    }, 500);
+    }, 400);
 
     return () => clearInterval(interval);
-  }, [currentDocData, navigation, activeTab]);
+  }, [currentDocData, navigation, activeTab, incomingEditorChanges]);
 
   return (
     <PluginDataContext.Provider
