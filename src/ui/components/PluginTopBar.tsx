@@ -116,6 +116,7 @@ const EditorBar = () => {
         <Stack direction={'row'} gap={8}>
           <Button
             variant="outlined"
+            disabled={pluginContext.loadingState != 'NONE'}
             size="small"
             onClick={() => {
               //console.log(pluginContext);

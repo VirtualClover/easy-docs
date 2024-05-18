@@ -40,6 +40,9 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'select-node') {
     let id: SceneNode | any = { id: msg.id };
     selectNode(id);
+    figma.ui.postMessage({
+      type: 'finished-selecting-node',
+    });
     //figma.viewport.scrollAndZoomIntoView([id]);
   }
 

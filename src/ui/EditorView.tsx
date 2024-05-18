@@ -16,13 +16,13 @@ import {
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { Editor } from './components/Editor';
-import { EditorSkeleton } from './components/skeletons/EditorSkeleton';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
 import { createNewPageJSON } from '../utils/docs/createNewPageJSON';
 import { pushNewDataToFigma } from '../utils/editor/pushNewDataToFigma';
+import { selectNewPageFromEditor } from '../utils/editor/selectNewPageFromEditor';
 
 function a11yProps(index: number) {
   return {
@@ -38,29 +38,10 @@ export const EditorView = () => {
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     if (newActiveTab < tabs.length) {
       //pluginContext.setActiveTab(newActiveTab);
-      console.log(`clicked to change tab to : ${newActiveTab}`);
-
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: 'select-node',
-            id: pluginContext.currentDocData.pages[newActiveTab].frameId,
-          },
-        },
-        '*'
-      );
+      selectNewPageFromEditor(newActiveTab, pluginContext);
     } else {
       //pluginContext.setActiveTab(0);
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: 'select-node',
-            id: pluginContext.currentDocData.pages[0].frameId,
-          },
-        },
-        '*'
-      );
-      console.log('New active tab!');
+      selectNewPageFromEditor(0, pluginContext);
     }
 
     //console.log(newActiveTab);

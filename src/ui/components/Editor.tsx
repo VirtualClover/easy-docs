@@ -13,6 +13,7 @@ import { createReactEditorJS } from 'react-editor-js';
 import { formatPageData } from '../../utils/docs/formatPageData';
 import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 import { reconcilePageData } from '../../utils/docs/reconcileData';
+import { selectNewPageFromEditor } from '../../utils/editor/selectNewPageFromEditor';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -75,15 +76,7 @@ export const Editor = () => {
               /*console.log(
                 ' if no blocks length. render when active tab does not exist in doc'
               );*/
-              parent.postMessage(
-                {
-                  pluginMessage: {
-                    type: 'select-node',
-                    id: pluginContext.currentDocData.pages[0].frameId,
-                  },
-                },
-                '*'
-              );
+              selectNewPageFromEditor(0, pluginContext);
             } else {
               /*console.log(
                 'if no blocks length. render when active tab exists in doc'
@@ -149,6 +142,7 @@ export const Editor = () => {
         pluginContext.currentDocData.pages[pluginContext.activeTab]
       ).then(() => {
         setStopUpdates(false);
+        pluginContext.setLoadingState('NONE');
         //console.log('set false');
       });
     }
@@ -156,7 +150,9 @@ export const Editor = () => {
 
   return (
     <>
-      {(pluginContext.incomingFigmaChanges || skeleton) && (
+      {(pluginContext.incomingFigmaChanges ||
+        skeleton ||
+        pluginContext.loadingState != 'NONE') && (
         <Box
           sx={{
             position: 'absolute',
