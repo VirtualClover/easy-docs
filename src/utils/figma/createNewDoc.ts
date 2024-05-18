@@ -5,11 +5,14 @@ import { setNodeFills } from './setNodeFills';
 
 /**
  * Creates a new doc on the Figma canvas
- * @param data 
- * @param settings 
- * @returns 
+ * @param data
+ * @param settings
+ * @returns
  */
-export function createNewDoc(data: DocData, settings: PluginSettings): SectionNode {
+export async function createNewDoc(
+  data: DocData,
+  settings: PluginSettings
+): Promise<SectionNode> {
   let parentSection = figma.createSection();
   parentSection.resizeWithoutConstraints(
     settings.section.padding,
@@ -17,6 +20,6 @@ export function createNewDoc(data: DocData, settings: PluginSettings): SectionNo
   );
   parentSection.name = data.title;
   setNodeFills(parentSection, settings.section.backgroundColor);
-  generateFigmaContentFromJSON(data, parentSection, settings);
+  await generateFigmaContentFromJSON(data, parentSection, settings);
   return parentSection;
 }

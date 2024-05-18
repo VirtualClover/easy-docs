@@ -60,13 +60,16 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'create-new-doc') {
     context.stopSendingUpdates = true;
-    let section = createNewDoc(DEFAULT_DOC_DATA, context.settings);
-    generateJSONFromFigmaContent(section).then((data) => {
-      context.stopSendingUpdates = false;
-      context.lastFetchDoc = data;
-      figma.ui.postMessage({
-        type: 'new-node-data',
-        data: context.lastFetchDoc,
+    let section: SectionNode;
+    createNewDoc(DEFAULT_DOC_DATA, context.settings).then((s) => {
+      section = s;
+      generateJSONFromFigmaContent(section).then((data) => {
+        context.stopSendingUpdates = false;
+        context.lastFetchDoc = data;
+        figma.ui.postMessage({
+          type: 'new-node-data',
+          data: context.lastFetchDoc,
+        });
       });
     });
   }

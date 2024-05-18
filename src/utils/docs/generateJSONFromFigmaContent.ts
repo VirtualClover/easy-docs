@@ -55,12 +55,10 @@ async function generatePageDataFromFrame(
     title: '',
     frameId: frame.id,
   };
-
   if (frame.children) {
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
-      //console.log(childNode.name);
       let editedDate =
         parseInt(
           childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
@@ -93,9 +91,6 @@ async function generatePageDataFromFrame(
                 ),
               },
             });
-            if (!pageData.title && typeof headerContent === 'string') {
-              pageData.title = headerContent;
-            }
             break;
           case componentData.paragraph.id:
             pageData.blocks.push({
@@ -178,6 +173,7 @@ async function generatePageDataFromFrame(
       }
     }
   }
+
   formatPageData(pageData);
   frame.name = pageData.title;
   return pageData;
