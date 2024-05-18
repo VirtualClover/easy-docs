@@ -81,13 +81,12 @@ export const EditorView = () => {
       tempTabs.push(
         <Tab
           sx={{
-            maxWidth: 300,
+            maxWidth: 150,
             overflow: 'hidden',
             whiteSpace: 'noWrap',
             textOverflow: 'ellipsis',
             display: 'block',
             flexDirection: 'row',
-            flex: 1,
           }}
           label={pluginContext.currentDocData.pages[i].title}
           {...a11yProps(i)}
@@ -109,7 +108,8 @@ export const EditorView = () => {
                 ? pluginContext.activeTab
                 : 0
             }
-            variant={tabs ? 'standard' : 'scrollable'} // If we remove this ternary the Tabs component bugs out
+            variant={'scrollable'} // If we remove this ternary the Tabs component bugs out
+            scrollButtons={'auto'}
             onChange={handleChange}
             aria-label="Pages on the document"
           >
