@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import {
   Box,
   Button,
@@ -15,19 +17,31 @@ import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { CodeBlock } from './CodeBlock';
 import { CopyToClipboard } from 'react-copy-to-clipboard'; // Using a library because for the life of me I cannot find a native workaround
 import { ExportButton } from './ExportButton';
+import { ExportFileFormat } from '../../utils/constants';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
+import { generatePageExport } from '../../utils/docs/exportMarkDown';
 
-interface componentProps {
-  pageData: string;
-}
-
-//TODO USE PRISM
-
-export const ExportView = ({ pageData }: componentProps): JSX.Element => {
-  const [format, setFormat] = React.useState('json');
+export const ExportView = (): JSX.Element => {
+  const [format, setFormat] = React.useState('json' as ExportFileFormat);
   const [open, setOpen] = React.useState(false);
   const pluginContext = React.useContext(PluginDataContext);
+  //Freezing data so it doesnt mutate if something's changes in figma
+  const [mountedData, setMountedData] = React.useState(
+    pluginContext.currentDocData
+  );
+  const [mountedActiveTab, setMountedActiveTab] = React.useState(
+    pluginContext.activeTab
+  );
+  const [previewData, setPreviewdata] = React.useState(
+    generatePageExport(mountedData.pages[mountedActiveTab], format)
+  );
+
+  React.useEffect(() => {
+    setPreviewdata(
+      generatePageExport(mountedData.pages[mountedActiveTab], format)
+    );
+  }, [format]);
 
   return (
     <>
@@ -45,7 +59,7 @@ export const ExportView = ({ pageData }: componentProps): JSX.Element => {
             value={format}
             label="Choose a format"
             onChange={(e) => {
-              setFormat(e.target.value);
+              setFormat(e.target.value as ExportFileFormat);
             }}
           >
             <MenuItem value={'md'}>Markdown</MenuItem>
@@ -58,18 +72,17 @@ export const ExportView = ({ pageData }: componentProps): JSX.Element => {
       <Typography variant="h4" sx={{ mb: BASE_STYLE_TOKENS.units.u8 }}>
         Preview
       </Typography>
-      <Typography variant="caption">Page_1.{format}</Typography>
-      <CodeBlock
-        code={JSON.stringify(pluginContext.currentDocData, null, 2)}
-        language={format}
-      />
+      <Typography variant="caption">
+        {_.snakeCase(mountedData.pages[mountedActiveTab].title)}.{format}
+      </Typography>
+      <CodeBlock code={previewData} language={format} />
       <Stack
         direction="row-reverse"
         sx={{ position: 'relative', bottom: 0, mt: 32 }}
         gap={8}
       >
         <ExportButton />
-        <CopyToClipboard text={pageData} onCopy={() => setOpen(true)}>
+        <CopyToClipboard text={previewData} onCopy={() => setOpen(true)}>
           <Button>Copy to clipboard</Button>
         </CopyToClipboard>
         <Snackbar

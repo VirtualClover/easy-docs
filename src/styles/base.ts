@@ -40,6 +40,8 @@ export type ColorPalette = typeof BASE_COLOR_PALETTE;
 
 export const BASE_STYLE_TOKENS = {
   fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
+  codeFontFamily: ['Consolas', 'Monaco', 'monospace'].join(','),
+  baseFontSize: 12,
   units: {
     u0: 0,
     u1: 1,

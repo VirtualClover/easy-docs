@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material';
 
 const baseTheme = {
   typography: {
-    fontSize: BASE_STYLE_TOKENS.units.u12,
+    fontSize: BASE_STYLE_TOKENS.baseFontSize,
     fontFamily: BASE_STYLE_TOKENS.fontFamily,
     h1: { fontWeight: 600, fontSize: 36 },
     h2: { fontWeight: 600, fontSize: 28 },

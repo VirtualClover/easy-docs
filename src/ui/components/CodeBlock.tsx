@@ -1,10 +1,13 @@
 import 'prismjs';
 import 'prismjs/components/prism-json';
-import 'prismjs/themes/prism-okaidia.css';
+import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-markup';
 
 //import '../../styles/prism.css';
-import { Box } from '@mui/material';
+import { PrimsWrapper } from '../../styles/prism_styles';
 import React from 'react';
+
+//import 'prismjs/themes/prism-okaidia.css';
 
 declare var Prism: any;
 
@@ -14,16 +17,10 @@ export const CodeBlock = ({ code, language }) => {
   }, [code, language]);
 
   return (
-    <Box
-      sx={{
-        borderRadius: 1,
-        overflow: 'auto',
-        maxHeight: 225,
-      }}
-    >
+    <PrimsWrapper sx={{}}>
       <pre>
-        <code className={`language-json`}>{code}</code>
+        <code className={`language-${language}`}>{code}</code>
       </pre>
-    </Box>
+    </PrimsWrapper>
   );
 };

@@ -16,7 +16,6 @@ import { DocData, PluginData } from '../../utils/constants';
 import { ExportView } from './ExportView';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
-import { exportMarkdown } from '../../utils/docs/exportMarkDown';
 import { navigate } from '../../utils/navigate';
 import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 
@@ -145,13 +144,9 @@ const EditorBar = () => {
             disabled={disableActions}
             size="small"
             onClick={() => {
-              //console.log(pluginContext);
-              let markdown = exportMarkdown(
-                pluginContext.currentDocData.pages[pluginContext.activeTab]
-              );
               pluginContext.setSheetOpen(true);
               pluginContext.setSheetContent(() => (
-                <ExportView pageData={markdown} />
+                <ExportView />
               ));
               //console.log(markdown);
             }}
