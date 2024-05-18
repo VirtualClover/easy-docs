@@ -60,7 +60,7 @@ export const ExportView = ({ pageData }: componentProps): JSX.Element => {
       <Box
         sx={{
           bgcolor: 'grey.900',
-          maxHeight: 300,
+          maxHeight: 150,
           p: 16,
           borderRadius: 1,
           overflow: 'auto',

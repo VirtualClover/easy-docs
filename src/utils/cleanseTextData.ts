@@ -5,8 +5,7 @@
  */
 export function cleanseTextData(data) {
   if (data.text) {
-    let formattedString = data.text ? (data.text as string) : ' ';
-    data.text = formattedString.replace('&nbsp;', ' ');
+    data.text = cleanseString(data.text);
   }
   return data;
 }

@@ -3,12 +3,14 @@ import * as _ from 'lodash';
 
 import {
   AppBar,
+  CircularProgress,
   Divider,
   IconButton,
   Snackbar,
   Stack,
   Toolbar,
   Tooltip,
+  Typography,
 } from '@mui/material';
 
 import { Add } from '@mui/icons-material';
@@ -137,6 +139,23 @@ export const EditorView = () => {
       >
         <Editor />
       </Box>
+      <Snackbar
+        open={pluginContext.incomingFigmaChanges}
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Stack
+          gap={8}
+          alignItems={'center'}
+          justifyContent={'center'}
+          sx={{ bgcolor: 'grey.900', p: 12, borderRadius: 1 }}
+        >
+          <Typography sx={{ color: 'grey.50' }} variant="body2">
+            Loading the latest figma changes
+          </Typography>
+          <CircularProgress size={16} />
+        </Stack>
+      </Snackbar>
     </ViewContainer>
   );
 };
