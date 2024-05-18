@@ -60,7 +60,7 @@ export const Editor = () => {
                 console.log('Pre reconciliation CURRENT CONTEXT DATA');
                 console.log(pluginContext.currentDocData);
                 console.log('Recon data');
-                console.log(reconciliation.data);
+                console.log(reconciliation);
                 let tempDoc: DocData = clone(pluginContext.currentDocData);
                 tempDoc.pages[pluginContext.activeTab] = pageData;
                 tempDoc.author = EMPTY_AUTHOR_DATA;

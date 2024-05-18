@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 
 import { DocData, PageData, Reconciliation } from '../constants';
+import { cleanseString, cleanseTextData } from '../cleanseTextData';
 
-import { cleanseTextData } from '../cleanseTextData';
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';
 
@@ -90,11 +90,12 @@ export function reconcilePageData(
     let newBlock = newData.blocks[i];
     let currentDataBlock = clonedCurrentData.blocks[i];
     if (currentDataBlock) {
+      cleanseTextData(newBlock.data);
       if (
         !_.isEqual(newBlock.data, currentDataBlock.data) ||
         newBlock.type != currentDataBlock.type
       ) {
-        //console.log('block not equal');
+
         changesNumber++;
         currentDataBlock.data = cleanseTextData(newBlock.data);
         currentDataBlock.lastEdited = Date.now();
