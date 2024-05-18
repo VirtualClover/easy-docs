@@ -24,6 +24,17 @@ interface BarProps {
   pluginContext: PluginData;
 }
 
+const SettingsButton = () => {
+  const pluginContext = React.useContext(PluginDataContext);
+  return (
+    <Tooltip title="Settings">
+      <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
+        <SettingsOutlined />
+      </IconButton>
+    </Tooltip>
+  );
+};
+
 const InspectBar = () => {
   const pluginContext = React.useContext(PluginDataContext);
   return (
@@ -31,11 +42,7 @@ const InspectBar = () => {
       <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
         Inspect
       </Typography>
-      {
-        <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
-          <SettingsOutlined />
-        </IconButton>
-      }
+      <SettingsButton />
     </>
   );
 };
@@ -151,9 +158,7 @@ const EditorBar = () => {
           >
             Export
           </Button>
-          <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
-            <SettingsOutlined />
-          </IconButton>
+          <SettingsButton />
         </Stack>
       }
     </Box>
