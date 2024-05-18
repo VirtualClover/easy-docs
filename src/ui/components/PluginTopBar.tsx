@@ -53,6 +53,19 @@ const EditorBar = () => {
     setEditDocTitle(false);
   }
 
+  const [disableActions, setDisableActions] = React.useState(false);
+
+  React.useEffect(() => {
+    if (
+      pluginContext.incomingFigmaChanges ||
+      pluginContext.loadingState != 'NONE'
+    ) {
+      setDisableActions(true);
+    } else {
+      setDisableActions(false);
+    }
+  }, [pluginContext.incomingFigmaChanges, pluginContext.loadingState]);
+
   return (
     <Box
       sx={{
@@ -68,13 +81,18 @@ const EditorBar = () => {
           component="div"
           noWrap
           sx={{
+            opacity: disableActions ? 0.5 : 1,
             ml: 16,
             '&:hover': {
               cursor: 'pointer',
             },
             maxWidth: '80%',
           }}
-          onDoubleClick={() => setEditDocTitle(true)}
+          onDoubleClick={() => {
+            if (!disableActions) {
+              setEditDocTitle(true);
+            }
+          }}
           onMouseEnter={() => setEditIconVisible(true)}
           onMouseLeave={() => setEditIconVisible(false)}
         >
@@ -90,6 +108,7 @@ const EditorBar = () => {
       {editDocTitle && (
         <Input
           autoFocus
+          disabled={disableActions}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleInputChange(
@@ -116,7 +135,7 @@ const EditorBar = () => {
         <Stack direction={'row'} gap={8}>
           <Button
             variant="outlined"
-            disabled={pluginContext.loadingState != 'NONE'}
+            disabled={disableActions}
             size="small"
             onClick={() => {
               //console.log(pluginContext);

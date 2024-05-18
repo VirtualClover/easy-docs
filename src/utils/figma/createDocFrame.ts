@@ -1,7 +1,6 @@
 import { DEFAULT_SETTINGS, PluginSettings } from '../constants';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
-import { resizeSection } from './resizeSection';
 
 /**
  * Creates a doc frame

@@ -35,16 +35,18 @@ export async function generateFigmaContentFromJSON(
         .then(async (node) => {
           if (node.type === 'FRAME') {
             frame = node;
-            await generateFrameDataFromJSON(page, frame);
-            resizeSection(parentSection);
+            await generateFrameDataFromJSON(page, frame).then(() =>
+              resizeSection(parentSection)
+            );
           }
         })
         .catch((e) => console.error(e));
     } else {
       frame = createDocFrame(parentSection, page.title, settings);
       selectNode(frame);
-      await generateFrameDataFromJSON(page, frame);
-      resizeSection(parentSection);
+      await generateFrameDataFromJSON(page, frame).then(() =>
+        resizeSection(parentSection)
+      );
     }
   }
 
