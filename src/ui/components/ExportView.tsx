@@ -12,20 +12,22 @@ import {
 } from '@mui/material';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
+import { CodeBlock } from './CodeBlock';
 import { CopyToClipboard } from 'react-copy-to-clipboard'; // Using a library because for the life of me I cannot find a native workaround
 import { ExportButton } from './ExportButton';
+import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 
 interface componentProps {
   pageData: string;
 }
 
-
 //TODO USE PRISM
 
 export const ExportView = ({ pageData }: componentProps): JSX.Element => {
-  const [format, setFormat] = React.useState('md');
+  const [format, setFormat] = React.useState('json');
   const [open, setOpen] = React.useState(false);
+  const pluginContext = React.useContext(PluginDataContext);
 
   return (
     <>
@@ -57,22 +59,10 @@ export const ExportView = ({ pageData }: componentProps): JSX.Element => {
         Preview
       </Typography>
       <Typography variant="caption">Page_1.{format}</Typography>
-      <Box
-        sx={{
-          bgcolor: 'grey.900',
-          maxHeight: 150,
-          p: 16,
-          borderRadius: 1,
-          overflow: 'auto',
-        }}
-      >
-        <Typography
-          variant="body1"
-          sx={{ whiteSpace: 'pre-wrap', color: 'grey.100' }}
-        >
-          {pageData}
-        </Typography>
-      </Box>
+      <CodeBlock
+        code={JSON.stringify(pluginContext.currentDocData, null, 2)}
+        language={format}
+      />
       <Stack
         direction="row-reverse"
         sx={{ position: 'relative', bottom: 0, mt: 32 }}
