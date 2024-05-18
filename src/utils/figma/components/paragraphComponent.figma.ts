@@ -32,11 +32,14 @@ export async function createParagraphComponent(parent: FrameNode) {
   return { id: component.id, contentProp: contentProperty };
 }
 
-export function generateParagraphInstance(data): InstanceNode {
+export async function generateParagraphInstance(data): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
-  let component = figma.getNodeById(componentData.paragraph.id);
+  let component: BaseNode;
+  await figma.getNodeByIdAsync(componentData.paragraph.id).then((node) => {
+    component = node;
+  });
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({

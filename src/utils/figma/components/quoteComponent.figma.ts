@@ -77,11 +77,14 @@ export async function createQuoteComponent(parent: FrameNode) {
   };
 }
 
-export function generateQuoteInstance(data): InstanceNode {
+export async function generateQuoteInstance(data): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
-  let component = figma.getNodeById(componentData.quote.id);
+  let component: BaseNode;
+  await figma.getNodeByIdAsync(componentData.quote.id).then((node) => {
+    component = node;
+  });
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({

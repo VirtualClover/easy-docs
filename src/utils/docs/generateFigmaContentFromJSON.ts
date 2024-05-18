@@ -106,10 +106,18 @@ async function generateBlockInstanceFromJSON(
       });
       break;
     case 'paragraph':
-      node = generateParagraphInstance(block.data);
+      await generateParagraphInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
       break;
     case 'quote':
-      node = generateQuoteInstance(block.data);
+      await generateQuoteInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
       //node = generateParagraphInstance(block.data);
       break;
     case 'displayFrame':
