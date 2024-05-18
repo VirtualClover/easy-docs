@@ -21,7 +21,10 @@ export async function initComponents(
       timeout: 1500,
     }
   );
-  let currentComponentPage = figma.getNodeById(componentData.componentsPage.id);
+  let currentComponentPage: BaseNode;
+  await figma.getNodeByIdAsync(componentData.componentsPage.id).then((node) => {
+    currentComponentPage = node;
+  });
   if (currentComponentPage) {
     if (figma.currentPage == currentComponentPage) {
       let pages = figma.root.children;
