@@ -110,13 +110,16 @@ figma.ui.onmessage = (msg) => {
 
           generateFigmaContentFromJSON(data, section, context.settings).then(
             (m) => {
-              let selectedFrame = figma.getNodeById(msg.editedFrame);
-              if (selectedFrame && selectedFrame.type === 'FRAME') {
-                figma.currentPage.selection = [selectedFrame];
-              }
+              let selectedFrame: BaseNode;
+              figma.getNodeByIdAsync(msg.editedFrame).then((node) => {
+                selectedFrame = node;
+                if (selectedFrame && selectedFrame.type === 'FRAME') {
+                  figma.currentPage.selection = [selectedFrame];
+                }
 
-              context.stopSendingUpdates = false;
-              figma.ui.postMessage({ type: 'finished-figma-update' });
+                context.stopSendingUpdates = false;
+                figma.ui.postMessage({ type: 'finished-figma-update' });
+              });
             }
           );
         }
