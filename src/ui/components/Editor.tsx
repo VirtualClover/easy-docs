@@ -55,12 +55,12 @@ export const Editor = () => {
               } else {
                 let pageData = reconciliation.data as PageData;
                 formatPageData(pageData);
-                console.log('Pre reconciliation current editor data');
+                /*console.log('Pre reconciliation current editor data');
                 console.log(data);
                 console.log('Pre reconciliation CURRENT CONTEXT DATA');
                 console.log(pluginContext.currentDocData);
                 console.log('Recon data');
-                console.log(reconciliation);
+                console.log(reconciliation);*/
                 let tempDoc: DocData = clone(pluginContext.currentDocData);
                 tempDoc.pages[pluginContext.activeTab] = pageData;
                 tempDoc.author = EMPTY_AUTHOR_DATA;

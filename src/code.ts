@@ -76,9 +76,9 @@ figma.ui.onmessage = (msg) => {
     if (!context.stopSendingUpdates) {
       pushFigmaUpdates().then((res) => {
         if (res.type === 'new-node-data') {
-          console.log('push figma updates');
-          console.log(res.type);
-          console.log(res.data);
+          //console.log('push figma updates');
+          //console.log(res.type);
+          //console.log(res.data);
         }
         figma.ui.postMessage({
           type: res.type,
@@ -100,7 +100,7 @@ figma.ui.onmessage = (msg) => {
         section = node;
         context.lastFetchDoc = data;
         if (section && section.type === 'SECTION') {
-          console.log('generate');
+          //console.log('generate');
 
           generateFigmaContentFromJSON(data, section, context.settings).then(
             (m) => {

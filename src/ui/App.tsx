@@ -87,8 +87,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           if (event.data.pluginMessage) {
             switch (event.data.pluginMessage.type) {
               case 'new-node-data':
-                console.log('new doc data');
-                console.log(incomingEditorChanges);
+                //console.log('new doc data');
+                //console.log(incomingEditorChanges);
                 let data: DocData = event.data.pluginMessage.data;
                 if (data && data.pages && !incomingEditorChanges) {
                   setIncomingFigmaChanges(true);
