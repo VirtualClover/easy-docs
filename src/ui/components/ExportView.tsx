@@ -20,7 +20,7 @@ import { ExportButton } from './ExportButton';
 import { ExportFileFormat } from '../../utils/constants';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
-import { generatePageExport } from '../../utils/docs/exportMarkDown';
+import { generatePageExport } from '../../utils/docs/exportUtils';
 
 export const ExportView = (): JSX.Element => {
   const [format, setFormat] = React.useState('json' as ExportFileFormat);
