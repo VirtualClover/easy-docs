@@ -1,4 +1,4 @@
-import { Alert, styled } from '@mui/material';
+import { Alert, Typography, styled } from '@mui/material';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
@@ -18,26 +18,24 @@ interface ComponentProps {
   caption: string;
 }
 
+let IFrame = styled('iframe')(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  width: '100%',
+  height: 300,
+  borderRadius: 4,
+}));
+
+let BlockWrapper = styled('div')(({ theme }) => ({
+  margin: `${32} ${0}`,
+  width: '100%',
+  borderRadius: 4,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+}));
+
 const InputUI = (blockData: ComponentProps) => {
-  let IFrame = styled('iframe')(({ theme }) => ({
-    border: `1px solid ${theme.palette.divider}`,
-    width: '100%',
-    height: 300,
-    borderRadius: 4,
-  }));
-
-  let BlockWrapper = styled('div')(({ theme }) => ({
-    margin: `${32} ${0}`,
-    width: '100%',
-    borderRadius: 4,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  }));
-
-  let [src, setSrc] = React.useState(
-    generateFigmaURL(blockData.fileId, blockData.frameId, 'share')
-  );
+  //https://www.figma.com/design/tt54zCyis2CgMo6wRIkvB0/Untitled?node-id=16%3A249&t=Bad05SFQnNtoGy4z-1
 
   let [frameExistsInFile, setFrameExistsInFile] = React.useState(
     blockData.frameExistsInFile
@@ -48,22 +46,18 @@ const InputUI = (blockData: ComponentProps) => {
     fileId: blockData.fileId,
   });
 
-  return (
-    <BlockWrapper>
-      <input
-        className="cdx-input"
-        id="cdx-display-frame-frame-url"
-        placeholder={'Add Figma link here!'}
-        style={{ flex: 1 }}
-        value={src}
-        onChange={(e) => {
-          setSrc(e.target.value);
-          if (validateFigmaURL(e.target.value)) {
-            setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
-          }
-        }}
-      />
-      {validateFigmaURL(src) && (
+  let [src, setSrc] = React.useState(
+    generateFigmaURL(frameDetails.fileId, frameDetails.frameId, 'share')
+  );
+
+  let [preview, setPreview] = React.useState(<></>);
+  let [errorMsg, setErrorMsg] = React.useState(<></>);
+
+  React.useEffect(() => {
+    console.log('effect riggered');
+
+    if (frameDetails.fileId && frameDetails.frameId) {
+      setPreview(
         <>
           {typeof frameExistsInFile != 'undefined' && !frameExistsInFile && (
             <Alert severity="error">
@@ -84,7 +78,40 @@ const InputUI = (blockData: ComponentProps) => {
             defaultValue={blockData.caption}
           />
         </>
-      )}
+      );
+      setErrorMsg(<></>);
+    } else {
+      setPreview(<></>);
+      if (src) {
+        setErrorMsg(
+          <Typography
+            variant="caption"
+            sx={{ color: 'error.main', fontWeight: 600 }}
+          >
+            Please, enter a valid Figma URL
+          </Typography>
+        );
+      }
+    }
+  }, [frameDetails]);
+
+  return (
+    <BlockWrapper>
+      <input
+        className="cdx-input"
+        id="cdx-display-frame-frame-url"
+        placeholder={'Add Figma link here!'}
+        style={{ flex: 1 }}
+        defaultValue={src}
+        onChange={(e) => {
+          console.log(e.target.value);
+          console.log(src);
+          setSrc(e.target.value);
+          setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
+        }}
+      />
+      {errorMsg}
+      {preview}
     </BlockWrapper>
   );
 };
@@ -107,6 +134,7 @@ export class DisplayFrame {
     let ui = document.createElement('div');
     let root = createRoot(ui);
     root.render(<InputUI {...this.data} />);
+    console.log('render');
     ui.classList.add('display-frame');
 
     return ui;

@@ -4,9 +4,41 @@ type FrameIdTreatment = 'encode' | 'decode';
 type FigmaURLType = 'embed' | 'share';
 
 /**
+ * A simple validation for Figma URLs
+ * @param url
+ * @param validationType
+ * @returns
+ */
+export function validateFigmaURL(
+  url: string,
+  validationType: FigmaURLType | 'both' = 'share'
+): false | RegExpMatchArray {
+  if (url) {
+    switch (validationType) {
+      case 'share':
+        return url.match(
+          /(https?:\/\/(.+?\.)?figma\.com\/design|file(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
+        );
+        break;
+      case 'embed':
+        return url.match(
+          /(https?:\/\/(.+?\.)?figma\.com\/embed(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
+        );
+        break;
+      default:
+        return url.match(
+          /(https?:\/\/(.+?\.)?figma\.com\/design|file|embed(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
+        );
+        break;
+    }
+  }
+  return false;
+}
+
+/**
  * Formats the frame ID for a specific URL
  * @param id
- * @param treatment
+ * @param treatment Encode for url or decode from url
  * @returns
  */
 export function formatFrameIdForURLs(
@@ -21,7 +53,7 @@ export function formatFrameIdForURLs(
 }
 
 /**
- * Extracts the frame and file ID from the figma URL
+ * Extracts the frame and file ID from the figma share URL
  * @param url
  * @param frameIdTreatment
  * @returns
@@ -30,7 +62,7 @@ export function getDetailsFromFigmaURL(
   url: string,
   frameIdTreatment: FrameIdTreatment = 'encode'
 ): FrameDetailsFromURL {
-  if (url) {
+  if (url && validateFigmaURL(url)) {
     let fileId = url.match(
       /(?<=file|design\/)(.*?)(?=\/)/ // (?<=file|design\/)(.*?)(?=\/)
     )[0];
@@ -80,27 +112,11 @@ export function generateFigmaURL(
  * @param URL
  * @returns
  */
-export function getEmbedURLFromShare(URL: string): string {
-  let frameDetails = getDetailsFromFigmaURL(URL, 'encode');
-  return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${frameDetails.fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameDetails.frameId}`;
-}
-
-/**
- * A simple validation for Figma URLs
- * @param url
- * @param validationType
- * @returns
- */
-export function validateFigmaURL(
-  url: string,
-  validationType: FigmaURLType = 'share'
-) {
-  if (validationType == 'share')
-    return url.match(
-      /(https?:\/\/(.+?\.)?figma\.com\/design|file(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
-    );
-  else
-    return url.match(
-      /(https?:\/\/(.+?\.)?figma\.com\/embed(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/
-    );
+export function getEmbedURLFromShare(url: string): string {
+  if (url && validateFigmaURL(url)) {
+    let frameDetails = getDetailsFromFigmaURL(url, 'encode');
+    return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${frameDetails.fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameDetails.frameId}`;
+  } else {
+    return '';
+  }
 }
