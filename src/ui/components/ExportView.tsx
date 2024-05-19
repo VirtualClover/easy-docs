@@ -23,7 +23,7 @@ import React from 'react';
 import { generatePageExport } from '../../utils/docs/exportUtils';
 
 export const ExportView = (): JSX.Element => {
-  const [format, setFormat] = React.useState('json' as ExportFileFormat);
+  const [format, setFormat] = React.useState('md' as ExportFileFormat);
   const [open, setOpen] = React.useState(false);
   const pluginContext = React.useContext(PluginDataContext);
   //Freezing data so it doesnt mutate if something's changes in figma
@@ -66,7 +66,7 @@ export const ExportView = (): JSX.Element => {
             <MenuItem value={'html'}>HTML</MenuItem>
             <MenuItem value={'json'}>JSON</MenuItem>
           </Select>
-          <FormHelperText>Learn more about formats here.</FormHelperText>
+          {/*<FormHelperText>Learn more about formats here.</FormHelperText>*/}
         </FormControl>
       </Box>
       <Typography variant="h4" sx={{ mb: BASE_STYLE_TOKENS.units.u8 }}>
