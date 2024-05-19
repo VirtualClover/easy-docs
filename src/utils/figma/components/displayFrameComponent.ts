@@ -69,7 +69,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
   };
 }
 
-function generateOuterWrapper(
+async function generateOuterWrapper(
   component: InstanceNode,
   nodeToDisplay?: FrameNode
 ) {
@@ -100,10 +100,29 @@ function generateOuterWrapper(
 
   //Node to display
   if (nodeToDisplay) {
-    let duplicatedNode = nodeToDisplay.clone();
-    let scaleFactor = (1288 - 32) / nodeToDisplay.width;
-    duplicatedNode.rescale(scaleFactor);
-    displayFrame.appendChild(duplicatedNode);
+    let maxWidth: number = 1288 - 32;
+    let scaleFactor = maxWidth / nodeToDisplay.width;
+    let bytes = await nodeToDisplay.exportAsync({
+      format: 'PNG',
+      constraint: { type: 'SCALE', value: scaleFactor },
+    });
+    let image = figma.createImage(bytes);
+    let frame = figma.createFrame();
+    frame.name = `[EASY-DOCS]displaying: ${nodeToDisplay.name}`;
+    frame.x = maxWidth;
+    frame.resize(
+      nodeToDisplay.width * scaleFactor,
+      nodeToDisplay.height * scaleFactor
+    );
+    frame.fills = [
+      {
+        imageHash: image.hash,
+        scaleMode: 'FILL',
+        scalingFactor: 1,
+        type: 'IMAGE',
+      },
+    ];
+    displayFrame.appendChild(frame);
   }
 
   outerWrapper.appendChild(component);
@@ -159,7 +178,9 @@ export async function generateDisplayFrameInstance(
       }
     }
 
-    return generateOuterWrapper(instance, nodeToDisplay);
+    let outerWrapper = await generateOuterWrapper(instance, nodeToDisplay);
+
+    return outerWrapper;
     //instance.set
   }
   return null;
