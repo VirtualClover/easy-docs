@@ -69,10 +69,13 @@ async function generatePageDataFromFrame(
         figmaNodeId: childNode.id,
       };
       if (childNode.type == 'INSTANCE') {
-        let mainCompId =
-          childNode.mainComponent.parent.type == 'COMPONENT_SET'
-            ? childNode.mainComponent.parent.id
-            : childNode.mainComponent.id;
+        let mainCompId: string;
+        await childNode.getMainComponentAsync().then((component) => {
+          mainCompId =
+            component.parent.type == 'COMPONENT_SET'
+              ? component.parent.id
+              : component.id;
+        });
         switch (mainCompId) {
           case componentData.header.id:
             let headerContent =
@@ -129,10 +132,13 @@ async function generatePageDataFromFrame(
           (n) => n.type == 'INSTANCE'
         ) as InstanceNode;
         if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
-          let mainCompId =
-            instInsideAFrame.mainComponent.parent.type == 'COMPONENT_SET'
-              ? instInsideAFrame.mainComponent.parent.id
-              : instInsideAFrame.mainComponent.id;
+          let mainCompId: string;
+          await instInsideAFrame.getMainComponentAsync().then((component) => {
+            mainCompId =
+              component.parent.type == 'COMPONENT_SET'
+                ? component.parent.id
+                : component.id;
+          });
 
           switch (mainCompId) {
             case componentData.displayFrame.id:
