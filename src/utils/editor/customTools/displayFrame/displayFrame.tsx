@@ -59,7 +59,7 @@ const InputUI = (blockData: ComponentProps) => {
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
         <>
-          {typeof frameExistsInFile != 'undefined' && !frameExistsInFile && (
+          {blockData && !frameExistsInFile && (
             <Alert severity="error">
               The frame referenced in this block was possibly deleted.
             </Alert>
@@ -128,6 +128,7 @@ export class DisplayFrame {
 
   constructor({ data }) {
     this.data = data;
+    console.log(data);
   }
 
   render() {
@@ -152,23 +153,17 @@ export class DisplayFrame {
       caption = blockContent.querySelector('#cdx-display-frame-caption').value;
     }
 
-    //console.log(frameUrl);
-    //console.log(this.data);
+    console.log('frame ei¿xists');
+    console.log(this.data.frameExistsInFile);
 
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),
-      frameExistsInFile:
-        typeof this.data.frameExistsInFile != 'undefined' ?? true,
-      caption,
+      frameExistsInFile: this.data.frameExistsInFile,
+      caption: caption ?? '',
     };
   }
 
   validate(savedData) {
-    if (!savedData.fileId || !savedData.frameId) {
-      //console.log('Not validated');
-      return false;
-    }
-
     return true;
   }
 }

@@ -63,17 +63,24 @@ export function getDetailsFromFigmaURL(
   frameIdTreatment: FrameIdTreatment = 'encode'
 ): FrameDetailsFromURL {
   if (url && validateFigmaURL(url)) {
-    let fileId = url.match(
+    let fileMatch = url.match(
       /(?<=file|design\/)(.*?)(?=\/)/ // (?<=file|design\/)(.*?)(?=\/)
-    )[0];
-    let frameId = url.match(/(?<=node-id=)(.*?)(?=&)/)[0];
+    );
+    let frameMatch = url.match(/(?<=node-id=)(.*?)(?=&)/);
+    let fileId = fileMatch ? fileMatch[0] : '';
+    let frameId = frameMatch ? frameMatch[0] : '';
 
     //console.log(fileId);
     //console.log(frameId);
-
+    if (fileId && frameId) {
+      return {
+        fileId: fileId,
+        frameId: formatFrameIdForURLs(frameId, frameIdTreatment),
+      };
+    }
     return {
-      fileId: fileId,
-      frameId: formatFrameIdForURLs(frameId, frameIdTreatment),
+      fileId: '',
+      frameId: '',
     };
   }
 

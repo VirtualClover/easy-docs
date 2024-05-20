@@ -9,7 +9,7 @@ import {
 
 import { formatPageData } from './formatPageData';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
-import { getDetailsFromFigmaURL } from './figmaURLHandlers';
+import { getDetailsFromFigmaURL, validateFigmaURL } from './figmaURLHandlers';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
@@ -145,31 +145,45 @@ async function generatePageDataFromFrame(
               let url =
                 instInsideAFrame.componentProperties[
                   componentData.displayFrame.sourceProp
-                ].value;
+                ].value ?? '';
               let frameDetails;
-              if (url != '') {
+              let frameExistsInFile: boolean = false;
+              if (validateFigmaURL(url as string)) {
                 frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
+                await figma
+                  .getNodeByIdAsync(frameDetails.frameId)
+                  .then((node) => {
+                    frameExistsInFile = node != null ? true : false;
+                    pageData.blocks.push({
+                      type: 'displayFrame',
+                      ...objEssentials,
+                      data: {
+                        frameId: frameDetails.frameId,
+                        fileId: frameDetails.fileId,
+                        frameExistsInFile,
+                        caption:
+                          instInsideAFrame.componentProperties[
+                            componentData.displayFrame.captionProp
+                          ].value,
+                      },
+                    });
+                  })
+                  .catch((e) => console.error(e));
+              } else {
+                pageData.blocks.push({
+                  type: 'displayFrame',
+                  ...objEssentials,
+                  data: {
+                    frameId: '',
+                    fileId: '',
+                    frameExistsInFile,
+                    caption:
+                      instInsideAFrame.componentProperties[
+                        componentData.displayFrame.captionProp
+                      ].value,
+                  },
+                });
               }
-              let frameExistsInFile: boolean;
-              await figma
-                .getNodeByIdAsync(frameDetails.frameId)
-                .then((node) => {
-                  frameExistsInFile = node != null ? true : false;
-                  pageData.blocks.push({
-                    type: 'displayFrame',
-                    ...objEssentials,
-                    data: {
-                      frameId: frameDetails.frameId,
-                      fileId: frameDetails.fileId,
-                      frameExistsInFile,
-                      caption:
-                        instInsideAFrame.componentProperties[
-                          componentData.displayFrame.captionProp
-                        ].value,
-                    },
-                  });
-                })
-                .catch((e) => console.error(e));
 
               break;
             default:

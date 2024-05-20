@@ -5,12 +5,10 @@ import {
 } from '../../constants';
 
 import { cleanseString } from '../../cleanseTextData';
+import { generateBrokenLinkInstance } from './brokenLinkComponent';
 import { generateFigmaURL } from '../../docs/figmaURLHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
-import { generateBrokenLinkInstance } from './brokenLinkComponent';
-
-
 
 export async function createDisplayFrameComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -105,7 +103,13 @@ async function generateOuterWrapper(
   //Node to display
   if (nodeToDisplay) {
     let maxWidth: number = 1288 - 32;
+    let maxHeight: number = 900;
     let scaleFactor = maxWidth / nodeToDisplay.width;
+    // if frame is too long, then we resize so height doesnt surpass 900 so Figma can actually generate the preview
+    let proposedHeight = nodeToDisplay.height * scaleFactor;
+    if (proposedHeight > maxHeight) {
+      scaleFactor = maxHeight / nodeToDisplay.height;
+    }
     let bytes = await nodeToDisplay.exportAsync({
       format: 'PNG',
       constraint: { type: 'SCALE', value: scaleFactor },
@@ -128,8 +132,9 @@ async function generateOuterWrapper(
     ];
     displayFrame.appendChild(frame);
   } else {
-    await generateBrokenLinkInstance(brokenLinkCaption).then(n =>
-      displayFrame.appendChild(n));
+    await generateBrokenLinkInstance(brokenLinkCaption).then((n) =>
+      displayFrame.appendChild(n)
+    );
   }
 
   outerWrapper.appendChild(component);
@@ -185,7 +190,11 @@ export async function generateDisplayFrameInstance(
       }
     }
 
-    let outerWrapper = await generateOuterWrapper(instance, nodeToDisplay, 'Frame not found');
+    let outerWrapper = await generateOuterWrapper(
+      instance,
+      nodeToDisplay,
+      'Frame not found'
+    );
 
     return outerWrapper;
     //instance.set
