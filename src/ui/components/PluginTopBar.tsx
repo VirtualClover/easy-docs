@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Close, SettingsOutlined } from '@mui/icons-material';
+import { ArrowBack, Close, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants';
 
 import { ExportView } from './ExportView';
@@ -145,9 +145,7 @@ const EditorBar = () => {
             size="small"
             onClick={() => {
               pluginContext.setSheetOpen(true);
-              pluginContext.setSheetContent(() => (
-                <ExportView />
-              ));
+              pluginContext.setSheetContent(() => <ExportView />);
               //console.log(markdown);
             }}
           >
@@ -164,18 +162,18 @@ const SettingsBar = () => {
   const pluginContext = React.useContext(PluginDataContext);
   return (
     <>
-      <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
-        Settings
-      </Typography>
       {
         <IconButton
           onClick={() =>
             navigate(pluginContext.navigation.prevView, pluginContext)
           }
         >
-          <Close />
+          <ArrowBack />
         </IconButton>
       }
+      <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
+        Settings
+      </Typography>
     </>
   );
 };

@@ -196,3 +196,6 @@ export interface FrameDetailsFromURL {
 }
 
 export type ExportFileFormat = 'md' | 'html' | 'json';
+
+
+export const SETTINGS_GROUPS = ['Customization', 'Exports', 'Sync', 'About'];
