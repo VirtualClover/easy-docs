@@ -1,4 +1,5 @@
 import { BaseFileData } from '../../constants';
+import { createBrokenLinkComponent } from './brokenLinkComponent';
 import { createDisplayFrameComponent } from './displayFrameComponent';
 import { createHeaderComponent } from './headerComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
@@ -50,15 +51,18 @@ export async function initComponents(
     createParagraphComponent(frame),
     createQuoteComponent(frame),
     createDisplayFrameComponent(frame),
+    createBrokenLinkComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
     let quote = values[2];
     let displayFrame = values[3];
+    let brokenLink = values[4];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
     componentData.displayFrame = displayFrame;
+    componentData.brokenLink = brokenLink;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',
@@ -66,5 +70,6 @@ export async function initComponents(
       JSON.stringify(componentData)
     );
   });
+  await page.loadAsync();
   page.appendChild(frame);
 }

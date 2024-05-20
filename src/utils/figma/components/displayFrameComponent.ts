@@ -8,6 +8,9 @@ import { cleanseString } from '../../cleanseTextData';
 import { generateFigmaURL } from '../../docs/figmaURLHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
+import { generateBrokenLinkInstance } from './brokenLinkComponent';
+
+
 
 export async function createDisplayFrameComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -71,7 +74,8 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 
 async function generateOuterWrapper(
   component: InstanceNode,
-  nodeToDisplay?: FrameNode
+  nodeToDisplay?: FrameNode,
+  brokenLinkCaption?: string
 ) {
   //Outer wrapper
   let outerWrapper = figma.createFrame();
@@ -123,6 +127,9 @@ async function generateOuterWrapper(
       },
     ];
     displayFrame.appendChild(frame);
+  } else {
+    await generateBrokenLinkInstance(brokenLinkCaption).then(n =>
+      displayFrame.appendChild(n));
   }
 
   outerWrapper.appendChild(component);
@@ -170,7 +177,7 @@ export async function generateDisplayFrameInstance(
       [componentData.displayFrame.sourceProp]: sourceURL,
     });
 
-    let nodeToDisplay;
+    let nodeToDisplay: FrameNode;
 
     if (data.frameId) {
       if (referenceNode && referenceNode.type == 'FRAME') {
@@ -178,7 +185,7 @@ export async function generateDisplayFrameInstance(
       }
     }
 
-    let outerWrapper = await generateOuterWrapper(instance, nodeToDisplay);
+    let outerWrapper = await generateOuterWrapper(instance, nodeToDisplay, 'Frame not found');
 
     return outerWrapper;
     //instance.set
