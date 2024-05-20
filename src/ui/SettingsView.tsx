@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-import Stack from '@mui/material/Stack';
+import { AppBar, Box, Divider, Snackbar, Stack, Tabs, Toolbar } from '@mui/material';
+
+import { ViewContainer } from './components/ViewContainer';
 
 export const SettingsView = ({}) => {
   const [showAPIKey, setShowAPIKey] = React.useState(false);
@@ -15,12 +17,6 @@ export const SettingsView = ({}) => {
 
   return (
     <>
-      <Stack
-        spacing={1}
-        alignItems="center"
-        justifyContent={'center'}
-        style={{ flex: '1 1 auto' }}
-      ></Stack>
     </>
   );
 };
