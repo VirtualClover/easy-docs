@@ -14,6 +14,7 @@ import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigma
 import { pluginInit } from './utils/figma/pluginInit';
 import { reconcileDocData } from './utils/docs/reconcileData';
 import { selectNode } from './utils/figma/selectNode';
+import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -64,7 +65,7 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'create-new-doc') {
     context.stopSendingUpdates = true;
     let section: SectionNode;
-    createNewDoc(DEFAULT_DOC_DATA, context.settings).then((s) => {
+    createNewDoc(createNewDocJSON(), context.settings).then((s) => {
       section = s;
       generateJSONFromFigmaContent(section).then((data) => {
         context.stopSendingUpdates = false;
