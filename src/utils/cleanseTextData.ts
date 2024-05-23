@@ -30,7 +30,7 @@ export function cleanseString(string: string): string {
 
   let formattedString = string ? (string as string) : '';
   if (formattedString) {
-    formattedString = formattedString.replace('&nbsp;', ' ');
+    formattedString = formattedString.replace(/&nbsp;/g, ' ');
   }
   return formattedString;
 }
@@ -41,7 +41,7 @@ export function decodeStringForFigma(string: string): string {
     formattedString = formattedString.replace(/&lt;/g, '<');
     formattedString = formattedString.replace(/&gt;/g, '>');
     formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
-    formattedString = cleanseString(formattedString);
+    formattedString = formattedString.replace(/&nbsp;/g, ' ');
     return formattedString;
   } else return '';
 }
@@ -51,8 +51,11 @@ export function encodeStringForHTML(string: string): string {
     let formattedString = string;
     formattedString = formattedString.replace(/</g, '&lt;');
     formattedString = formattedString.replace(/>/g, '&gt;');
-    formattedString = formattedString.replace(/&(?![amp|gt|lt])/g, '&amp;');
-    formattedString = cleanseString(formattedString);
+    formattedString = formattedString.replace(
+      /&(?![amp|gt|lt|nbsp])/g,
+      '&amp;'
+    );
+    formattedString = formattedString.replace(/ +$/, '&nbsp;');
     return formattedString;
   } else return '';
 }

@@ -14,5 +14,5 @@ export function formatPageData(page: PageData) {
     return;
   }
   let firstHeaderBlock = page.blocks[i];
-  page.title = firstHeaderBlock.data.text;
+  page.title =  firstHeaderBlock.data.text;
 }

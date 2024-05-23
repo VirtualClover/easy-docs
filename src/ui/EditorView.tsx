@@ -21,6 +21,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
 import { createNewPageJSON } from '../utils/docs/createNewPageJSON';
+import { decodeStringForFigma } from '../utils/cleanseTextData';
 import { pushNewDataToFigma } from '../utils/editor/pushNewDataToFigma';
 import { selectNewPageFromEditor } from '../utils/editor/selectNewPageFromEditor';
 
@@ -69,7 +70,9 @@ export const EditorView = () => {
             display: 'block',
             flexDirection: 'row',
           }}
-          label={pluginContext.currentDocData.pages[i].title}
+          label={decodeStringForFigma(
+            pluginContext.currentDocData.pages[i].title
+          )}
           {...a11yProps(i)}
           key={i}
         />

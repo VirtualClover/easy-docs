@@ -7,6 +7,7 @@ import {
 } from '../constants';
 
 import { createDocFrame } from '../figma/createDocFrame';
+import { decodeStringForFigma } from '../cleanseTextData';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
 import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
@@ -22,7 +23,7 @@ export async function generateFigmaContentFromJSON(
   settings: PluginSettings
 ) {
   let pages = data.pages;
-  let docTitle = data.title;
+  let docTitle = decodeStringForFigma(data.title);
   parentSection.name = docTitle;
 
   for (let i = 0; i < pages.length; i++) {
@@ -55,7 +56,7 @@ export async function generateFigmaContentFromJSON(
 
 async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
   let blocks = data.blocks;
-  frame.name = data.title;
+  frame.name = decodeStringForFigma(data.title);
   let totalLength =
     frame.children.length > blocks.length
       ? frame.children.length

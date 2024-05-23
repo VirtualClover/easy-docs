@@ -12,6 +12,10 @@ import {
 } from '@mui/material';
 import { ArrowBack, Close, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../utils/cleanseTextData';
 
 import { ExportView } from './ExportView';
 import { PluginDataContext } from '../../utils/PluginDataContext';
@@ -53,7 +57,7 @@ const EditorBar = () => {
   function handleInputChange(pluginContext: PluginData, title: string) {
     let tempDoc: DocData = {
       ...pluginContext.currentDocData,
-      title: title,
+      title: encodeStringForHTML(title),
     };
     pushNewDataToFigma(pluginContext, tempDoc);
     setEditDocTitle(false);
@@ -102,7 +106,9 @@ const EditorBar = () => {
           onMouseEnter={() => setEditIconVisible(true)}
           onMouseLeave={() => setEditIconVisible(false)}
         >
-          {editDocTitle ? '' : pluginContext.currentDocData.title}
+          {decodeStringForFigma(
+            editDocTitle ? '' : pluginContext.currentDocData.title
+          )}
           {/* <IconButton
           onClick={() => setEditDocTitle(true)}
           sx={{ visibility: `${editIconVisible ? 'visible' : 'hidden'}` }}
@@ -134,7 +140,9 @@ const EditorBar = () => {
           }}
           fullWidth
           size="small"
-          defaultValue={pluginContext.currentDocData.title}
+          defaultValue={decodeStringForFigma(
+            pluginContext.currentDocData.title
+          )}
         />
       )}
       {

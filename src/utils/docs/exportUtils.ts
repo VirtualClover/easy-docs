@@ -6,6 +6,7 @@ import {
   PageData,
 } from '../constants';
 
+import { decodeStringForFigma } from '../cleanseTextData';
 import { generateFigmaURL } from './figmaURLHandlers';
 
 // TODO Add Nextra
@@ -66,7 +67,7 @@ export function generateMarkdownPage(data: PageData): string {
     }
   }
 
-  return markdown.join('  \n');
+  return decodeStringForFigma(markdown.join('  \n'));
 }
 
 export function generateJSONPage(data: PageData): string {

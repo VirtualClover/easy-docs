@@ -16,7 +16,7 @@ export async function generateJSONFromFigmaContent(
   section: SectionNode
 ): Promise<DocData> {
   let JSONData: DocData = {
-    title: section.name,
+    title: encodeStringForHTML(section.name),
     pages: [],
     sectionId: section.id,
     author: {
@@ -203,6 +203,6 @@ async function generatePageDataFromFrame(
   }
 
   formatPageData(pageData);
-  frame.name = pageData.title;
+  //frame.name = encodeStringForHTML(pageData.title);
   return pageData;
 }
