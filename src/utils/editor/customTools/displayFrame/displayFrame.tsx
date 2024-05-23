@@ -1,5 +1,9 @@
 import { Alert, Typography, styled } from '@mui/material';
 import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../../cleanseTextData';
+import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
   validateFigmaURL,
@@ -75,7 +79,7 @@ const InputUI = (blockData: ComponentProps) => {
             className="cdx-input"
             id="cdx-display-frame-caption"
             placeholder={'Enter a caption!'}
-            defaultValue={blockData.caption}
+            defaultValue={decodeStringForFigma(blockData.caption)}
           />
         </>
       );
@@ -159,7 +163,7 @@ export class DisplayFrame {
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),
       frameExistsInFile: this.data.frameExistsInFile,
-      caption: caption ?? '',
+      caption: encodeStringForHTML(caption ?? ''),
     };
   }
 
