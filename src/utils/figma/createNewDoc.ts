@@ -15,11 +15,11 @@ export async function createNewDoc(
 ): Promise<SectionNode> {
   let parentSection = figma.createSection();
   parentSection.resizeWithoutConstraints(
-    settings.section.padding,
-    settings.section.padding
+    settings.customization.section.padding,
+    settings.customization.section.padding
   );
   parentSection.name = data.title;
-  setNodeFills(parentSection, settings.section.backgroundColor);
+  setNodeFills(parentSection, settings.customization.section.backgroundColor);
   await generateFigmaContentFromJSON(data, parentSection, settings);
   return parentSection;
 }

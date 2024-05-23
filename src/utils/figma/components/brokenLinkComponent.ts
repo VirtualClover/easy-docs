@@ -32,7 +32,7 @@ export async function createBrokenLinkComponent(parent: FrameNode) {
       messageNode.fontSize = 24;
       messageNode.characters = 'Preview not available.';
       messageNode.textAlignHorizontal = 'CENTER';
-      setNodeFills(messageNode, DEFAULT_SETTINGS.palette.onBackground.mid);
+      setNodeFills(messageNode, DEFAULT_SETTINGS.customization.palette.onBackground.mid);
       component.appendChild(messageNode);
       messageNode.layoutSizingHorizontal = 'FILL';
 
@@ -43,7 +43,7 @@ export async function createBrokenLinkComponent(parent: FrameNode) {
       captionNode.fontSize = 16;
       captionNode.characters = 'Frame caption';
       captionNode.textAlignHorizontal = 'CENTER';
-      setNodeFills(captionNode, DEFAULT_SETTINGS.palette.onBackground.mid);
+      setNodeFills(captionNode, DEFAULT_SETTINGS.customization.palette.onBackground.mid);
       component.appendChild(captionNode);
       captionNode.layoutSizingHorizontal = 'FILL';
       captionProperty = component.addComponentProperty(

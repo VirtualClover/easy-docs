@@ -18,10 +18,10 @@ export function createDocFrame(
   //Create Frame
   const frame: FrameNode = figma.createFrame();
   frame.layoutMode = 'VERTICAL';
-  frame.horizontalPadding = settings.frame.padding;
-  frame.minWidth = DEFAULT_SETTINGS.frame.minWidth;
-  frame.minHeight = DEFAULT_SETTINGS.frame.minHeight;
-  frame.verticalPadding = settings.frame.padding;
+  frame.horizontalPadding = settings.customization.frame.padding;
+  frame.minWidth = settings.customization.frame.minWidth;
+  frame.minHeight = settings.customization.frame.minHeight;
+  frame.verticalPadding = settings.customization.frame.padding;
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';
   frame.name = decodeStringForFigma(name);
@@ -34,12 +34,13 @@ export function createDocFrame(
   //Append frame to parent
   if (parent.children.length) {
     let lastChild = parent.children[parent.children.length - 1];
-    frame.x = lastChild.x + lastChild.width + settings.section.docGap;
+    frame.x =
+      lastChild.x + lastChild.width + settings.customization.section.docGap;
   } else {
-    frame.x = parent.x + settings.section.padding;
+    frame.x = parent.x + settings.customization.section.padding;
   }
   parent.appendChild(frame);
-  frame.y = settings.section.padding;
+  frame.y = settings.customization.section.padding;
   //figma.viewport.scrollAndZoomIntoView([frame]);
   return frame;
 }

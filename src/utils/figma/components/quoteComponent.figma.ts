@@ -1,8 +1,8 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
-import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
 
 import { BaseFileData } from '../../constants';
 import { clone } from '../../clone';
+import { decodeStringForFigma } from '../../cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createQuoteComponent(parent: FrameNode) {
@@ -34,11 +34,14 @@ export async function createQuoteComponent(parent: FrameNode) {
       innerWrapper.cornerRadius = 16;
       const fills = clone(innerWrapper.strokes);
       fills[0] = figma.util.solidPaint(
-        DEFAULT_SETTINGS.palette.divider.simple,
+        DEFAULT_SETTINGS.customization.palette.divider.simple,
         fills[0]
       );
       innerWrapper.strokes = fills;
-      setNodeFills(innerWrapper, DEFAULT_SETTINGS.palette.surface);
+      setNodeFills(
+        innerWrapper,
+        DEFAULT_SETTINGS.customization.palette.surface
+      );
       component.appendChild(innerWrapper);
       innerWrapper.layoutSizingHorizontal = 'FILL';
       //Quote
@@ -46,7 +49,10 @@ export async function createQuoteComponent(parent: FrameNode) {
       quoteNode.fontName = { family: 'Inter', style: 'Medium Italic' };
       quoteNode.fontSize = 36;
       quoteNode.characters = 'Quote';
-      setNodeFills(quoteNode, DEFAULT_SETTINGS.palette.onBackground.high);
+      setNodeFills(
+        quoteNode,
+        DEFAULT_SETTINGS.customization.palette.onBackground.high
+      );
       innerWrapper.appendChild(quoteNode);
       quoteNode.layoutSizingHorizontal = 'FILL';
       contentProperty = component.addComponentProperty(
@@ -60,7 +66,10 @@ export async function createQuoteComponent(parent: FrameNode) {
       authorNode.fontName = { family: 'Inter', style: 'Regular' };
       authorNode.fontSize = 16;
       authorNode.characters = '- Author';
-      setNodeFills(authorNode, DEFAULT_SETTINGS.palette.onBackground.mid);
+      setNodeFills(
+        authorNode,
+        DEFAULT_SETTINGS.customization.palette.onBackground.mid
+      );
       innerWrapper.appendChild(authorNode);
       authorNode.layoutSizingHorizontal = 'FILL';
       authorProperty = component.addComponentProperty(

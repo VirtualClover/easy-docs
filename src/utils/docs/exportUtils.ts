@@ -25,7 +25,7 @@ let generateIFrame = (
   )}<figure class="${classPrefix}figma-frame">\n${addIndetation(
     identation + 2
   )}<iframe style="border: 1px solid ${
-    DEFAULT_SETTINGS.palette.divider.simple
+    DEFAULT_SETTINGS.customization.palette.divider.simple
   };" src="${generateFigmaURL(
     block.data.fileId,
     block.data.frameId,

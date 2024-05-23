@@ -30,7 +30,7 @@ export async function createHeaderComponent(
       textNode.fontName = { family: 'Inter', style: 'Bold' };
       textNode.fontSize = currentSize;
       textNode.characters = 'Heading';
-      setNodeFills(textNode, DEFAULT_SETTINGS.palette.onBackground.high);
+      setNodeFills(textNode, DEFAULT_SETTINGS.customization.palette.onBackground.high);
       header.appendChild(textNode);
       textNode.layoutSizingHorizontal = 'FILL';
       contentProperty = header.addComponentProperty(

@@ -2,7 +2,6 @@
 // it will then create that many rectangles on the screen.
 
 import {
-  DEFAULT_DOC_DATA,
   DEFAULT_SETTINGS,
   DocData,
   EMPTY_DOC_OBJECT,
