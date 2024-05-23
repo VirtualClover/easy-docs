@@ -1,6 +1,7 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
 
 import { BaseFileData } from '../../constants';
+import { cleanseString } from '../../cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
@@ -43,7 +44,7 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.paragraph.contentProp]: data.text.replace('&nbsp;', ' '),
+      [componentData.paragraph.contentProp]: cleanseString(data.text),
     });
     return instance;
     //instance.set

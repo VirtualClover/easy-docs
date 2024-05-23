@@ -24,3 +24,11 @@ export function cleanseString(string: string): string {
   }
   return formattedString;
 }
+
+export function decodeStringForFigma(string: string): string {
+  let formattedString = string;
+  formattedString = formattedString.replace('&lt;', '<');
+  formattedString = formattedString.replace('&lt;', '<');
+  formattedString = cleanseString(formattedString);
+  return formattedString;
+}

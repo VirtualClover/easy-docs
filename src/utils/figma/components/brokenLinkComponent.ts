@@ -1,7 +1,7 @@
 import { BaseFileData, DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from "../../constants";
+
+import { cleanseString } from "../../cleanseTextData";
 import { setNodeFills } from "../setNodeFills";
-
-
 
 export async function createBrokenLinkComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -61,7 +61,7 @@ export async function createBrokenLinkComponent(parent: FrameNode) {
 }
 
 
-export async function generateBrokenLinkInstance(caption: String): Promise<InstanceNode> {
+export async function generateBrokenLinkInstance(caption: string): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
@@ -72,7 +72,7 @@ export async function generateBrokenLinkInstance(caption: String): Promise<Insta
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.brokenLink.captionProp]: caption.replace('&nbsp;', ' '),
+      [componentData.brokenLink.captionProp]: cleanseString(caption),
     });
     return instance;
     //instance.set

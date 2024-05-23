@@ -3,11 +3,8 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/components/prism-markup';
 
-//import '../../styles/prism.css';
 import { PrimsWrapper } from '../../styles/prism_styles';
 import React from 'react';
-
-//import 'prismjs/themes/prism-okaidia.css';
 
 declare var Prism: any;
 
