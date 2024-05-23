@@ -1,7 +1,11 @@
 import * as _ from 'lodash';
 
 import { DocData, PageData, Reconciliation } from '../constants';
-import { cleanseString, cleanseTextData } from '../cleanseTextData';
+import {
+  cleanseBlockData,
+  cleanseString,
+  cleanseTextData,
+} from '../cleanseTextData';
 
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';
@@ -88,16 +92,16 @@ export function reconcilePageData(
   }
   for (let i = 0; i < newData.blocks.length; i++) {
     let newBlock = newData.blocks[i];
+    //newBlock.data = cleanseBlockData(newBlock.data);
     let currentDataBlock = clonedCurrentData.blocks[i];
+    //currentDataBlock.data = cleanseBlockData(currentDataBlock.data);
     if (currentDataBlock) {
-      cleanseTextData(newBlock.data);
       if (
         !_.isEqual(newBlock.data, currentDataBlock.data) ||
         newBlock.type != currentDataBlock.type
       ) {
-
         changesNumber++;
-        currentDataBlock.data = cleanseTextData(newBlock.data);
+        currentDataBlock.data = newBlock.data;
         currentDataBlock.lastEdited = Date.now();
         currentDataBlock.type = newBlock.type;
         currentDataBlock.figmaNodeId = currentDataBlock.figmaNodeId

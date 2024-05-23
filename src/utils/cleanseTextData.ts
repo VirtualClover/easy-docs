@@ -5,7 +5,17 @@
  */
 export function cleanseTextData(data) {
   if (data.text) {
-    data.text = cleanseString(data.text);
+    data.text = decodeStringForFigma(data.text);
+  }
+  return data;
+}
+
+export function cleanseBlockData(data) {
+  if (data.text) {
+    data.text = decodeStringForFigma(data.text);
+  }
+  if (data.caption) {
+    data.text = decodeStringForFigma(data.caption);
   }
   return data;
 }
@@ -27,8 +37,18 @@ export function cleanseString(string: string): string {
 
 export function decodeStringForFigma(string: string): string {
   let formattedString = string;
-  formattedString = formattedString.replace('&lt;', '<');
-  formattedString = formattedString.replace('&lt;', '<');
+  formattedString = formattedString.replace(/&lt;/g, '<');
+  formattedString = formattedString.replace(/&gt;/g, '>');
+  formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
+  formattedString = cleanseString(formattedString);
+  return formattedString;
+}
+
+export function encodeStringForHTML(string: string): string {
+  let formattedString = string;
+  formattedString = formattedString.replace(/</g, '&lt;');
+  formattedString = formattedString.replace(/>/g, '&gt;');
+  formattedString = formattedString.replace(/&(?![amp|gt|lt])/g, '&amp;');
   formattedString = cleanseString(formattedString);
   return formattedString;
 }

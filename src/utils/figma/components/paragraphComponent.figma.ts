@@ -1,7 +1,7 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
+import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
 
 import { BaseFileData } from '../../constants';
-import { cleanseString } from '../../cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
@@ -44,7 +44,7 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.paragraph.contentProp]: cleanseString(data.text),
+      [componentData.paragraph.contentProp]: decodeStringForFigma(data.text),
     });
     return instance;
     //instance.set

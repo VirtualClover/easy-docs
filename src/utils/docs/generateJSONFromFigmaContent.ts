@@ -10,6 +10,7 @@ import {
 import { formatPageData } from './formatPageData';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 import { getDetailsFromFigmaURL, validateFigmaURL } from './figmaURLHandlers';
+import { encodeStringForHTML } from '../cleanseTextData';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
@@ -100,9 +101,11 @@ async function generatePageDataFromFrame(
               type: 'paragraph',
               ...objEssentials,
               data: {
-                text: childNode.componentProperties[
-                  componentData.paragraph.contentProp
-                ].value,
+                text: encodeStringForHTML(
+                  childNode.componentProperties[
+                    componentData.paragraph.contentProp
+                  ].value as string
+                ),
               },
             });
             break;
