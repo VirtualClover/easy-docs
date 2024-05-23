@@ -3,8 +3,8 @@ import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
+import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
 
-import { cleanseString } from '../../cleanseTextData';
 import { generateBrokenLinkInstance } from './brokenLinkComponent';
 import { generateFigmaURL } from '../../docs/figmaURLHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
@@ -178,7 +178,7 @@ export async function generateDisplayFrameInstance(
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.displayFrame.captionProp]: cleanseString(data.caption),
+      [componentData.displayFrame.captionProp]: decodeStringForFigma(data.caption),
       [componentData.displayFrame.sourceProp]: sourceURL,
     });
 

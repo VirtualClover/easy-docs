@@ -36,19 +36,23 @@ export function cleanseString(string: string): string {
 }
 
 export function decodeStringForFigma(string: string): string {
-  let formattedString = string;
-  formattedString = formattedString.replace(/&lt;/g, '<');
-  formattedString = formattedString.replace(/&gt;/g, '>');
-  formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
-  formattedString = cleanseString(formattedString);
-  return formattedString;
+  if (string && typeof string === 'string') {
+    let formattedString = string;
+    formattedString = formattedString.replace(/&lt;/g, '<');
+    formattedString = formattedString.replace(/&gt;/g, '>');
+    formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
+    formattedString = cleanseString(formattedString);
+    return formattedString;
+  } else return '';
 }
 
 export function encodeStringForHTML(string: string): string {
-  let formattedString = string;
-  formattedString = formattedString.replace(/</g, '&lt;');
-  formattedString = formattedString.replace(/>/g, '&gt;');
-  formattedString = formattedString.replace(/&(?![amp|gt|lt])/g, '&amp;');
-  formattedString = cleanseString(formattedString);
-  return formattedString;
+  if (string && typeof string === 'string') {
+    let formattedString = string;
+    formattedString = formattedString.replace(/</g, '&lt;');
+    formattedString = formattedString.replace(/>/g, '&gt;');
+    formattedString = formattedString.replace(/&(?![amp|gt|lt])/g, '&amp;');
+    formattedString = cleanseString(formattedString);
+    return formattedString;
+  } else return '';
 }

@@ -79,9 +79,10 @@ async function generatePageDataFromFrame(
         });
         switch (mainCompId) {
           case componentData.header.id:
-            let headerContent =
+            let headerContent = encodeStringForHTML(
               childNode.componentProperties[componentData.header.contentProp]
-                .value;
+                .value as string
+            );
             pageData.blocks.push({
               type: 'header',
               ...objEssentials,
@@ -114,12 +115,14 @@ async function generatePageDataFromFrame(
               type: 'quote',
               ...objEssentials,
               data: {
-                text: childNode.componentProperties[
-                  componentData.quote.contentProp
-                ].value,
-                caption:
+                text: encodeStringForHTML(
+                  childNode.componentProperties[componentData.quote.contentProp]
+                    .value as string
+                ),
+                caption: encodeStringForHTML(
                   childNode.componentProperties[componentData.quote.authorProp]
-                    .value,
+                    .value as string
+                ),
                 alignment: 'left',
               },
             });
@@ -164,10 +167,11 @@ async function generatePageDataFromFrame(
                         frameId: frameDetails.frameId,
                         fileId: frameDetails.fileId,
                         frameExistsInFile,
-                        caption:
+                        caption: encodeStringForHTML(
                           instInsideAFrame.componentProperties[
                             componentData.displayFrame.captionProp
-                          ].value,
+                          ].value as string
+                        ),
                       },
                     });
                   })
@@ -180,10 +184,11 @@ async function generatePageDataFromFrame(
                     frameId: '',
                     fileId: '',
                     frameExistsInFile,
-                    caption:
+                    caption: encodeStringForHTML(
                       instInsideAFrame.componentProperties[
                         componentData.displayFrame.captionProp
-                      ].value,
+                      ].value as string
+                    ),
                   },
                 });
               }

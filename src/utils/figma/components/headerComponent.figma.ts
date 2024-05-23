@@ -5,6 +5,7 @@ import {
 } from '../../constants';
 
 import { BaseFileData } from '../../constants';
+import { decodeStringForFigma } from '../../cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
@@ -76,7 +77,7 @@ export async function generateHeaderInstance(data): Promise<InstanceNode> {
     let component = componentSet.children[0] as ComponentNode;
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.header.contentProp]: data.text,
+      [componentData.header.contentProp]: decodeStringForFigma(data.text),
       [componentData.header.levelProp.key]: `${data.level}`,
     });
     return instance;

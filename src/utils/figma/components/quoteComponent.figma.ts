@@ -1,7 +1,7 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
+import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
 
 import { BaseFileData } from '../../constants';
-import { cleanseString } from '../../cleanseTextData';
 import { clone } from '../../clone';
 import { setNodeFills } from '../setNodeFills';
 
@@ -89,10 +89,10 @@ export async function generateQuoteInstance(data): Promise<InstanceNode> {
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.quote.contentProp]: cleanseString(data.text),
+      [componentData.quote.contentProp]: decodeStringForFigma(data.text),
     });
     instance.setProperties({
-      [componentData.quote.authorProp]: cleanseString(data.caption),
+      [componentData.quote.authorProp]: decodeStringForFigma(data.caption),
     });
     return instance;
     //instance.set
