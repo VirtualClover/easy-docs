@@ -185,8 +185,6 @@ export async function generateDisplayFrameInstance(
     });
 
     let nodeToDisplay: FrameNode;
-    console.log('Frame data');
-    console.log(data);
 
     if (data.frameId) {
       if (referenceNode && referenceNode.type == 'FRAME') {
