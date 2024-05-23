@@ -6,8 +6,12 @@ import { PageData } from '../constants';
  */
 export function formatPageData(page: PageData) {
   let i = 0;
-  while (page.blocks[i].type != 'header') {
+  while (page.blocks[i] && page.blocks[i].type != 'header') {
     i++;
+  }
+  if (i == page.blocks.length) {
+    page.title = 'Untitled page';
+    return;
   }
   let firstHeaderBlock = page.blocks[i];
   page.title = firstHeaderBlock.data.text;
