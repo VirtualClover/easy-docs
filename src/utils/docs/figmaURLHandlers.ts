@@ -46,9 +46,9 @@ export function formatFrameIdForURLs(
   treatment: FrameIdTreatment = 'encode'
 ): string {
   if (treatment == 'decode') {
-    return id.replace('%3A', ':');
+    return id.replace(/%3A|-/, ':');
   } else {
-    return id.replace(':', '%3A');
+    return id.replace(':', '-');
   }
 }
 
@@ -63,6 +63,7 @@ export function getDetailsFromFigmaURL(
   frameIdTreatment: FrameIdTreatment = 'encode'
 ): FrameDetailsFromURL {
   if (url && validateFigmaURL(url)) {
+    url = cleanURL(url);
     let fileMatch = url.match(
       /(?<=file|design\/)(.*?)(?=\/)/ // (?<=file|design\/)(.*?)(?=\/)
     );
@@ -121,9 +122,19 @@ export function generateFigmaURL(
  */
 export function getEmbedURLFromShare(url: string): string {
   if (url && validateFigmaURL(url)) {
+    url = cleanURL(url);
     let frameDetails = getDetailsFromFigmaURL(url, 'encode');
     return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${frameDetails.fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameDetails.frameId}`;
   } else {
     return '';
   }
+}
+
+/**
+ * Removes blank spaces from a URL
+ * @param url
+ * @returns
+ */
+export function cleanURL(url: string): string {
+  return url.replace(/^\s+|\s+$|\s+(?=\s)/g, '');
 }

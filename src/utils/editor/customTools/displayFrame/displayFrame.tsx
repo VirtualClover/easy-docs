@@ -139,7 +139,7 @@ export class DisplayFrame {
     let ui = document.createElement('div');
     let root = createRoot(ui);
     root.render(<InputUI {...this.data} />);
-    console.log('render');
+    //console.log('render');
     ui.classList.add('display-frame');
 
     return ui;
@@ -157,8 +157,8 @@ export class DisplayFrame {
       caption = blockContent.querySelector('#cdx-display-frame-caption').value;
     }
 
-    console.log('frame ei¿xists');
-    console.log(this.data.frameExistsInFile);
+    //console.log('frame ei¿xists');
+    //console.log(this.data.frameExistsInFile);
 
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),

@@ -178,11 +178,15 @@ export async function generateDisplayFrameInstance(
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.displayFrame.captionProp]: decodeStringForFigma(data.caption),
+      [componentData.displayFrame.captionProp]: decodeStringForFigma(
+        data.caption
+      ),
       [componentData.displayFrame.sourceProp]: sourceURL,
     });
 
     let nodeToDisplay: FrameNode;
+    console.log('Frame data');
+    console.log(data);
 
     if (data.frameId) {
       if (referenceNode && referenceNode.type == 'FRAME') {
