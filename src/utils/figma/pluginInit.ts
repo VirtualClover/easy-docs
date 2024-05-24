@@ -15,6 +15,7 @@ import { objectIsNull } from '../objectisNull';
 export async function pluginInit() {
   let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
   let userData: AuthorUser = getUserDetailsInFigma();
+  
   let componentData: BaseFileData = stringData
     ? JSON.parse(stringData)
     : BASE_FILE_DATA;
@@ -41,6 +42,7 @@ export async function pluginInit() {
       }
     }
   }
+  
   figma.ui.postMessage({
     type: 'data-loaded',
     data: { settings: DEFAULT_SETTINGS, user: userData },

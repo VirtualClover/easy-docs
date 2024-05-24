@@ -84,8 +84,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
       if (navigation.currentView != 'SETTINGS' && loadingState != 'MAYOR') {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
+                    
           if (event.data.pluginMessage) {
             switch (event.data.pluginMessage.type) {
+
               case 'new-node-data':
                 //console.log('new doc data');
                 //console.log(incomingEditorChanges);
@@ -141,9 +143,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 console.log('set editor changes false');
 
                 setIncomingEditorChanges(false);
-                break;
-
-              case 'finished-selecting-node':
                 break;
 
               default:

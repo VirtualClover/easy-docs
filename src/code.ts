@@ -21,6 +21,7 @@ import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 
 // This shows the HTML page in "ui.html".
 figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
+figma.skipInvisibleInstanceChildren = true;
 
 let context = {
   //parentSection: null,

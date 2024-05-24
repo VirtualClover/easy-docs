@@ -1,4 +1,3 @@
-import { DEFAULT_SETTINGS } from '../../utils/constants';
 import { Drawer } from '@mui/material';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
@@ -10,7 +9,6 @@ export const BottomSheet = () => {
     if (pluginContext.sheetOpen) {
       //pluginContext.setLoadingState('MAYOR');
     }
-    console.log('Sheet open');
   }, [pluginContext.sheetOpen]);
 
   return (
