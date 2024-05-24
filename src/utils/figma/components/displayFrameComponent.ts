@@ -3,10 +3,10 @@ import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
-import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
 
+import {decodeStringForFigma} from '../../cleanseTextData';
 import { generateBrokenLinkInstance } from './brokenLinkComponent';
-import { generateFigmaURL } from '../../docs/figmaURLHandlers';
+import { generateFigmaURL } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 

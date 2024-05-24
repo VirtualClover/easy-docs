@@ -9,7 +9,7 @@ import {
 
 import { formatPageData } from './formatPageData';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
-import { getDetailsFromFigmaURL, validateFigmaURL } from './figmaURLHandlers';
+import { getDetailsFromFigmaURL, validateFigmaURL } from '../general/urlHandlers';
 import { encodeStringForHTML } from '../cleanseTextData';
 
 export async function generateJSONFromFigmaContent(

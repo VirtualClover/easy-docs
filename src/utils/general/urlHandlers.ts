@@ -108,7 +108,7 @@ export function generateFigmaURL(
   } else {
     let formatedFrameID = formatFrameIdForURLs(frameId, 'encode');
     if (type == 'embed') {
-      return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${formatedFrameID}`;
+      return `https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2F%3Ftype%3Ddesign%26node-id%3D${formatedFrameID}`;
     } else {
       return `https://www.figma.com/design/${fileId}/?&node-id=${formatedFrameID}&mode=design`;
     }

@@ -6,8 +6,7 @@ import {
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
-  validateFigmaURL,
-} from '../../../docs/figmaURLHandlers';
+} from '../../../general/urlHandlers';
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';

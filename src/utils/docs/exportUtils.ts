@@ -1,13 +1,12 @@
 import {
   BlockData,
   DEFAULT_SETTINGS,
-  DocData,
   ExportFileFormat,
   PageData,
 } from '../constants';
 
 import { decodeStringForFigma } from '../cleanseTextData';
-import { generateFigmaURL } from './figmaURLHandlers';
+import { generateFigmaURL } from '../general/urlHandlers';
 
 // TODO Add Nextra
 
