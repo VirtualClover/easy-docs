@@ -5,12 +5,12 @@ const baseTheme = {
   typography: {
     fontSize: BASE_STYLE_TOKENS.baseFontSize,
     fontFamily: BASE_STYLE_TOKENS.fontFamily,
-    h1: { fontWeight: 600, fontSize: 36 },
-    h2: { fontWeight: 600, fontSize: 28 },
-    h3: { fontWeight: 600, fontSize: 20 },
-    h4: { fontWeight: 600, fontSize: 16 },
-    h5: { fontWeight: 600, fontSize: 14 },
-    h6: { fontWeight: 600, fontSize: 12 },
+    h1: { fontWeight: 700, fontSize: 36 },
+    h2: { fontWeight: 700, fontSize: 28 },
+    h3: { fontWeight: 700, fontSize: 20 },
+    h4: { fontWeight: 700, fontSize: 16 },
+    h5: { fontWeight: 700, fontSize: 14 },
+    h6: { fontWeight: 700, fontSize: 12 },
   },
   spacing: BASE_STYLE_TOKENS.units.u1,
 };

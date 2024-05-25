@@ -121,6 +121,9 @@ export const DEFAULT_HEADING_SIZES = [
   BASE_STYLE_TOKENS.units.u32,
 ];
 
+export const DEFAULT_GUIDELINES = ['do', 'dont', 'caution'] as const;
+export type GuidelineType = (typeof DEFAULT_GUIDELINES)[number];
+
 const sectionSettings = {
   backgroundColor: BASE_STYLE_TOKENS.palette.surface,
   padding: BASE_STYLE_TOKENS.units.u16,
@@ -153,7 +156,13 @@ const exportSettings = {
 
 export type ExportSettings = typeof exportSettings;
 
-export const SETTINGS_GROUPS = ['Customization', 'Exports', 'Sync', 'About'];
+export const SETTINGS_GROUPS = [
+  'Customization',
+  'Exports',
+  'Sync',
+  'About',
+] as const;
+export type SettingsGroups = (typeof SETTINGS_GROUPS)[number];
 
 export const DEFAULT_SETTINGS = {
   customization: customizationSettings,

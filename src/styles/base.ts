@@ -5,35 +5,48 @@ const BASE_COLOR_PALETTE = {
   onSecondary: '#275488',
   background: '#FFF',
   onBackground: {
-    high: '#000000',
-    mid: '#626262',
+    high: '#22264F',
+    mid: '#626582',
     low: '#898C93',
-    link: '2C7CD6',
+    link: '#2C7CD6',
   },
   surface: '#F0F5F8',
   onSurface: {
-    high: '#000000',
-    mid: '#626262',
+    high: '#22264F',
+    mid: '#626582',
     low: '#898C93',
   },
   divider: {
-    simple: '#DFE3EC',
+    simple: '#BED1E2',
     interactive: '#B9B7B7',
   },
-  callout: {
-    success: '',
-    info: '',
-    error: '',
-    warning: '',
-    neutral: '',
+  status: {
+    success: {
+      muted: '#D0FFCF',
+      default: '#ACF4B8',
+      content: '#426347',
+    },
+    warning: {
+      muted: '#FFF4CF',
+      default: '#F0D796',
+      content: '#574D34',
+    },
+    error: {
+      muted: '#FFCFDB',
+      default: '#FF5A82',
+      content: '#AA5656',
+    },
+    info: {
+      muted: '#CFDDFF',
+      default: '#ACC9F4',
+      content: '#2E3B6A',
+    },
+    neutral: {
+      muted: '#D5E1EC',
+      default: '#BED1E2',
+      content: '#1F507B',
+    },
   },
-  onCallout: '',
-  guidelines: {
-    do: '',
-    dont: '',
-    warning: '',
-  },
-  onGuidelines: '',
 };
 
 export type ColorPalette = typeof BASE_COLOR_PALETTE;

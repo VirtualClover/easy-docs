@@ -10,6 +10,10 @@ export const PluginContainer = styled(Container, {
     background: theme.palette.background.default,
   },
 
+  'h1, h2, h3, h4, h5, h6': {
+    fontWeight: 700,
+  },
+
   '.codex-editor': {
     zIndex: 1200,
   },

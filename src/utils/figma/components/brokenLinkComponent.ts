@@ -1,6 +1,6 @@
 import { BaseFileData, DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from "../../constants";
+import { cleanseString, decodeStringForFigma } from "../../cleanseTextData";
 
-import { cleanseString } from "../../cleanseTextData";
 import { setNodeFills } from "../setNodeFills";
 
 export async function createBrokenLinkComponent(parent: FrameNode) {
@@ -72,7 +72,7 @@ export async function generateBrokenLinkInstance(caption: string): Promise<Insta
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.brokenLink.captionProp]: cleanseString(caption),
+      [componentData.brokenLink.captionProp]: decodeStringForFigma(caption),
     });
     return instance;
     //instance.set

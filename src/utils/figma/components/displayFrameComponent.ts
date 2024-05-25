@@ -4,7 +4,7 @@ import {
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
 
-import {decodeStringForFigma} from '../../cleanseTextData';
+import { decodeStringForFigma } from '../../cleanseTextData';
 import { generateBrokenLinkInstance } from './brokenLinkComponent';
 import { generateFigmaURL } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
@@ -32,8 +32,10 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       sourceWrapper.horizontalPadding = 8;
       setNodeFills(
         sourceWrapper,
-        DEFAULT_SETTINGS.customization.palette.divider.simple
+        DEFAULT_SETTINGS.customization.palette.status.neutral.muted
       );
+      sourceWrapper.bottomLeftRadius = 16;
+      sourceWrapper.bottomRightRadius = 16;
       component.appendChild(sourceWrapper);
       sourceWrapper.layoutSizingHorizontal = 'FILL';
       let sourceNode = figma.createText();
@@ -42,7 +44,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       sourceNode.characters = 'Source here';
       setNodeFills(
         sourceNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground.mid
+        DEFAULT_SETTINGS.customization.palette.status.neutral.content
       );
       sourceWrapper.appendChild(sourceNode);
       sourceNode.layoutSizingHorizontal = 'FILL';
@@ -105,7 +107,12 @@ async function generateOuterWrapper(
   displayFrame.paddingTop = 16;
   displayFrame.paddingLeft = 16;
   displayFrame.paddingRight = 16;
-  setNodeFills(displayFrame, DEFAULT_SETTINGS.customization.palette.surface);
+  displayFrame.topLeftRadius = 16;
+  displayFrame.topRightRadius = 16;
+  setNodeFills(
+    displayFrame,
+    DEFAULT_SETTINGS.customization.palette.status.neutral.default
+  );
   outerWrapper.appendChild(displayFrame);
   displayFrame.layoutSizingHorizontal = 'FILL';
 

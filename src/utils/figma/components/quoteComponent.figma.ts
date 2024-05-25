@@ -40,7 +40,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       innerWrapper.strokes = fills;
       setNodeFills(
         innerWrapper,
-        DEFAULT_SETTINGS.customization.palette.surface
+        DEFAULT_SETTINGS.customization.palette.status.neutral.muted
       );
       component.appendChild(innerWrapper);
       innerWrapper.layoutSizingHorizontal = 'FILL';
@@ -68,7 +68,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       authorNode.characters = '- Author';
       setNodeFills(
         authorNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground.mid
+        DEFAULT_SETTINGS.customization.palette.status.neutral.content
       );
       innerWrapper.appendChild(authorNode);
       authorNode.layoutSizingHorizontal = 'FILL';
