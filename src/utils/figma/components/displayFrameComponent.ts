@@ -94,7 +94,7 @@ async function generateOuterWrapper(
   outerWrapper.primaryAxisSizingMode = 'AUTO';
   outerWrapper.paddingBottom = 32;
   outerWrapper.itemSpacing = 0;
-  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Frame`;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}DosAndDonts`;
 
   //Display
   let displayFrame = figma.createFrame();
@@ -183,17 +183,16 @@ export async function generateDisplayFrameInstance(
     referenceNode = node;
   });
 
-  if (nodeSupportsChildren(component)) {
-    let sourceWrapper = component.children[0];
+  if (component.type == 'COMPONENT') {
+    let instance = component.createInstance();
+    let sourceWrapper = instance.children[0];
     if (nodeSupportsChildren(sourceWrapper)) {
       let sourceNode = sourceWrapper.children[0];
       if (sourceNode.type == 'TEXT' && referenceNode) {
         sourceNode.hyperlink = { type: 'URL', value: sourceURL };
       }
     }
-  }
-  if (component.type == 'COMPONENT') {
-    let instance = component.createInstance();
+
     instance.setProperties({
       [componentData.displayFrame.captionProp]: decodeStringForFigma(
         data.caption

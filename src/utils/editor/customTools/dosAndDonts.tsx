@@ -1,4 +1,5 @@
 import { Alert, Stack, Typography, styled } from '@mui/material';
+import { DEFAULT_SETTINGS, GuidelineType } from '../../constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -57,6 +58,9 @@ const InputUI = (blockData: ComponentProps) => {
   let [type, setType] = React.useState(blockData.type ?? 'do');
   let [preview, setPreview] = React.useState(<></>);
   let [errorMsg, setErrorMsg] = React.useState(<></>);
+  let [bgColor, setBgColor] = React.useState(
+    DEFAULT_SETTINGS.customization.palette.status.success.muted
+  );
 
   React.useEffect(() => {
     console.log('effect riggered');
@@ -100,8 +104,35 @@ const InputUI = (blockData: ComponentProps) => {
     }
   }, [frameDetails]);
 
+  React.useEffect(() => {
+    let statusColor: string;
+    switch (type) {
+      case 'do':
+        statusColor = 'success';
+        break;
+      case 'dont':
+        statusColor = 'error';
+        break;
+      case 'caution':
+        statusColor = 'warning';
+        break;
+      default:
+        statusColor = 'success';
+        break;
+    }
+
+    setBgColor(
+      DEFAULT_SETTINGS.customization.palette.status[statusColor].muted
+    );
+  }, [type]);
+
   return (
-    <BlockWrapper>
+    <BlockWrapper
+      style={{
+        background: bgColor,
+        outline: `6px solid ${bgColor}`,
+      }}
+    >
       <Stack direction="row" gap={2}>
         <select
           className="cdx-input"
@@ -109,10 +140,13 @@ const InputUI = (blockData: ComponentProps) => {
           id="cdx-dos-and-donts-type"
           style={{ width: 100 }}
           defaultValue={type}
+          onChange={(e) => {
+            setType(e.target.value);
+          }}
         >
-          <option value="do">Do</option>
-          <option value="dont">Dont</option>
-          <option value="caution">Caution</option>
+          <option value="do">✅ Do</option>
+          <option value="dont">❌ Don't</option>
+          <option value="caution">⚠ Caution</option>
         </select>
         <input
           className="cdx-input"

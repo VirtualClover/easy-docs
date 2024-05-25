@@ -252,17 +252,16 @@ export async function generateDosAndDontsInstance(
   if (componentSet.type == 'COMPONENT_SET') {
     let component = componentSet.children[0] as ComponentNode;
 
-    if (nodeSupportsChildren(component)) {
-      let sourceWrapper = component.children[0];
-      if (nodeSupportsChildren(sourceWrapper)) {
-        let sourceNode = sourceWrapper.children[0];
-        if (sourceNode.type == 'TEXT' && referenceNode) {
-          sourceNode.hyperlink = { type: 'URL', value: sourceURL };
-        }
+    let instance = component.createInstance();
+
+    let sourceWrapper = instance.children[0];
+    if (nodeSupportsChildren(sourceWrapper)) {
+      let sourceNode = sourceWrapper.children[0];
+      if (sourceNode.type == 'TEXT' && referenceNode) {
+        sourceNode.hyperlink = { type: 'URL', value: sourceURL };
       }
     }
 
-    let instance = component.createInstance();
     instance.setProperties({
       [componentData.dosAndDonts.sourceProp]: sourceURL,
       [componentData.dosAndDonts.captionProp]: decodeStringForFigma(

@@ -8,6 +8,7 @@ import {
   getDetailsFromFigmaURL,
 } from '../../general/urlHandlers';
 
+import { DEFAULT_SETTINGS } from '../../constants';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { figmaIcon } from '../../../assets/svgs';
@@ -53,6 +54,8 @@ const InputUI = (blockData: ComponentProps) => {
   let [src, setSrc] = React.useState(
     generateFigmaURL(frameDetails.fileId, frameDetails.frameId, 'share')
   );
+
+  let bgColor = DEFAULT_SETTINGS.customization.palette.status.neutral.muted;
 
   let [preview, setPreview] = React.useState(<></>);
   let [errorMsg, setErrorMsg] = React.useState(<></>);
@@ -100,7 +103,12 @@ const InputUI = (blockData: ComponentProps) => {
   }, [frameDetails]);
 
   return (
-    <BlockWrapper>
+    <BlockWrapper
+      style={{
+        background: bgColor,
+        outline: `6px solid ${bgColor}`,
+      }}
+    >
       <input
         className="cdx-input"
         id="cdx-display-frame-frame-url"
