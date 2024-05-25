@@ -1,6 +1,7 @@
 import { BaseFileData } from '../../constants';
 import { createBrokenLinkComponent } from './brokenLinkComponent';
 import { createDisplayFrameComponent } from './displayFrameComponent';
+import { createDosAndDontsComponent } from './dosAndDontsComponent.figma';
 import { createHeaderComponent } from './headerComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
@@ -51,17 +52,20 @@ export async function initComponents(
     createParagraphComponent(frame),
     createQuoteComponent(frame),
     createDisplayFrameComponent(frame),
+    createDosAndDontsComponent(frame),
     createBrokenLinkComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
     let quote = values[2];
     let displayFrame = values[3];
-    let brokenLink = values[4];
+    let dosAndDonts = values[4];
+    let brokenLink = values[5];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
     componentData.displayFrame = displayFrame;
+    componentData.dosAndDonts = dosAndDonts;
     componentData.brokenLink = brokenLink;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(

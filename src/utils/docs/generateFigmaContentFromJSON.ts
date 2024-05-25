@@ -9,6 +9,7 @@ import {
 import { createDocFrame } from '../figma/createDocFrame';
 import { decodeStringForFigma } from '../cleanseTextData';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent';
+import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
 import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
 import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
@@ -123,6 +124,13 @@ async function generateBlockInstanceFromJSON(
       break;
     case 'displayFrame':
       await generateDisplayFrameInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
+      break;
+    case 'dosAndDonts':
+      await generateDosAndDontsInstance(block.data).then((n) => {
         if (n) {
           node = n;
         }

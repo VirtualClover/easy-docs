@@ -1,12 +1,16 @@
-import { Alert, styled } from '@mui/material';
+import { Alert, Stack, Typography, styled } from '@mui/material';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../cleanseTextData';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
-  validateFigmaURL,
 } from '../../general/urlHandlers';
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { dosAndDontsIcon } from '../../../assets/svgs';
 
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
 //`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
@@ -14,30 +18,29 @@ import { createRoot } from 'react-dom/client';
 interface ComponentProps {
   frameId: string;
   fileId: string;
+  type: string;
   frameExistsInFile: boolean;
   caption: string;
 }
 
+let IFrame = styled('iframe')(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  width: '100%',
+  height: 300,
+  borderRadius: 4,
+}));
+
+let BlockWrapper = styled('div')(({ theme }) => ({
+  margin: `${32} ${0}`,
+  width: '100%',
+  borderRadius: 4,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+}));
+
 const InputUI = (blockData: ComponentProps) => {
-  let IFrame = styled('iframe')(({ theme }) => ({
-    border: `1px solid ${theme.palette.divider}`,
-    width: '100%',
-    height: 300,
-    borderRadius: 4,
-  }));
-
-  let BlockWrapper = styled('div')(({ theme }) => ({
-    margin: `${32} ${0}`,
-    width: '100%',
-    borderRadius: 4,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  }));
-
-  let [src, setSrc] = React.useState(
-    generateFigmaURL(blockData.fileId, blockData.frameId, 'share')
-  );
+  //https://www.figma.com/design/tt54zCyis2CgMo6wRIkvB0/Untitled?node-id=16%3A249&t=Bad05SFQnNtoGy4z-1
 
   let [frameExistsInFile, setFrameExistsInFile] = React.useState(
     blockData.frameExistsInFile
@@ -48,24 +51,20 @@ const InputUI = (blockData: ComponentProps) => {
     fileId: blockData.fileId,
   });
 
-  return (
-    <BlockWrapper>
-      <input
-        className="cdx-input"
-        id="cdx-display-frame-frame-url"
-        placeholder={'Add Figma link here!'}
-        style={{ flex: 1 }}
-        value={src}
-        onChange={(e) => {
-          setSrc(e.target.value);
-          if (validateFigmaURL(e.target.value)) {
-            setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
-          }
-        }}
-      />
-      {validateFigmaURL(src) && (
+  let [src, setSrc] = React.useState(
+    generateFigmaURL(frameDetails.fileId, frameDetails.frameId, 'share')
+  );
+  let [type, setType] = React.useState(blockData.type ?? 'do');
+  let [preview, setPreview] = React.useState(<></>);
+  let [errorMsg, setErrorMsg] = React.useState(<></>);
+
+  React.useEffect(() => {
+    console.log('effect riggered');
+
+    if (frameDetails.fileId && frameDetails.frameId) {
+      setPreview(
         <>
-          {typeof frameExistsInFile != 'undefined' && !frameExistsInFile && (
+          {blockData && !frameExistsInFile && (
             <Alert severity="error">
               The frame referenced in this block was possibly deleted.
             </Alert>
@@ -79,12 +78,58 @@ const InputUI = (blockData: ComponentProps) => {
           ></IFrame>
           <input
             className="cdx-input"
-            id="cdx-display-frame-caption"
+            id="cdx-dos-and-donts-caption"
             placeholder={'Enter a caption!'}
-            defaultValue={blockData.caption}
+            defaultValue={decodeStringForFigma(blockData.caption)}
           />
         </>
-      )}
+      );
+      setErrorMsg(<></>);
+    } else {
+      setPreview(<></>);
+      if (src) {
+        setErrorMsg(
+          <Typography
+            variant="caption"
+            sx={{ color: 'error.main', fontWeight: 600 }}
+          >
+            Please, enter a valid Figma URL
+          </Typography>
+        );
+      }
+    }
+  }, [frameDetails]);
+
+  return (
+    <BlockWrapper>
+      <Stack direction="row" gap={2}>
+        <select
+          className="cdx-input"
+          name="Guideline type"
+          id="cdx-dos-and-donts-type"
+          style={{ width: 100 }}
+          defaultValue={type}
+        >
+          <option value="do">Do</option>
+          <option value="dont">Dont</option>
+          <option value="caution">Caution</option>
+        </select>
+        <input
+          className="cdx-input"
+          id="cdx-dos-and-donts-frame-url"
+          placeholder={'Add Figma link here!'}
+          style={{ flex: 1 }}
+          defaultValue={src}
+          onChange={(e) => {
+            console.log(e.target.value);
+            console.log(src);
+            setSrc(e.target.value);
+            setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
+          }}
+        />
+      </Stack>
+      {errorMsg}
+      {preview}
     </BlockWrapper>
   );
 };
@@ -94,8 +139,8 @@ export class DosAndDonts {
 
   static get toolbox() {
     return {
-      title: `Do's and dont's`,
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" ><path d="m576-160-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm79-360L513-662l56-56 85 85 170-170 56 57-225 226ZM80-280v-80h360v80H80Zm0-320v-80h360v80H80Z"/></svg>',
+      title: `Dos and Don'ts`,
+      icon: dosAndDontsIcon,
     };
   }
 
@@ -107,6 +152,7 @@ export class DosAndDonts {
     let ui = document.createElement('div');
     let root = createRoot(ui);
     root.render(<InputUI {...this.data} />);
+    //console.log('render');
     ui.classList.add('dos-and-donts');
 
     return ui;
@@ -115,32 +161,32 @@ export class DosAndDonts {
   save(blockContent) {
     let caption;
     let frameUrl;
-    if (blockContent.querySelector('#cdx-display-frame-frame-url')) {
+    let type;
+    if (blockContent.querySelector('#cdx-dos-and-donts-frame-url')) {
       frameUrl = blockContent.querySelector(
-        '#cdx-display-frame-frame-url'
+        '#cdx-dos-and-donts-frame-url'
       ).value;
     }
-    if (blockContent.querySelector('#cdx-display-frame-caption')) {
-      caption = blockContent.querySelector('#cdx-display-frame-caption').value;
+    if (blockContent.querySelector('#cdx-dos-and-donts-type')) {
+      type = blockContent.querySelector('#cdx-dos-and-donts-type').value;
     }
 
-    //console.log(frameUrl);
-    //console.log(this.data);
+    if (blockContent.querySelector('#cdx-dos-and-donts-caption')) {
+      caption = blockContent.querySelector('#cdx-dos-and-donts-caption').value;
+    }
+
+    //console.log('frame ei¿xists');
+    //console.log(this.data.frameExistsInFile);
 
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),
-      frameExistsInFile:
-        typeof this.data.frameExistsInFile != 'undefined' ?? true,
-      caption,
+      type: type,
+      frameExistsInFile: this.data.frameExistsInFile,
+      caption: encodeStringForHTML(caption ?? ''),
     };
   }
 
   validate(savedData) {
-    if (!savedData.fileId || !savedData.frameId) {
-      //console.log('Not validated');
-      return false;
-    }
-
     return true;
   }
 }

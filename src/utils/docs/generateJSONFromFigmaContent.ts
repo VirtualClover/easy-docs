@@ -9,7 +9,10 @@ import {
 
 import { formatPageData } from './formatPageData';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
-import { getDetailsFromFigmaURL, validateFigmaURL } from '../general/urlHandlers';
+import {
+  getDetailsFromFigmaURL,
+  validateFigmaURL,
+} from '../general/urlHandlers';
 import { encodeStringForHTML } from '../cleanseTextData';
 
 export async function generateJSONFromFigmaContent(
@@ -148,52 +151,109 @@ async function generatePageDataFromFrame(
 
           switch (mainCompId) {
             case componentData.displayFrame.id:
-              let url =
-                instInsideAFrame.componentProperties[
-                  componentData.displayFrame.sourceProp
-                ].value ?? '';
-              let frameDetails;
-              let frameExistsInFile: boolean = false;
-              if (validateFigmaURL(url as string)) {
-                frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
-                await figma
-                  .getNodeByIdAsync(frameDetails.frameId)
-                  .then((node) => {
-                    frameExistsInFile = node != null ? true : false;
-                    pageData.blocks.push({
-                      type: 'displayFrame',
-                      ...objEssentials,
-                      data: {
-                        frameId: frameDetails.frameId,
-                        fileId: frameDetails.fileId,
-                        frameExistsInFile,
-                        caption: encodeStringForHTML(
-                          instInsideAFrame.componentProperties[
-                            componentData.displayFrame.captionProp
-                          ].value as string
-                        ),
-                      },
-                    });
-                  })
-                  .catch((e) => console.error(e));
-              } else {
-                pageData.blocks.push({
-                  type: 'displayFrame',
-                  ...objEssentials,
-                  data: {
-                    frameId: '',
-                    fileId: '',
-                    frameExistsInFile,
-                    caption: encodeStringForHTML(
-                      instInsideAFrame.componentProperties[
-                        componentData.displayFrame.captionProp
-                      ].value as string
-                    ),
-                  },
-                });
+              {
+                let url =
+                  instInsideAFrame.componentProperties[
+                    componentData.displayFrame.sourceProp
+                  ].value ?? '';
+                let frameDetails;
+                let frameExistsInFile: boolean = false;
+                if (validateFigmaURL(url as string)) {
+                  frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
+                  await figma
+                    .getNodeByIdAsync(frameDetails.frameId)
+                    .then((node) => {
+                      frameExistsInFile = node != null ? true : false;
+                      pageData.blocks.push({
+                        type: 'displayFrame',
+                        ...objEssentials,
+                        data: {
+                          frameId: frameDetails.frameId,
+                          fileId: frameDetails.fileId,
+                          frameExistsInFile,
+                          caption: encodeStringForHTML(
+                            instInsideAFrame.componentProperties[
+                              componentData.displayFrame.captionProp
+                            ].value as string
+                          ),
+                        },
+                      });
+                    })
+                    .catch((e) => console.error(e));
+                } else {
+                  pageData.blocks.push({
+                    type: 'displayFrame',
+                    ...objEssentials,
+                    data: {
+                      frameId: '',
+                      fileId: '',
+                      frameExistsInFile,
+                      caption: encodeStringForHTML(
+                        instInsideAFrame.componentProperties[
+                          componentData.displayFrame.captionProp
+                        ].value as string
+                      ),
+                    },
+                  });
+                }
+              }
+              break;
+            case componentData.dosAndDonts.id:
+              {
+                let url =
+                  instInsideAFrame.componentProperties[
+                    componentData.dosAndDonts.sourceProp
+                  ].value ?? '';
+                let frameDetails;
+                let frameExistsInFile: boolean = false;
+                if (validateFigmaURL(url as string)) {
+                  frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
+                  await figma
+                    .getNodeByIdAsync(frameDetails.frameId)
+                    .then((node) => {
+                      frameExistsInFile = node != null ? true : false;
+                      pageData.blocks.push({
+                        type: 'dosAndDonts',
+                        ...objEssentials,
+                        data: {
+                          frameId: frameDetails.frameId,
+                          fileId: frameDetails.fileId,
+                          type: instInsideAFrame.componentProperties[
+                            componentData.dosAndDonts.typeProp.key
+                          ].value,
+                          frameExistsInFile,
+                          caption: encodeStringForHTML(
+                            instInsideAFrame.componentProperties[
+                              componentData.dosAndDonts.captionProp
+                            ].value as string
+                          ),
+                        },
+                      });
+                    })
+                    .catch((e) => console.error(e));
+                } else {
+                  pageData.blocks.push({
+                    type: 'dosAndDonts',
+                    ...objEssentials,
+                    data: {
+                      frameId: '',
+                      fileId: '',
+                      type: instInsideAFrame.componentProperties[
+                        componentData.dosAndDonts.typeProp.key
+                      ].value,
+                      frameExistsInFile,
+                      caption: encodeStringForHTML(
+                        instInsideAFrame.componentProperties[
+                          componentData.dosAndDonts.captionProp
+                        ].value as string
+                      ),
+                    },
+                  });
+                }
               }
 
               break;
+
             default:
               break;
           }

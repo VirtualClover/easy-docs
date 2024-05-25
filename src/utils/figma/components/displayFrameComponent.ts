@@ -29,7 +29,8 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       let sourceWrapper = figma.createFrame();
       sourceWrapper.layoutMode = 'VERTICAL';
       sourceWrapper.verticalPadding = 8;
-      sourceWrapper.horizontalPadding = 8;
+      sourceWrapper.paddingRight = 8;
+      sourceWrapper.paddingLeft = 16;
       setNodeFills(
         sourceWrapper,
         DEFAULT_SETTINGS.customization.palette.status.neutral.muted

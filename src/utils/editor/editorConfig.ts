@@ -1,4 +1,4 @@
-import { DisplayFrame } from './customTools/displayFrame/displayFrame';
+import { DisplayFrame } from './customTools/displayFrame';
 import { DosAndDonts } from './customTools/dosAndDonts';
 import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';

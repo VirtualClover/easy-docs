@@ -56,6 +56,12 @@ export const BASE_FILE_DATA = {
     captionProp: '',
     sourceProp: '',
   },
+  dosAndDonts: {
+    id: '',
+    captionProp: '',
+    sourceProp: '',
+    typeProp: { key: '', variables: [] },
+  },
   brokenLink: {
     id: '',
     captionProp: '',
