@@ -42,6 +42,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       let sourceNode = figma.createText();
       sourceNode.fontName = { family: 'Inter', style: 'Medium Italic' };
       sourceNode.fontSize = 12;
+      sourceNode.textDecoration = 'UNDERLINE';
       sourceNode.characters = 'Source here';
       setNodeFills(
         sourceNode,
