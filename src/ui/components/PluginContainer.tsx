@@ -14,6 +14,10 @@ export const PluginContainer = styled(Container, {
     fontWeight: 700,
   },
 
+  '.ce-popover--opened': {
+    maxHeight: '500px',
+  },
+
   '.codex-editor': {
     zIndex: 1200,
   },
@@ -46,6 +50,9 @@ export const PluginContainer = styled(Container, {
     background: theme.palette.background.default,
     color: theme.palette.text.primary,
     '&:hover': {
+      background: theme.palette.background.paper,
+    },
+    '&--active': {
       background: theme.palette.background.paper,
     },
   },

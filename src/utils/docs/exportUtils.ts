@@ -4,6 +4,10 @@ import {
   ExportFileFormat,
   PageData,
 } from '../constants';
+import {
+  decideEmojiBasedOnDosAndDonts,
+  mapDosAndDontsToStatus,
+} from '../general/mapDosAndDontsToStatus';
 
 import { decodeStringForFigma } from '../cleanseTextData';
 import { generateFigmaURL } from '../general/urlHandlers';
@@ -14,26 +18,32 @@ let addIndetation = (level) => {
   return '  '.repeat(level);
 };
 
+let generateIFrameStyle = (
+  borderColor: string,
+  borderWidth: number,
+  borderRadius: number = 8
+) =>
+  `border: ${borderWidth}px solid ${borderColor}; border-radius:${borderRadius}px`;
+
 let generateIFrame = (
-  block: BlockData,
+  iframeSrc: string,
+  iFrameCaption: string,
   identation: number = 0,
+  style: string = '',
+  extraClass: string = '',
   classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
 ) => {
   return `${addIndetation(
     identation
-  )}<figure class="${classPrefix}figma-frame">\n${addIndetation(
+  )}<figure class="${classPrefix}figma-frame ${
+    extraClass ? `${classPrefix}${extraClass}` : ''
+  }">\n${addIndetation(
     identation + 2
-  )}<iframe style="border: 1px solid ${
-    DEFAULT_SETTINGS.customization.palette.divider.simple
-  };" src="${generateFigmaURL(
-    block.data.fileId,
-    block.data.frameId,
-    'embed'
-  )}" allowfullscreen></iframe>\n${
-    block.data.caption &&
+  )}<iframe style="${style}" src="${iframeSrc}" allowfullscreen></iframe>\n${
+    iFrameCaption &&
     `${addIndetation(identation + 2)}<figcaption>\n${addIndetation(
       identation + 3
-    )}${block.data.caption}\n${addIndetation(identation + 2)}</figcaption>\n`
+    )}${iFrameCaption}\n${addIndetation(identation + 2)}</figcaption>\n`
   }${addIndetation(identation)}</figure>`;
 };
 
@@ -61,7 +71,52 @@ export function generateMarkdownPage(data: PageData): string {
         markdown.push(`> ${block.data.text}  \n> ${block.data.caption}`);
         break;
       case 'displayFrame':
-        markdown.push(generateIFrame(block));
+        if (block.data.fileId && block.data.frameId) {
+          let src = generateFigmaURL(
+            block.data.fileId,
+            block.data.frameId,
+            'embed'
+          );
+          markdown.push(
+            generateIFrame(
+              src,
+              block.data.caption,
+              0,
+              generateIFrameStyle(
+                DEFAULT_SETTINGS.customization.palette.status.neutral.default,
+                3
+              ),
+              'display-frame'
+            )
+          );
+        }
+        break;
+      case 'dosAndDonts':
+        if (block.data.fileId && block.data.frameId) {
+          let src = generateFigmaURL(
+            block.data.fileId,
+            block.data.frameId,
+            'embed'
+          );
+          markdown.push(
+            generateIFrame(
+              src,
+              `${decideEmojiBasedOnDosAndDonts(block.data.type)} ${
+                block.data.caption
+              }`,
+              0,
+              generateIFrameStyle(
+                DEFAULT_SETTINGS.customization.palette.status[
+                  mapDosAndDontsToStatus(block.data.type)
+                ].default,
+                3
+              ),
+              `${block.data.type}-frame`
+            )
+          );
+        }
+        break;
+      default:
         break;
     }
   }
@@ -115,7 +170,50 @@ export function generateHTMLPage(data: PageData): string {
         );
         break;
       case 'displayFrame':
-        html.push(generateIFrame(block, 1));
+        if (block.data.fileId && block.data.frameId) {
+          let src = generateFigmaURL(
+            block.data.fileId,
+            block.data.frameId,
+            'embed'
+          );
+          html.push(
+            generateIFrame(
+              src,
+              block.data.caption,
+              1,
+              generateIFrameStyle(
+                DEFAULT_SETTINGS.customization.palette.status.neutral.default,
+                3
+              ),
+              'display-frame'
+            )
+          );
+        }
+        break;
+      case 'dosAndDonts':
+        if (block.data.fileId && block.data.frameId) {
+          let src = generateFigmaURL(
+            block.data.fileId,
+            block.data.frameId,
+            'embed'
+          );
+          html.push(
+            generateIFrame(
+              src,
+              `${decideEmojiBasedOnDosAndDonts(block.data.type)} ${
+                block.data.caption
+              }`,
+              1,
+              generateIFrameStyle(
+                DEFAULT_SETTINGS.customization.palette.status[
+                  mapDosAndDontsToStatus(block.data.type)
+                ].default,
+                3
+              ),
+              `${block.data.type}-frame`
+            )
+          );
+        }
         break;
     }
   }
