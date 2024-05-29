@@ -10,6 +10,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@editorjs/table": "^2.3.0",
     "@figma/plugin-typings": "^1.93.0",
     "@types/react": "^18.2.13",
     "css-loader": "^6.2.0",

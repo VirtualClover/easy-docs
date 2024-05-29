@@ -4,6 +4,7 @@ import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
 import List from '@editorjs/list';
+import Table from '@editorjs/table';
 
 /**
  * The base editor config
@@ -40,6 +41,14 @@ export const EDITOR_TOOLS = {
     inlineToolbar: true,
     config: {
       defaultStyle: 'unordered',
+    },
+  },
+  table: {
+    class: Table,
+    inlineToolbar: true,
+    config: {
+      rows: 2,
+      cols: 2,
     },
   },
 };
