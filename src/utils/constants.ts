@@ -66,6 +66,10 @@ export const BASE_FILE_DATA = {
     id: '',
     captionProp: '',
   },
+  list: {
+    id: '',
+    contentProp: '',
+  },
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 

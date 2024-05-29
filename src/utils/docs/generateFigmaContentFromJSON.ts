@@ -11,6 +11,7 @@ import { decodeStringForFigma } from '../cleanseTextData';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent';
 import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
+import { generateListInstance } from '../figma/components/listComponent.figma';
 import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
 import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
 import { resizeSection } from '../figma/resizeSection';
@@ -131,6 +132,13 @@ async function generateBlockInstanceFromJSON(
       break;
     case 'dosAndDonts':
       await generateDosAndDontsInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
+      break;
+    case 'list':
+      await generateListInstance(block.data).then((n) => {
         if (n) {
           node = n;
         }

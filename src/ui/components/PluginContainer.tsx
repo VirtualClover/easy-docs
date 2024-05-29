@@ -66,6 +66,10 @@ export const PluginContainer = styled(Container, {
     color: theme.palette.text.primary,
   },
 
+  '.cdx-list__item': {
+    padding: 0,
+  },
+
   '.ce-toolbar__plus, .ce-toolbar__settings-btn': {
     background: theme.palette.background.default,
     color: theme.palette.text.primary,

@@ -3,6 +3,7 @@ import { createBrokenLinkComponent } from './brokenLinkComponent';
 import { createDisplayFrameComponent } from './displayFrameComponent';
 import { createDosAndDontsComponent } from './dosAndDontsComponent.figma';
 import { createHeaderComponent } from './headerComponent.figma';
+import { createListComponent } from './listComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
 
@@ -54,6 +55,7 @@ export async function initComponents(
     createDisplayFrameComponent(frame),
     createDosAndDontsComponent(frame),
     createBrokenLinkComponent(frame),
+    createListComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
@@ -61,12 +63,14 @@ export async function initComponents(
     let displayFrame = values[3];
     let dosAndDonts = values[4];
     let brokenLink = values[5];
+    let list = values[6];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
     componentData.displayFrame = displayFrame;
     componentData.dosAndDonts = dosAndDonts;
     componentData.brokenLink = brokenLink;
+    componentData.list = list;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',

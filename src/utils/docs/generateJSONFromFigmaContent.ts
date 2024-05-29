@@ -14,6 +14,7 @@ import {
   validateFigmaURL,
 } from '../general/urlHandlers';
 import { encodeStringForHTML } from '../cleanseTextData';
+import { clone } from '../clone';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
@@ -132,6 +133,49 @@ async function generatePageDataFromFrame(
             //console.log(pageData);
 
             break;
+          case componentData.list.id:
+            let content = clone(
+              encodeStringForHTML(
+                childNode.componentProperties[componentData.list.contentProp]
+                  .value as string
+              )
+            );
+            let arr = content.split('\n');
+            let listStyle: string = 'unordered';
+            let textNode = childNode.findOne(
+              (n) => n.type === 'TEXT'
+            ) as TextNode;
+            if (textNode.characters.length) {
+              let unformattedStyle = textNode.getRangeListOptions(
+                0,
+                textNode.characters.length
+              ) as TextListOptions;
+              if (unformattedStyle.type && unformattedStyle.type != 'NONE') {
+                listStyle = unformattedStyle.type.toLowerCase();
+              } else {
+                await figma
+                  .loadFontAsync({ family: 'Inter', style: 'Regular' })
+                  .then(() => {
+                    textNode.setRangeListOptions(
+                      0,
+                      textNode.characters.length,
+                      {
+                        type: 'UNORDERED',
+                      }
+                    );
+                  });
+              }
+            }
+            pageData.blocks.push({
+              type: 'list',
+              ...objEssentials,
+              data: {
+                items: arr,
+                style: listStyle,
+              },
+            });
+            break;
+
           default:
             break;
         }
