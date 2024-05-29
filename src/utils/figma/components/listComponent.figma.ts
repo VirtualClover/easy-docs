@@ -48,21 +48,24 @@ export async function generateListInstance(data): Promise<InstanceNode> {
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     let jointData = '';
+    let jointDataDecoded = '';
     //Get text node
     let textNode = instance.findOne((n) => n.type === 'TEXT');
     if (data.items.length) {
       jointData = data.items.join('\n');
+      jointDataDecoded = decodeStringForFigma(jointData);
       console.log(data.items);
       console.log(jointData);
     }
     instance.setProperties({
-      [componentData.list.contentProp]: decodeStringForFigma(jointData),
+      [componentData.list.contentProp]: jointDataDecoded,
     });
+    console.log('here');
     await figma
       .loadFontAsync({ family: 'Inter', style: 'Regular' })
       .then(() => {
-        if (textNode.type == 'TEXT') {
-          textNode.setRangeListOptions(0, jointData.length, {
+        if (textNode.type == 'TEXT' && jointDataDecoded.length) {
+          textNode.setRangeListOptions(0, jointDataDecoded.length, {
             type: data.style.toUpperCase(),
           });
         }

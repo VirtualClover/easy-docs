@@ -1,11 +1,7 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import {
-  DEFAULT_SETTINGS,
-  DocData,
-  EMPTY_DOC_OBJECT,
-} from './utils/constants';
+import { DEFAULT_SETTINGS, DocData, EMPTY_DOC_OBJECT } from './utils/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
@@ -83,9 +79,9 @@ figma.ui.onmessage = (msg) => {
     if (!context.stopSendingUpdates) {
       pushFigmaUpdates().then((res) => {
         if (res.type === 'new-node-data') {
-          //console.log('push figma updates');
-          //console.log(res.type);
-          //console.log(res.data);
+          console.log('push figma updates');
+          console.log(res.type);
+          console.log(res.data);
         }
         figma.ui.postMessage({
           type: res.type,

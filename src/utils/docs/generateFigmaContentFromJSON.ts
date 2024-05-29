@@ -27,6 +27,8 @@ export async function generateFigmaContentFromJSON(
   let pages = data.pages;
   let docTitle = decodeStringForFigma(data.title);
   parentSection.name = docTitle;
+  console.log('editor data');
+  console.log(data);
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];

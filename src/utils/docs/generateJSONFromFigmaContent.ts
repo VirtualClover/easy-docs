@@ -134,13 +134,21 @@ async function generatePageDataFromFrame(
 
             break;
           case componentData.list.id:
-            let content = clone(
-              encodeStringForHTML(
-                childNode.componentProperties[componentData.list.contentProp]
-                  .value as string
-              )
-            );
-            let arr = content.split('\n');
+            let unformattedContent = childNode.componentProperties[
+              componentData.list.contentProp
+            ].value as string;
+            let content = clone(encodeStringForHTML(unformattedContent));
+            console.log('unformattedcontent');
+            console.log(unformattedContent);
+            let emptyLastItem: boolean = false;
+            if (content.match(/\n+$/gm)) {
+              emptyLastItem = true;
+              console.log('empty line true!');
+            }
+            let arr = [];
+            if (content) {
+              arr = content.split('\n');
+            }
             let listStyle: string = 'unordered';
             let textNode = childNode.findOne(
               (n) => n.type === 'TEXT'

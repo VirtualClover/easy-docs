@@ -55,7 +55,7 @@ export function encodeStringForHTML(string: string): string {
       /&(?![amp|gt|lt|nbsp])/g,
       '&amp;'
     );
-    formattedString = formattedString.replace(/ +$/, '&nbsp;');
+    formattedString = formattedString.replace(/ +$/gm, '&nbsp;');
     return formattedString;
   } else return '';
 }

@@ -116,6 +116,18 @@ export function generateMarkdownPage(data: PageData): string {
           );
         }
         break;
+      case 'list':
+        if (block.data.items.length) {
+          for (let i = 0; i < block.data.items.length; i++) {
+            const listItem = block.data.items[i];
+            if (block.data.style == 'unordered') {
+              markdown.push(`* ${listItem}`);
+            } else {
+              markdown.push(`${i + 1}. ${listItem}`);
+            }
+          }
+        }
+        break;
       default:
         break;
     }
@@ -214,6 +226,19 @@ export function generateHTMLPage(data: PageData): string {
             )
           );
         }
+        break;
+      case 'list':
+        let tag = block.data.style == 'unordered' ? 'ul' : 'ol';
+        html.push(`${addIndetation(1)}<${tag} class="${classPrefix}${tag}">`);
+        if (block.data.items.length) {
+          for (let i = 0; i < block.data.items.length; i++) {
+            const listItem = block.data.items[i];
+            html.push(`${addIndetation(2)}<li>${listItem}</li>`);
+          }
+        }
+        html.push(`${addIndetation(1)}</${tag}>`);
+        break;
+      default:
         break;
     }
   }
