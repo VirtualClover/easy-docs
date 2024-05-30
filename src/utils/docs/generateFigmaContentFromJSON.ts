@@ -8,7 +8,7 @@ import {
 
 import { createDocFrame } from '../figma/createDocFrame';
 import { decodeStringForFigma } from '../cleanseTextData';
-import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent';
+import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent.figma';
 import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
 import { generateListInstance } from '../figma/components/listComponent.figma';

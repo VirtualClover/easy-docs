@@ -1,11 +1,12 @@
 import { BaseFileData } from '../../constants';
-import { createBrokenLinkComponent } from './brokenLinkComponent';
-import { createDisplayFrameComponent } from './displayFrameComponent';
+import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
+import { createDisplayFrameComponent } from './displayFrameComponent.figma';
 import { createDosAndDontsComponent } from './dosAndDontsComponent.figma';
 import { createHeaderComponent } from './headerComponent.figma';
 import { createListComponent } from './listComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
+import { createTableCellComponent } from './tableComponent.figma';
 
 /**
  * Generates the main components in a Figma file
@@ -56,6 +57,7 @@ export async function initComponents(
     createDosAndDontsComponent(frame),
     createBrokenLinkComponent(frame),
     createListComponent(frame),
+    createTableCellComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
@@ -64,6 +66,7 @@ export async function initComponents(
     let dosAndDonts = values[4];
     let brokenLink = values[5];
     let list = values[6];
+    let tableCell = values[7];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
@@ -71,6 +74,7 @@ export async function initComponents(
     componentData.dosAndDonts = dosAndDonts;
     componentData.brokenLink = brokenLink;
     componentData.list = list;
+    componentData.tableCell = tableCell;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',

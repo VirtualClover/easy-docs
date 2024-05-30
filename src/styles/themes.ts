@@ -38,7 +38,7 @@ export const lightTheme = createTheme({
       secondary: BASE_STYLE_TOKENS.palette.onBackground.mid,
     },
     background: {
-      default: BASE_STYLE_TOKENS.palette.background,
+      default: BASE_STYLE_TOKENS.palette.background.default,
       paper: BASE_STYLE_TOKENS.palette.surface,
     },
     divider: BASE_STYLE_TOKENS.palette.divider.simple,

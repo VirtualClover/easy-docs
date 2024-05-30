@@ -3,7 +3,7 @@ const BASE_COLOR_PALETTE = {
   onPrimary: '#FFF',
   secondary: '#D6E9FF',
   onSecondary: '#275488',
-  background: '#FFF',
+  background: { default: '#FFF', tonal_low: '#F4F7F9', tonal_high: '#E3EBF2' },
   onBackground: {
     high: '#22264F',
     mid: '#626582',

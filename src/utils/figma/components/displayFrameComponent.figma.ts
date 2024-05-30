@@ -5,7 +5,7 @@ import {
 } from '../../constants';
 
 import { decodeStringForFigma } from '../../cleanseTextData';
-import { generateBrokenLinkInstance } from './brokenLinkComponent';
+import { generateBrokenLinkInstance } from './brokenLinkComponent.figma';
 import { generateFigmaURL } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';

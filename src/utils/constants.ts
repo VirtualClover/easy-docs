@@ -70,6 +70,11 @@ export const BASE_FILE_DATA = {
     id: '',
     contentProp: '',
   },
+  tableCell: {
+    id: '',
+    contentProp: '',
+    typeProp: { key: '', variables: [''] },
+  },
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 
@@ -133,6 +138,9 @@ export const DEFAULT_HEADING_SIZES = [
 
 export const DEFAULT_GUIDELINES = ['do', 'dont', 'caution'] as const;
 export type GuidelineType = (typeof DEFAULT_GUIDELINES)[number];
+
+export const DEFAULT_TABLE_CELL_TYPES = ['header', 'body', 'bodyAlt'] as const;
+export type TableCellType = (typeof DEFAULT_TABLE_CELL_TYPES)[number];
 
 const sectionSettings = {
   backgroundColor: BASE_STYLE_TOKENS.palette.surface,
