@@ -1,15 +1,14 @@
 import {
-  DEFAULT_HEADING_SIZES,
+  BaseFileData,
   DEFAULT_SETTINGS,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
-  TableCellType,
 } from '../../constants';
 
-import { BaseFileData } from '../../constants';
 import { clone } from '../../clone';
-import { decodeStringForFigma } from '../../cleanseTextData';
+import { isOdd } from '../../general/isOdd';
 import { setNodeFills } from '../setNodeFills';
+import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
 export async function createTableCellComponent(
   parent: FrameNode,
@@ -91,4 +90,86 @@ export async function createTableCellComponent(
           .variantOptions,
     },
   };
+}
+
+async function generateTableWrapper() {
+  //Outer wrapper
+  let outerWrapper = figma.createFrame();
+  outerWrapper.layoutMode = 'VERTICAL';
+  outerWrapper.counterAxisSizingMode = 'FIXED';
+  outerWrapper.primaryAxisSizingMode = 'AUTO';
+  outerWrapper.itemSpacing = 0;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Table`;
+  outerWrapper.strokeWeight = 1;
+  outerWrapper.clipsContent = true;
+  setNodeStrokeColor(
+    outerWrapper,
+    DEFAULT_SETTINGS.customization.palette.divider.simple
+  );
+  return outerWrapper;
+}
+
+async function generateTableRow(index: number, hasHeader: boolean = false) {
+  //Outer wrapper
+  let outerWrapper = figma.createFrame();
+  outerWrapper.layoutMode = 'HORIZONTAL';
+  outerWrapper.counterAxisSizingMode = 'AUTO';
+  outerWrapper.primaryAxisSizingMode = 'FIXED';
+  outerWrapper.itemSpacing = 0;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}TableRow`;
+  outerWrapper.strokeWeight = 1;
+  if ((isOdd(index) && !hasHeader) || (!isOdd(index) && hasHeader)) {
+    setNodeFills(
+      outerWrapper,
+      DEFAULT_SETTINGS.customization.palette.background.default
+    );
+  } else {
+    setNodeFills(
+      outerWrapper,
+      DEFAULT_SETTINGS.customization.palette.background.tonal_low
+    );
+  }
+
+  return outerWrapper;
+}
+
+export async function generateTableInstance(data): Promise<FrameNode | null> {
+  let componentData: BaseFileData = JSON.parse(
+    figma.root.getSharedPluginData('EasyDocs', 'components')
+  );
+  let componentSet: BaseNode;
+  await figma
+    .getNodeByIdAsync(componentData.tableCell.id)
+    .then((node) => {
+      componentSet = node;
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
+  if (componentSet.type == 'COMPONENT_SET') {
+    let component = componentSet.children[0] as ComponentNode;
+    let tableWrapper = await generateTableWrapper();
+
+    for (let i = 0; i < data.content.length; i++) {
+      const row = data.content[i];
+      let rowWrapper = await generateTableRow(i);
+      for (let ci = 0; ci < row.length; ci++) {
+        const cellContent = row[ci];
+        let cellInstance = component.createInstance();
+
+        cellInstance.setProperties({
+          [componentData.tableCell.contentProp]: cellContent,
+          [componentData.tableCell.typeProp.key]:
+            data.withHeadings && i == 0 ? 'header' : 'body',
+        });
+        rowWrapper.appendChild(cellInstance);
+      }
+      tableWrapper.appendChild(row);
+    }
+
+    return tableWrapper;
+  }
+
+  return null;
 }

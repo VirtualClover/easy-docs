@@ -157,8 +157,11 @@ async function generatePageDataFromFrame(
               let unformattedStyle = textNode.getRangeListOptions(
                 0,
                 textNode.characters.length
-              ) as TextListOptions;
-              if (unformattedStyle.type && unformattedStyle.type != 'NONE') {
+              );
+              if (
+                unformattedStyle != figma.mixed &&
+                unformattedStyle.type != 'NONE'
+              ) {
                 listStyle = unformattedStyle.type.toLowerCase();
               } else {
                 await figma
