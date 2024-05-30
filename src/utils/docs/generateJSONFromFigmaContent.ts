@@ -138,8 +138,8 @@ async function generatePageDataFromFrame(
               componentData.list.contentProp
             ].value as string;
             let content = clone(encodeStringForHTML(unformattedContent));
-            console.log('unformattedcontent');
-            console.log(unformattedContent);
+            //console.log('unformattedcontent');
+            //console.log(unformattedContent);
             let emptyLastItem: boolean = false;
             if (content.match(/\n+$/gm)) {
               emptyLastItem = true;

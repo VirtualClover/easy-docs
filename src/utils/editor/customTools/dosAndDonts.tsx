@@ -68,7 +68,7 @@ const InputUI = (blockData: ComponentProps) => {
   );
 
   React.useEffect(() => {
-    console.log('effect riggered');
+    //console.log('effect riggered');
 
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
@@ -146,8 +146,8 @@ const InputUI = (blockData: ComponentProps) => {
           style={{ flex: 1 }}
           defaultValue={src}
           onChange={(e) => {
-            console.log(e.target.value);
-            console.log(src);
+            //console.log(e.target.value);
+            //console.log(src);
             setSrc(e.target.value);
             setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
           }}
@@ -223,7 +223,7 @@ export class DosAndDonts {
    * @param {string} tune — tune name from this.settings
    */
   _toggleType(type: GuidelineType) {
-    console.log('Block type changed', type);
+    //console.log('Block type changed', type);
     this.data.type = type;
   }
 

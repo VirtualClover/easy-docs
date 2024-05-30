@@ -61,7 +61,7 @@ const InputUI = (blockData: ComponentProps) => {
   let [errorMsg, setErrorMsg] = React.useState(<></>);
 
   React.useEffect(() => {
-    console.log('effect riggered');
+    //console.log('effect riggered');
 
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
@@ -116,8 +116,8 @@ const InputUI = (blockData: ComponentProps) => {
         style={{ flex: 1 }}
         defaultValue={src}
         onChange={(e) => {
-          console.log(e.target.value);
-          console.log(src);
+          //console.log(e.target.value);
+          //console.log(src);
           setSrc(e.target.value);
           setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
         }}
@@ -140,7 +140,7 @@ export class DisplayFrame {
 
   constructor({ data }) {
     this.data = data;
-    console.log(data);
+    //console.log(data);
   }
 
   render() {

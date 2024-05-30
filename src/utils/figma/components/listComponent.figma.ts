@@ -54,13 +54,13 @@ export async function generateListInstance(data): Promise<InstanceNode> {
     if (data.items.length) {
       jointData = data.items.join('\n');
       jointDataDecoded = decodeStringForFigma(jointData);
-      console.log(data.items);
-      console.log(jointData);
+      //console.log(data.items);
+      //console.log(jointData);
     }
     instance.setProperties({
       [componentData.list.contentProp]: jointDataDecoded,
     });
-    console.log('here');
+    //console.log('here');
     await figma
       .loadFontAsync({ family: 'Inter', style: 'Regular' })
       .then(() => {

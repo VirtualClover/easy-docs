@@ -160,6 +160,8 @@ export const Editor = () => {
             height: '100%',
             zIndex: 1300,
             bgcolor: 'background.default',
+            left: 0,
+            pl: 16,
           }}
         >
           <EditorSkeleton />
