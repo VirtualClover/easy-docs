@@ -47,8 +47,8 @@ export const EDITOR_TOOLS = {
     class: Table,
     inlineToolbar: true,
     config: {
-      rows: 2,
-      cols: 2,
+      rows: 1,
+      cols: 1,
     },
   },
 };

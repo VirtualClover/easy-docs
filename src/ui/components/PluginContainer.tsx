@@ -24,6 +24,21 @@ export const PluginContainer = styled(Container, {
 
   '.cdx-block': {
     color: theme.palette.text.secondary,
+
+    '& .tc-wrap': {
+      '--color-border': theme.palette.divider,
+      height: 'auto',
+    },
+
+    '& .tc-table--heading .tc-row:first-child, .tc-table--heading .tc-row:first-child [contenteditable]:empty:before': {
+      color: theme.palette.text.primary
+    },
+
+    '& .tc-table--heading .tc-row:nth-child(odd)': {
+      background: theme.palette.background.paper,
+    }
+
+    //      color: theme.palette.text.primary
   },
   '.cdx-block, .ce-header': {
     '&::selection': {

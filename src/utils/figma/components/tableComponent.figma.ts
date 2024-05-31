@@ -52,7 +52,7 @@ export async function createTableCellComponent(
       setNodeFills(
         textNode,
         DEFAULT_SETTINGS.customization.palette.onBackground[
-        isHeader ? 'high' : 'mid'
+          isHeader ? 'high' : 'mid'
         ]
       );
       cell.appendChild(textNode);
@@ -170,8 +170,9 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
 
       cellInstance.setProperties({
         [componentData.tableCell.contentProp]: cellContent,
-        [componentData.tableCell.typeProp.key]:
-          data.withHeadings ? 'header' : 'body',
+        [componentData.tableCell.typeProp.key]: data.withHeadings
+          ? 'header'
+          : 'body',
       });
 
       rowWrapper.appendChild(cellInstance);

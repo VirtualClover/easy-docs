@@ -311,7 +311,7 @@ async function generatePageDataFromFrame(
               break;
             case componentData.tableCell.id:
               let content: string[][] = [];
-              let row = instInsideAFrame.parent
+              let row = instInsideAFrame.parent;
               let tableWrapper = row.parent;
               let withHeadings = false;
               for (let i = 0; i < tableWrapper.children.length; i++) {
@@ -319,32 +319,39 @@ async function generatePageDataFromFrame(
                 if (currentRow.type === 'FRAME') {
                   let tempRowContent: string[] = [];
                   for (let ci = 0; ci < currentRow.children.length; ci++) {
-                    const cell = currentRow.children[i];
+                    const cell = currentRow.children[ci];
                     if (cell.type === 'INSTANCE') {
-                      await instInsideAFrame.getMainComponentAsync().then((component) => {
-                        mainCompId =
-                          component.parent.type == 'COMPONENT_SET'
-                            ? component.parent.id
-                            : component.id;
+                      await instInsideAFrame
+                        .getMainComponentAsync()
+                        .then((component) => {
+                          console.log('maincomp type');
+                          mainCompId =
+                            component.parent.type == 'COMPONENT_SET'
+                              ? component.parent.id
+                              : component.id;
 
-                        if (mainCompId === componentData.tableCell.id) {
-                          // check if header
-                          if (i == 0 && ci == 0) {
-                            withHeadings = cell.componentProperties[componentData.tableCell.typeProp.key]
-                              .value == 'header';
+                          if (mainCompId === componentData.tableCell.id) {
+                            // check if header
+                            if (i == 0 && ci == 0) {
+                              withHeadings =
+                                cell.componentProperties[
+                                  componentData.tableCell.typeProp.key
+                                ].value == 'header';
+                            }
+
+                            tempRowContent.push(
+                              encodeStringForHTML(
+                                cell.componentProperties[
+                                  componentData.tableCell.contentProp
+                                ].value as string
+                              )
+                            );
                           }
-
-                          tempRowContent.push(encodeStringForHTML(cell.componentProperties[componentData.tableCell.contentProp]
-                            .value as string)
-                          )
-                        }
-                      });
+                        });
                     }
-
                   }
                   content.push(tempRowContent);
                 }
-
               }
               pageData.blocks.push({
                 type: 'table',
