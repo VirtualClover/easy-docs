@@ -169,14 +169,65 @@ export function generateJSONPage(data: PageData): string {
   return JSON.stringify(data, null, 2);
 }
 
+let generateHTMLTableRow = (
+  rowData: string[],
+  isHeader: boolean = false,
+  initialIndentation: number = 0,
+  classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
+): string => {
+  let htmlRow = [];
+  htmlRow.push(`${addIndetation(initialIndentation + 1)}<tr>`);
+  if (rowData.length) {
+    for (let i = 0; i < rowData.length; i++) {
+      let cell = rowData[i];
+      let cellTag = isHeader ? 'th' : 'td';
+      htmlRow.push(
+        `${addIndetation(initialIndentation + 2)}<${cellTag} ${
+          isHeader ? `class="${classPrefix}table-header"` : ''
+        }>${cell}</${cellTag}>`
+      );
+    }
+  }
+  htmlRow.push(`${addIndetation(initialIndentation + 1)}</tr>`);
+  return htmlRow.join('\n');
+};
+
+let generateHTMLTable = (data, initialIndentation: number = 0) => {
+  let html = [];
+  let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
+  let content: string[][] = data.content;
+  html.push(
+    `${addIndetation(initialIndentation)}<table class="${classPrefix}table">`
+  );
+  if (data.content.length) {
+    for (let i = 0; i < content.length; i++) {
+      let rowData = content[i];
+      html.push(
+        generateHTMLTableRow(
+          rowData,
+          i == 0 && data.withHeadings,
+          initialIndentation
+        )
+      );
+    }
+  }
+  html.push(`${addIndetation(initialIndentation)}</table>`);
+  return html.join('\n');
+};
+
 export function generateHTMLPage(data: PageData): string {
   //console.log(data);
 
   let html = [];
-
+  html.push('<!DOCTYPE html>');
+  html.push('<html>');
+  let htmlHeadData = `${addIndetation(1)}<head><title>${
+    data.title
+  }</title></head>`;
+  html.push(htmlHeadData);
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
-
-  html.push(`<main class="${classPrefix}body">`);
+  html.push(`${addIndetation(1)}<body>`);
+  html.push(`${addIndetation(2)}<main class="${classPrefix}body">`);
 
   for (let i = 0; i < data.blocks.length; i++) {
     const block = data.blocks[i];
@@ -184,14 +235,14 @@ export function generateHTMLPage(data: PageData): string {
     switch (block.type) {
       case 'header':
         html.push(
-          `${addIndetation(1)}<h${block.data.level} class="${classPrefix}h${
+          `${addIndetation(3)}<h${block.data.level} class="${classPrefix}h${
             block.data.level
           }">${block.data.text}</h${block.data.level}>`
         );
         break;
       case 'paragraph':
         html.push(
-          `${addIndetation(1)}<p class="${classPrefix}p">${block.data.text}</p>`
+          `${addIndetation(3)}<p class="${classPrefix}p">${block.data.text}</p>`
         );
         break;
       case 'quote':
@@ -202,12 +253,12 @@ export function generateHTMLPage(data: PageData): string {
             2
           )}<blockquote>\n${addIndetation(3)}${
             block.data.text
-          }\n${addIndetation(2)}</blockquote>\n${
+          }\n${addIndetation(4)}</blockquote>\n${
             block.data.caption &&
-            `${addIndetation(2)}<figcaption>\n${addIndetation(3)}${
+            `${addIndetation(4)}<figcaption>\n${addIndetation(5)}${
               block.data.caption
-            }\n${addIndetation(2)}</figcaption>\n`
-          }${addIndetation(1)}</figure>`
+            }\n${addIndetation(4)}</figcaption>\n`
+          }${addIndetation(3)}</figure>`
         );
         break;
       case 'displayFrame':
@@ -221,7 +272,7 @@ export function generateHTMLPage(data: PageData): string {
             generateIFrame(
               src,
               block.data.caption,
-              1,
+              3,
               generateIFrameStyle(
                 DEFAULT_SETTINGS.customization.palette.status.neutral.default,
                 3
@@ -244,7 +295,7 @@ export function generateHTMLPage(data: PageData): string {
               `${decideEmojiBasedOnDosAndDonts(block.data.type)} ${
                 block.data.caption
               }`,
-              1,
+              3,
               generateIFrameStyle(
                 DEFAULT_SETTINGS.customization.palette.status[
                   mapDosAndDontsToStatus(block.data.type)
@@ -258,21 +309,26 @@ export function generateHTMLPage(data: PageData): string {
         break;
       case 'list':
         let tag = block.data.style == 'unordered' ? 'ul' : 'ol';
-        html.push(`${addIndetation(1)}<${tag} class="${classPrefix}${tag}">`);
+        html.push(`${addIndetation(3)}<${tag} class="${classPrefix}${tag}">`);
         if (block.data.items.length) {
           for (let i = 0; i < block.data.items.length; i++) {
             const listItem = block.data.items[i];
-            html.push(`${addIndetation(2)}<li>${listItem}</li>`);
+            html.push(`${addIndetation(4)}<li>${listItem}</li>`);
           }
         }
-        html.push(`${addIndetation(1)}</${tag}>`);
+        html.push(`${addIndetation(3)}</${tag}>`);
+        break;
+      case 'table':
+        html.push(generateHTMLTable(block.data, 3));
         break;
       default:
         break;
     }
   }
 
-  html.push(`</main>`);
+  html.push(`${addIndetation(2)}</main>`);
+  html.push(`${addIndetation(1)}</body>`);
+  html.push(`</html>`);
 
   return html.join('  \n');
 }
