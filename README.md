@@ -1,6 +1,6 @@
 # 📝 Easy docs
 
-Better docs is Figma plugin, that helps you create and edit documentation more efficiently.
+Easy Docs is Figma plugin, that helps you create and edit documentation more efficiently.
 
 ## Special mentions  
 
