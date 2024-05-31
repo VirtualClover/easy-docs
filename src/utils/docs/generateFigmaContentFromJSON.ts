@@ -16,6 +16,7 @@ import { generateParagraphInstance } from '../figma/components/paragraphComponen
 import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
 import { resizeSection } from '../figma/resizeSection';
 import { selectNode } from '../figma/selectNode';
+import { generateTableInstance } from '../figma/components/tableComponent.figma';
 
 let lastEditedKey = 'lastEdited';
 
@@ -77,9 +78,9 @@ async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
           lastEditedKey
         )
           ? parseInt(
-              figmaNode.getSharedPluginData(FIGMA_NAMESPACE, lastEditedKey),
-              10
-            )
+            figmaNode.getSharedPluginData(FIGMA_NAMESPACE, lastEditedKey),
+            10
+          )
           : 0;
 
         if (nodeLastEdited != block.lastEdited) {
@@ -141,6 +142,13 @@ async function generateBlockInstanceFromJSON(
       break;
     case 'list':
       await generateListInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
+      break;
+    case 'table':
+      await generateTableInstance(block.data).then((n) => {
         if (n) {
           node = n;
         }

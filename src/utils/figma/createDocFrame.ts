@@ -2,6 +2,7 @@ import { DEFAULT_SETTINGS, PluginSettings } from '../constants';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { decodeStringForFigma } from '../cleanseTextData';
+import { setNodeFills } from './setNodeFills';
 
 /**
  * Creates a doc frame
@@ -22,6 +23,7 @@ export function createDocFrame(
   frame.minWidth = settings.customization.frame.minWidth;
   frame.minHeight = settings.customization.frame.minHeight;
   frame.verticalPadding = settings.customization.frame.padding;
+  setNodeFills(frame, DEFAULT_SETTINGS.customization.palette.background.default);
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';
   frame.name = decodeStringForFigma(name);

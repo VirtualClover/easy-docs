@@ -30,19 +30,11 @@ export async function createTableCellComponent(
       cell.verticalPadding = 16;
       cell.horizontalPadding = 16;
       cell.name = `${cellTypePropKey}=${currentType}`;
-      let bgColor = DEFAULT_SETTINGS.customization.palette.background.default;
-      switch (currentType) {
-        case 'bodyAlt':
-          bgColor = DEFAULT_SETTINGS.customization.palette.background.tonal_low;
-          break;
-        case 'header':
-          bgColor =
-            DEFAULT_SETTINGS.customization.palette.background.tonal_high;
-          break;
-        default:
-          break;
+      if (currentType === 'header') {
+        let bgColor =
+          DEFAULT_SETTINGS.customization.palette.background.tonal_high;
+        setNodeFills(cell, bgColor);
       }
-      setNodeFills(cell, bgColor);
       cell.strokeRightWeight = 1;
       const fills = clone(cell.strokes);
       fills[0] = figma.util.solidPaint(
@@ -60,7 +52,7 @@ export async function createTableCellComponent(
       setNodeFills(
         textNode,
         DEFAULT_SETTINGS.customization.palette.onBackground[
-          isHeader ? 'high' : 'mid'
+        isHeader ? 'high' : 'mid'
         ]
       );
       cell.appendChild(textNode);
@@ -101,6 +93,7 @@ async function generateTableWrapper() {
   outerWrapper.itemSpacing = 0;
   outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Table`;
   outerWrapper.strokeWeight = 1;
+  outerWrapper.cornerRadius = 16;
   outerWrapper.clipsContent = true;
   setNodeStrokeColor(
     outerWrapper,
@@ -149,23 +142,40 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
 
   if (componentSet.type == 'COMPONENT_SET') {
     let component = componentSet.children[0] as ComponentNode;
+    let emptyData = [[], []];
     let tableWrapper = await generateTableWrapper();
+    if (data.content.length) {
+      for (let i = 0; i < data.content.length; i++) {
+        const row = data.content[i];
+        let rowWrapper = await generateTableRow(i);
+        for (let ci = 0; ci < row.length; ci++) {
+          const cellContent = row[ci];
+          let cellInstance = component.createInstance();
 
-    for (let i = 0; i < data.content.length; i++) {
-      const row = data.content[i];
-      let rowWrapper = await generateTableRow(i);
-      for (let ci = 0; ci < row.length; ci++) {
-        const cellContent = row[ci];
-        let cellInstance = component.createInstance();
-
-        cellInstance.setProperties({
-          [componentData.tableCell.contentProp]: cellContent,
-          [componentData.tableCell.typeProp.key]:
-            data.withHeadings && i == 0 ? 'header' : 'body',
-        });
-        rowWrapper.appendChild(cellInstance);
+          cellInstance.setProperties({
+            [componentData.tableCell.contentProp]: cellContent,
+            [componentData.tableCell.typeProp.key]:
+              data.withHeadings && i == 0 ? 'header' : 'body',
+          });
+          rowWrapper.appendChild(cellInstance);
+          cellInstance.layoutSizingHorizontal = 'FILL';
+        }
+        tableWrapper.appendChild(rowWrapper);
+        rowWrapper.layoutSizingHorizontal = 'FILL';
       }
-      tableWrapper.appendChild(row);
+    } else {
+      let rowWrapper = await generateTableRow(0);
+      let cellContent = 'Item 1';
+      let cellInstance = component.createInstance();
+
+      cellInstance.setProperties({
+        [componentData.tableCell.contentProp]: cellContent,
+        [componentData.tableCell.typeProp.key]:
+          data.withHeadings ? 'header' : 'body',
+      });
+
+      rowWrapper.appendChild(cellInstance);
+      tableWrapper.appendChild(rowWrapper);
     }
 
     return tableWrapper;

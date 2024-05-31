@@ -4,6 +4,7 @@ import { BaseFileData } from '../../constants';
 import { clone } from '../../clone';
 import { decodeStringForFigma } from '../../cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
+import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
 export async function createQuoteComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -32,12 +33,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       innerWrapper.paddingBottom = 16;
       innerWrapper.itemSpacing = 8;
       innerWrapper.cornerRadius = 16;
-      const fills = clone(innerWrapper.strokes);
-      fills[0] = figma.util.solidPaint(
-        DEFAULT_SETTINGS.customization.palette.divider.simple,
-        fills[0]
-      );
-      innerWrapper.strokes = fills;
+      setNodeStrokeColor(innerWrapper, DEFAULT_SETTINGS.customization.palette.divider.simple);
       setNodeFills(
         innerWrapper,
         DEFAULT_SETTINGS.customization.palette.status.neutral.muted
