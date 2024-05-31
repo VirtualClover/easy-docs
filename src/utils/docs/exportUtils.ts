@@ -47,6 +47,30 @@ let generateIFrame = (
   }${addIndetation(identation)}</figure>`;
 };
 
+let generateMDTableRow = (rowData: string[]): string => {
+  let mdRow = [];
+  for (let i = 0; i < rowData.length; i++) {
+    const cell = rowData[i];
+    mdRow.push(`${i == 0 ? '|' : ' '}${cell}|`);
+  }
+
+  return mdRow.join('');
+};
+
+let generateMDTable = (data) => {
+  let md = [];
+  let content: string[][] = data.content;
+  for (let i = 0; i < content.length; i++) {
+    let rowData = content[i];
+    md.push(generateMDTableRow(rowData));
+    if (i == 0) {
+      md.push('|' + '---|'.repeat(rowData.length));
+    }
+  }
+
+  return md.join('\n');
+};
+
 /**
  * Generates markdown from the JSON page doc object
  * @param data
@@ -126,6 +150,11 @@ export function generateMarkdownPage(data: PageData): string {
               markdown.push(`${i + 1}. ${listItem}`);
             }
           }
+        }
+        break;
+      case 'table':
+        if (block.data.content.length) {
+          markdown.push(generateMDTable(block.data));
         }
         break;
       default:

@@ -324,7 +324,6 @@ async function generatePageDataFromFrame(
                       await instInsideAFrame
                         .getMainComponentAsync()
                         .then((component) => {
-                          console.log('maincomp type');
                           mainCompId =
                             component.parent.type == 'COMPONENT_SET'
                               ? component.parent.id
