@@ -51,6 +51,25 @@ export async function generateJSONFromFigmaContent(
   return EMPTY_DOC_OBJECT;
 }
 
+function scanInsideAFrame(frame: FrameNode, idToExclude: string = '') {
+  let instInsideAFrame: InstanceNode = frame.findOne(
+    (n) => n.type == 'INSTANCE' && n.id != idToExclude
+  ) as InstanceNode;
+
+  return instInsideAFrame;
+}
+
+async function getMainCompIdFromInstance(instance: InstanceNode) {
+  let mainCompId: string = '';
+  await instance.getMainComponentAsync().then((component) => {
+    mainCompId =
+      component.parent.type == 'COMPONENT_SET'
+        ? component.parent.id
+        : component.id;
+  });
+  return mainCompId;
+}
+
 async function generatePageDataFromFrame(
   frame: FrameNode,
   componentData: BaseFileData
@@ -81,6 +100,7 @@ async function generatePageDataFromFrame(
               ? component.parent.id
               : component.id;
         });
+
         switch (mainCompId) {
           case componentData.header.id:
             let headerContent = encodeStringForHTML(
@@ -192,18 +212,19 @@ async function generatePageDataFromFrame(
         }
       } // If a comppnent is inside a frame like frame display
       else if (childNode.type == 'FRAME') {
-        let instInsideAFrame: InstanceNode = childNode.findOne(
-          (n) => n.type == 'INSTANCE'
-        ) as InstanceNode;
-
+        let instInsideAFrame: InstanceNode = scanInsideAFrame(childNode);
+        let mainCompId: string;
         if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
-          let mainCompId: string;
-          await instInsideAFrame.getMainComponentAsync().then((component) => {
-            mainCompId =
-              component.parent.type == 'COMPONENT_SET'
-                ? component.parent.id
-                : component.id;
-          });
+          await getMainCompIdFromInstance(instInsideAFrame).then(
+            (id) => (mainCompId = id)
+          );
+
+          if (mainCompId == componentData.brokenLink.id) {
+            instInsideAFrame = scanInsideAFrame(childNode, instInsideAFrame.id);
+            await getMainCompIdFromInstance(instInsideAFrame).then(
+              (id) => (mainCompId = id)
+            );
+          }
 
           switch (mainCompId) {
             case componentData.displayFrame.id:
@@ -363,6 +384,8 @@ async function generatePageDataFromFrame(
 
               break;
             default:
+              console.log(instInsideAFrame);
+              console.log(mainCompId);
               break;
           }
         }
