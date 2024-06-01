@@ -12,7 +12,6 @@ import Table from '@editorjs/table';
 export const EDITOR_TOOLS = {
   paragraph: {
     class: Paragraph,
-    inlineToolbar: false,
   },
   header: {
     class: Header,

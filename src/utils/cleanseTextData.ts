@@ -35,13 +35,20 @@ export function cleanseString(string: string): string {
   return formattedString;
 }
 
-export function decodeStringForFigma(string: string): string {
+export function decodeStringForFigma(
+  string: string,
+  encodeFlavoredText = false
+): string {
   if (string && typeof string === 'string') {
     let formattedString = string;
     formattedString = formattedString.replace(/&lt;/g, '<');
     formattedString = formattedString.replace(/&gt;/g, '>');
     formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
     formattedString = formattedString.replace(/&nbsp;/g, ' ');
+    if (encodeFlavoredText) {
+      formattedString = formattedString.replace(/</g, '[[[');
+      formattedString = formattedString.replace(/>/g, ']]]');
+    }
     return formattedString;
   } else return '';
 }

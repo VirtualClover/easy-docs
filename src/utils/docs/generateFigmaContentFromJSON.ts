@@ -5,6 +5,7 @@ import {
   PageData,
   PluginSettings,
 } from '../constants';
+import { getFlavoredTextTags, matchFlavoredText } from '../general/flavoredText';
 
 import { createDocFrame } from '../figma/createDocFrame';
 import { decodeStringForFigma } from '../cleanseTextData';
@@ -14,9 +15,9 @@ import { generateHeaderInstance } from '../figma/components/headerComponent.figm
 import { generateListInstance } from '../figma/components/listComponent.figma';
 import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
 import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
+import { generateTableInstance } from '../figma/components/tableComponent.figma';
 import { resizeSection } from '../figma/resizeSection';
 import { selectNode } from '../figma/selectNode';
-import { generateTableInstance } from '../figma/components/tableComponent.figma';
 
 let lastEditedKey = 'lastEdited';
 
@@ -102,6 +103,7 @@ async function generateBlockInstanceFromJSON(
   frame: FrameNode,
   indexInFrame: number
 ) {
+  
   let node: InstanceNode | FrameNode;
   switch (block.type) {
     case 'header':
