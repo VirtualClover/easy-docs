@@ -11,3 +11,15 @@ export function setNodeFills(node, fill: string) {
   fills[0].visible = true;
   node.fills = fills;
 }
+
+export function setRangeNodeFills(
+  node: TextNode,
+  start: number,
+  end: number,
+  fill: string
+) {
+  const fills = clone(node.fills);
+  fills[0] = figma.util.solidPaint(fill, fills[0]);
+  fills[0].visible = true;
+  node.setRangeFills(start, end, fills);
+}

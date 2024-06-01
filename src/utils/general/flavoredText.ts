@@ -6,9 +6,22 @@ let matchAnchorOnString = (string: string) => {
 };
 
 export let matchFlavoredText = (string: string) => {
-  let matches = [...string.matchAll(/\[\[\[(a|b|i)\b[^>]*\]\]\](.*?)\[\[\[\/(a|b|i)\]\]\]/gi)];
+  let matches = [
+    ...string.matchAll(
+      /\[\[\[(a|b|i)\b[^>]*\]\]\](.*?)\[\[\[\/(a|b|i)\]\]\]/gi
+    ),
+  ];
   console.log(matches);
   return matches;
+};
+
+export let getURLFromAnchor = (string: string, type = 'figma') => {
+  if (type == 'figma') {
+    let matches = string.match(
+      /\[\[\[a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\]\]\]/
+    );
+    return { href: matches[2], tag: matches[0] };
+  }
 };
 
 export let getFlavoredTextTags = (matchedString: string) => {

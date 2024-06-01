@@ -1,9 +1,12 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
 import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
+import {
+  getURLFromAnchor,
+  matchFlavoredText,
+} from '../../general/flavoredText';
+import { setNodeFills, setRangeNodeFills } from '../setNodeFills';
 
 import { BaseFileData } from '../../constants';
-import { matchFlavoredText } from '../../general/flavoredText';
-import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -61,11 +64,11 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
         figma.loadFontAsync({ family: 'Inter', style: 'Regular' }),
       ]).then(() => {
         let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
-        let offset = 0;
+        let globalOffset = 0;
         flavoredMatches.forEach((match) => {
           console.log('match found at ' + match.index);
-          let start = match.index + offset;
-          let end = match[0].length + 1 + offset;
+          let start = match.index + globalOffset;
+          let end = match[0].length + 1 + globalOffset;
           let currentStartOffset = 7;
           let currentCloseOffset = 8;
           let currentTotalOffset = currentCloseOffset + currentStartOffset;
@@ -78,19 +81,46 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
                 style: 'Bold',
               });
 
-              offset += currentStartOffset;
+              globalOffset += currentStartOffset;
               textNode.deleteCharacters(start, start + currentStartOffset);
               textNode.deleteCharacters(
                 end - currentTotalOffset,
                 end - currentStartOffset
               );
-              offset += currentCloseOffset;
+              globalOffset += currentCloseOffset;
               break;
             case 'i':
               textNode.setRangeFontName(start, end, {
                 family: 'Inter',
                 style: 'Italic',
               });
+              globalOffset += currentStartOffset;
+              textNode.deleteCharacters(start, start + currentStartOffset);
+              textNode.deleteCharacters(
+                end - currentTotalOffset,
+                end - currentStartOffset
+              );
+              globalOffset += currentCloseOffset;
+              break;
+            case 'a':
+              let tagMatch = getURLFromAnchor(match[0]);
+              currentStartOffset = tagMatch.tag.length;
+              currentTotalOffset = currentCloseOffset + currentStartOffset;
+              textNode.setRangeHyperlink(start, end, {
+                type: 'URL',
+                value: tagMatch.href,
+              });
+              textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
+              setRangeNodeFills(textNode, start, end, '#5551ff');
+              globalOffset += currentStartOffset;
+              textNode.deleteCharacters(start, start + currentStartOffset);
+              textNode.deleteCharacters(
+                end - currentTotalOffset,
+                end - currentStartOffset
+              );
+              globalOffset += currentCloseOffset;
+              break;
+            default:
               break;
           }
         });
