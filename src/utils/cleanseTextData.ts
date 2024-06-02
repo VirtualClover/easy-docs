@@ -63,6 +63,8 @@ export function encodeStringForHTML(string: string): string {
       '&amp;'
     );
     formattedString = formattedString.replace(/ +$/gm, '&nbsp;');
+    formattedString = formattedString.replace(/\[\[\[/g, '<');
+    formattedString = formattedString.replace(/\]\]\]/g, '>');
     return formattedString;
   } else return '';
 }

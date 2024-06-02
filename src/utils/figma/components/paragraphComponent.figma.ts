@@ -66,13 +66,15 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
         let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
         let globalOffset = 0;
         flavoredMatches.forEach((match) => {
-          console.log('match found at ' + match.index);
+          console.log('start wo offset ' + match.index);
+          console.log('start w offset ' + match.index);
           let start = match.index + globalOffset;
-          let end = match[0].length + 1 + globalOffset;
+          let end = match.index + match[0].length + globalOffset;
           let currentStartOffset = 7;
           let currentCloseOffset = 8;
           let currentTotalOffset = currentCloseOffset + currentStartOffset;
-          console.log('match end at ' + end);
+          console.log('end wo offset ' + match.index + match[0].length);
+          console.log('end w offset ' + end);
           let tag = match[1];
           switch (tag) {
             case 'b':
@@ -81,13 +83,13 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
                 style: 'Bold',
               });
 
-              globalOffset += currentStartOffset;
+              globalOffset -= currentStartOffset;
               textNode.deleteCharacters(start, start + currentStartOffset);
               textNode.deleteCharacters(
                 end - currentTotalOffset,
                 end - currentStartOffset
               );
-              globalOffset += currentCloseOffset;
+              globalOffset -= currentCloseOffset;
               break;
             case 'i':
               textNode.setRangeFontName(start, end, {
@@ -100,7 +102,7 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
                 end - currentTotalOffset,
                 end - currentStartOffset
               );
-              globalOffset += currentCloseOffset;
+              globalOffset -= currentCloseOffset;
               break;
             case 'a':
               let tagMatch = getURLFromAnchor(match[0]);
@@ -112,13 +114,13 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
               });
               textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
               setRangeNodeFills(textNode, start, end, '#5551ff');
-              globalOffset += currentStartOffset;
+              globalOffset -= currentStartOffset;
               textNode.deleteCharacters(start, start + currentStartOffset);
               textNode.deleteCharacters(
                 end - currentTotalOffset,
                 end - currentStartOffset
               );
-              globalOffset += currentCloseOffset;
+              globalOffset -= currentCloseOffset;
               break;
             default:
               break;

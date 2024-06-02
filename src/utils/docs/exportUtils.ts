@@ -39,7 +39,7 @@ let generateIFrame = (
     extraClass ? `${classPrefix}${extraClass}` : ''
   }">\n${addIndetation(
     identation + 2
-  )}<iframe style="${style}" src="${iframeSrc}" allowfullscreen></iframe>\n${
+  )}<iframe style="${style}"  width="100%" height="300px" src="${iframeSrc}" allowfullscreen></iframe>\n${
     iFrameCaption &&
     `${addIndetation(identation + 2)}<figcaption>\n${addIndetation(
       identation + 3

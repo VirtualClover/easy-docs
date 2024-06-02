@@ -8,7 +8,7 @@ let matchAnchorOnString = (string: string) => {
 export let matchFlavoredText = (string: string) => {
   let matches = [
     ...string.matchAll(
-      /\[\[\[(a|b|i)\b[^>]*\]\]\](.*?)\[\[\[\/(a|b|i)\]\]\]/gi
+      /\[\[\[(a|b|i)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(a|b|i)\]\]\]/gi
     ),
   ];
   console.log(matches);
