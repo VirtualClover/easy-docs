@@ -73,8 +73,8 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
           let currentStartOffset = 7;
           let currentCloseOffset = 8;
           let currentTotalOffset = currentCloseOffset + currentStartOffset;
-          console.log('end wo offset ' + match.index + match[0].length);
-          console.log('end w offset ' + end);
+          //console.log('end wo offset ' + match.index + match[0].length);
+          //console.log('end w offset ' + end);
           let tag = match[1];
           switch (tag) {
             case 'b':

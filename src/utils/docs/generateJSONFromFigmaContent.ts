@@ -160,7 +160,8 @@ async function generatePageDataFromFrame(
                   '[[[/a]]]' +
                   textContent.slice(currentEnd);
                 globalOffset += 24 + style.hyperlink.value.length;
-                //console.log('link');
+                console.log('link');
+                console.log(encodeStringForHTML(textContent));
               }
             }
             //console.log(encodeStringForHTML(textContent));
