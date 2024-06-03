@@ -162,7 +162,7 @@ async function generatePageDataFromFrame(
                   textContent.slice(currentEnd);
                 globalOffset += 23 + style.hyperlink.value.length;
                 //console.log('link');
-                console.log(encodeStringForHTML(textContent));
+                //console.log(encodeStringForHTML(textContent));
               }
             }
             //console.log(encodeStringForHTML(textContent));
