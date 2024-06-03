@@ -51,6 +51,8 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
   let content = decodeStringForFigma(data.text, true);
   let flavoredMatches = matchFlavoredText(content);
 
+  console.log(content);
+
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
@@ -63,11 +65,13 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
         figma.loadFontAsync({ family: 'Inter', style: 'Italic' }),
         figma.loadFontAsync({ family: 'Inter', style: 'Regular' }),
       ]).then(() => {
+        console.log('gets here');
+
         let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
         let globalOffset = 0;
         flavoredMatches.forEach((match) => {
-          console.log('start wo offset ' + match.index);
-          console.log('start w offset ' + match.index);
+          //console.log('start wo offset ' + match.index);
+          //console.log('start w offset ' + match.index);
           let start = match.index + globalOffset;
           let end = match.index + match[0].length + globalOffset;
           let currentStartOffset = 7;
@@ -105,7 +109,10 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
               globalOffset -= currentCloseOffset;
               break;
             case 'a':
+              console.log('Gets to a');
+
               let tagMatch = getURLFromAnchor(match[0]);
+              console.log('Gets to 2');
               currentStartOffset = tagMatch.tag.length;
               currentTotalOffset = currentCloseOffset + currentStartOffset;
               textNode.setRangeHyperlink(start, end, {
@@ -113,6 +120,7 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
                 value: tagMatch.href,
               });
               textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
+              console.log('Gets to a 3');
               setRangeNodeFills(textNode, start, end, '#5551ff');
               globalOffset -= currentStartOffset;
               textNode.deleteCharacters(start, start + currentStartOffset);
@@ -120,6 +128,7 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
                 end - currentTotalOffset,
                 end - currentStartOffset
               );
+              console.log('Gets to 4');
               globalOffset -= currentCloseOffset;
               break;
             default:

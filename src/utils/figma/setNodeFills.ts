@@ -18,8 +18,8 @@ export function setRangeNodeFills(
   end: number,
   fill: string
 ) {
-  const fills = clone(node.fills);
-  fills[0] = figma.util.solidPaint(fill, fills[0]);
-  fills[0].visible = true;
+  let fills = [figma.util.solidPaint(fill)];
+  console.log(start, ' ' + end, fill);
   node.setRangeFills(start, end, fills);
+  console.log('fills applied');
 }

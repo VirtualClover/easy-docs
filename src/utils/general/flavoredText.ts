@@ -11,7 +11,7 @@ export let matchFlavoredText = (string: string) => {
       /\[\[\[(a|b|i)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(a|b|i)\]\]\]/gi
     ),
   ];
-  console.log(matches);
+  //console.log(matches);
   return matches;
 };
 

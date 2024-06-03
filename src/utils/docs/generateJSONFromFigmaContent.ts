@@ -136,7 +136,7 @@ async function generatePageDataFromFrame(
             let globalOffset = 0;
             for (let i = 0; i < flavoredStyles.length; i++) {
               let style = flavoredStyles[i];
-              console.log(style);
+              //console.log(style);
               let currentStart = style.start + globalOffset;
               let currentEnd = style.end + globalOffset;
               if (style.fontName.style == 'Bold') {
@@ -147,20 +147,21 @@ async function generatePageDataFromFrame(
                   '[[[/b]]]' +
                   textContent.slice(currentEnd);
                 globalOffset += 15;
-                console.log('bold');
+                //console.log('bold');
               }
               if (style.fontName.style == 'Italic') {
                 //console.log('italic');
               }
               if (style.hyperlink) {
+                console.log(textContent.slice(0, currentStart));
                 textContent =
                   textContent.slice(0, currentStart) +
                   `[[[a href="${style.hyperlink.value}"]]]` +
                   textContent.slice(currentStart, currentEnd) +
                   '[[[/a]]]' +
                   textContent.slice(currentEnd);
-                globalOffset += 24 + style.hyperlink.value.length;
-                console.log('link');
+                globalOffset += 23 + style.hyperlink.value.length;
+                //console.log('link');
                 console.log(encodeStringForHTML(textContent));
               }
             }
@@ -203,7 +204,7 @@ async function generatePageDataFromFrame(
             let emptyLastItem: boolean = false;
             if (content.match(/\n+$/gm)) {
               emptyLastItem = true;
-              console.log('empty line true!');
+              //console.log('empty line true!');
             }
             let arr = [];
             if (content) {
@@ -424,8 +425,8 @@ async function generatePageDataFromFrame(
 
               break;
             default:
-              console.log(instInsideAFrame);
-              console.log(mainCompId);
+              //console.log(instInsideAFrame);
+              //console.log(mainCompId);
               break;
           }
         }
