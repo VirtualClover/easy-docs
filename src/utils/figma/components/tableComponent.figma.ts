@@ -52,7 +52,7 @@ export async function createTableCellComponent(
       setNodeFills(
         textNode,
         DEFAULT_SETTINGS.customization.palette.onBackground[
-          isHeader ? 'high' : 'mid'
+        isHeader ? 'high' : 'mid'
         ]
       );
       cell.appendChild(textNode);
@@ -91,7 +91,7 @@ async function generateTableWrapper() {
   outerWrapper.counterAxisSizingMode = 'FIXED';
   outerWrapper.primaryAxisSizingMode = 'AUTO';
   outerWrapper.itemSpacing = 0;
-  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Table`;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}TableWrapper`;
   outerWrapper.strokeWeight = 1;
   outerWrapper.cornerRadius = 16;
   outerWrapper.clipsContent = true;
@@ -143,7 +143,18 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
   if (componentSet.type == 'COMPONENT_SET') {
     let component = componentSet.children[0] as ComponentNode;
     let emptyData = [[], []];
-    let tableWrapper = await generateTableWrapper();
+    let tableInnerWrapper = await generateTableWrapper();
+
+    //Outside table wrapper
+    let tableWrapper = figma.createFrame();
+    tableWrapper.layoutMode = 'VERTICAL';
+    tableWrapper.counterAxisSizingMode = 'FIXED';
+    tableWrapper.primaryAxisSizingMode = 'AUTO';
+    tableWrapper.itemSpacing = 0;
+    tableWrapper.name = `${FIGMA_COMPONENT_PREFIX}Table`;
+    tableWrapper.paddingBottom = 32;
+
+
     if (data.content.length) {
       for (let i = 0; i < data.content.length; i++) {
         const row = data.content[i];
@@ -160,7 +171,7 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
           rowWrapper.appendChild(cellInstance);
           cellInstance.layoutSizingHorizontal = 'FILL';
         }
-        tableWrapper.appendChild(rowWrapper);
+        tableInnerWrapper.appendChild(rowWrapper);
         rowWrapper.layoutSizingHorizontal = 'FILL';
       }
     } else {
@@ -176,8 +187,11 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
       });
 
       rowWrapper.appendChild(cellInstance);
-      tableWrapper.appendChild(rowWrapper);
+      tableInnerWrapper.appendChild(rowWrapper);
     }
+
+    tableWrapper.appendChild(tableInnerWrapper);
+    tableInnerWrapper.layoutSizingHorizontal = 'FILL';
 
     return tableWrapper;
   }
