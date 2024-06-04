@@ -38,7 +38,7 @@ export let setFlavoredTextOnFigmaNode = async (
       figma.loadFontAsync({ family: 'Inter', style: 'Italic' }),
       figma.loadFontAsync({ family: 'Inter', style: 'Regular' }),
     ]).then(() => {
-      console.log('gets here');
+      //console.log('gets here');
       let textNode: TextNode;
       if (node.type === 'INSTANCE') {
         textNode = node.findOne((n) => n.type == 'TEXT') as TextNode;
@@ -110,4 +110,57 @@ export let setFlavoredTextOnFigmaNode = async (
       });
     });
   }
+};
+
+export let setFlavoredTextOnEncodedString = (
+  node: TextNode | InstanceNode,
+  customTextContent?: string
+) => {
+  let textNode: TextNode;
+  if (node.type === 'INSTANCE') {
+    textNode = node.findOne((n) => n.type == 'TEXT') as TextNode;
+  }
+  if (node.type === 'TEXT') {
+    textNode = node;
+  }
+  let textContent: string = customTextContent ?? textNode.characters;
+  let flavoredStyles = textNode.getStyledTextSegments([
+    'fontName',
+    'hyperlink',
+  ]);
+
+  let globalOffset = 0;
+  for (let i = 0; i < flavoredStyles.length; i++) {
+    let style = flavoredStyles[i];
+    //console.log(style);
+    let currentStart = style.start + globalOffset;
+    let currentEnd = style.end + globalOffset;
+    if (style.fontName.style == 'Bold') {
+      textContent =
+        textContent.slice(0, currentStart) +
+        '[[[b]]]' +
+        textContent.slice(currentStart, currentEnd) +
+        '[[[/b]]]' +
+        textContent.slice(currentEnd);
+      globalOffset += 15;
+      //console.log('bold');
+    }
+    if (style.fontName.style == 'Italic') {
+      //console.log('italic');
+    }
+    if (style.hyperlink) {
+      //console.log(textContent.slice(0, currentStart));
+      textContent =
+        textContent.slice(0, currentStart) +
+        `[[[a href="${style.hyperlink.value}"]]]` +
+        textContent.slice(currentStart, currentEnd) +
+        '[[[/a]]]' +
+        textContent.slice(currentEnd);
+      globalOffset += 23 + style.hyperlink.value.length;
+      //console.log('link');
+      //console.log(encodeStringForHTML(textContent));
+    }
+  }
+
+  return textContent;
 };

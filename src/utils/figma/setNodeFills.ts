@@ -19,7 +19,5 @@ export function setRangeNodeFills(
   fill: string
 ) {
   let fills = [figma.util.solidPaint(fill)];
-  console.log(start, ' ' + end, fill);
   node.setRangeFills(start, end, fills);
-  console.log('fills applied');
 }

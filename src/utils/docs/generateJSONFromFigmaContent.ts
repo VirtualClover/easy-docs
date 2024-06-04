@@ -15,6 +15,7 @@ import {
 } from '../general/urlHandlers';
 import { encodeStringForHTML } from '../cleanseTextData';
 import { clone } from '../clone';
+import { setFlavoredTextOnEncodedString } from '../general/flavoredText';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
@@ -122,51 +123,8 @@ async function generatePageDataFromFrame(
             });
             break;
           case componentData.paragraph.id:
-            let textContent = childNode.componentProperties[
-              componentData.paragraph.contentProp
-            ].value as string;
-            let pTextNode = childNode.findOne(
-              (n) => n.type == 'TEXT'
-            ) as TextNode;
-            let flavoredStyles = pTextNode.getStyledTextSegments([
-              'fontName',
-              'hyperlink',
-            ]);
-            //console.log(flavoredStyles);
-            let globalOffset = 0;
-            for (let i = 0; i < flavoredStyles.length; i++) {
-              let style = flavoredStyles[i];
-              //console.log(style);
-              let currentStart = style.start + globalOffset;
-              let currentEnd = style.end + globalOffset;
-              if (style.fontName.style == 'Bold') {
-                textContent =
-                  textContent.slice(0, currentStart) +
-                  '[[[b]]]' +
-                  textContent.slice(currentStart, currentEnd) +
-                  '[[[/b]]]' +
-                  textContent.slice(currentEnd);
-                globalOffset += 15;
-                //console.log('bold');
-              }
-              if (style.fontName.style == 'Italic') {
-                //console.log('italic');
-              }
-              if (style.hyperlink) {
-                console.log(textContent.slice(0, currentStart));
-                textContent =
-                  textContent.slice(0, currentStart) +
-                  `[[[a href="${style.hyperlink.value}"]]]` +
-                  textContent.slice(currentStart, currentEnd) +
-                  '[[[/a]]]' +
-                  textContent.slice(currentEnd);
-                globalOffset += 23 + style.hyperlink.value.length;
-                //console.log('link');
-                //console.log(encodeStringForHTML(textContent));
-              }
-            }
             //console.log(encodeStringForHTML(textContent));
-
+            let textContent = setFlavoredTextOnEncodedString(childNode);
             pageData.blocks.push({
               type: 'paragraph',
               ...objEssentials,
