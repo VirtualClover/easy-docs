@@ -1,3 +1,5 @@
+import { ENCODED_CHARS } from './constants';
+
 /**
  * Cleans a text obj within a data obj for Figma
  * @param data
@@ -46,8 +48,14 @@ export function decodeStringForFigma(
     formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
     formattedString = formattedString.replace(/&nbsp;/g, ' ');
     if (encodeFlavoredText) {
-      formattedString = formattedString.replace(/</g, '[[[');
-      formattedString = formattedString.replace(/>/g, ']]]');
+      formattedString = formattedString.replace(
+        /</g,
+        ENCODED_CHARS.brackets.open
+      );
+      formattedString = formattedString.replace(
+        />/g,
+        ENCODED_CHARS.brackets.close
+      );
     }
     return formattedString;
   } else return '';

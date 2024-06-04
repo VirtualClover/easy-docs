@@ -5,6 +5,13 @@ import { BASE_STYLE_TOKENS } from '../styles/base';
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];
 
+export const ENCODED_CHARS = {
+  brackets: {
+    open: '[[[',
+    close: ']]]',
+  },
+};
+
 export type ChangesPlatform = 'figma' | 'editor';
 
 export const EMPTY_USER_AUTHOR_DATA = {
@@ -203,29 +210,29 @@ export interface Reconciliation {
   changesNumber: number;
 }
 
-export interface PageReconciliation { }
+export interface PageReconciliation {}
 
 export const DEFAULT_PLUGIN_DATA = {
   currentDocData: DEFAULT_DOC_DATA,
   currentUser: EMPTY_USER_AUTHOR_DATA,
-  setCurrentUser: (authorUser: AuthorUser) => { },
-  setCurrentDocData: (data: DocData) => { },
+  setCurrentUser: (authorUser: AuthorUser) => {},
+  setCurrentDocData: (data: DocData) => {},
   navigation: initialNavigation,
-  setNavigation: (view) => { },
+  setNavigation: (view) => {},
   loadingState: LOADING_STATES[0] as LoadingStates,
-  setLoadingState: (loadingState: LoadingStates) => { },
+  setLoadingState: (loadingState: LoadingStates) => {},
   settings: DEFAULT_SETTINGS,
-  setSettings: (settings: PluginSettings) => { },
+  setSettings: (settings: PluginSettings) => {},
   incomingFigmaChanges: false,
-  setIncomingFigmaChanges: (state: boolean) => { },
+  setIncomingFigmaChanges: (state: boolean) => {},
   incomingEditorChanges: false,
-  setIncomingEditorChanges: (state: boolean) => { },
+  setIncomingEditorChanges: (state: boolean) => {},
   activeTab: 0 as number,
-  setActiveTab: (state: number) => { },
+  setActiveTab: (state: number) => {},
   sheetOpen: false,
-  setSheetOpen: (state: boolean) => { },
+  setSheetOpen: (state: boolean) => {},
   sheetContent: null,
-  setSheetContent: (content: () => JSX.Element) => { },
+  setSheetContent: (content: () => JSX.Element) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 
