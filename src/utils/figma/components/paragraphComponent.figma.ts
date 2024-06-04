@@ -3,6 +3,7 @@ import { cleanseString, decodeStringForFigma } from '../../cleanseTextData';
 import {
   getURLFromAnchor,
   matchFlavoredText,
+  setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 import { setNodeFills, setRangeNodeFills } from '../setNodeFills';
 
@@ -49,9 +50,8 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
     component = node;
   });
   let content = decodeStringForFigma(data.text, true);
-  let flavoredMatches = matchFlavoredText(content);
 
-  console.log(content);
+  //console.log(content);
 
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
@@ -59,79 +59,7 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
       [componentData.paragraph.contentProp]: content,
     });
 
-    if (flavoredMatches.length) {
-      await Promise.all([
-        figma.loadFontAsync({ family: 'Inter', style: 'Bold' }),
-        figma.loadFontAsync({ family: 'Inter', style: 'Italic' }),
-        figma.loadFontAsync({ family: 'Inter', style: 'Regular' }),
-      ]).then(() => {
-        console.log('gets here');
-
-        let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
-        let globalOffset = 0;
-        flavoredMatches.forEach((match) => {
-          //console.log('start wo offset ' + match.index);
-          //console.log('start w offset ' + match.index);
-          let start = match.index + globalOffset;
-          let end = match.index + match[0].length + globalOffset;
-          let currentStartOffset = 7;
-          let currentCloseOffset = 8;
-          let currentTotalOffset = currentCloseOffset + currentStartOffset;
-          //console.log('end wo offset ' + match.index + match[0].length);
-          //console.log('end w offset ' + end);
-          let tag = match[1];
-          switch (tag) {
-            case 'b':
-              textNode.setRangeFontName(start, end, {
-                family: 'Inter',
-                style: 'Bold',
-              });
-
-              globalOffset -= currentStartOffset;
-              textNode.deleteCharacters(start, start + currentStartOffset);
-              textNode.deleteCharacters(
-                end - currentTotalOffset,
-                end - currentStartOffset
-              );
-              globalOffset -= currentCloseOffset;
-              break;
-            case 'i':
-              textNode.setRangeFontName(start, end, {
-                family: 'Inter',
-                style: 'Italic',
-              });
-              globalOffset += currentStartOffset;
-              textNode.deleteCharacters(start, start + currentStartOffset);
-              textNode.deleteCharacters(
-                end - currentTotalOffset,
-                end - currentStartOffset
-              );
-              globalOffset -= currentCloseOffset;
-              break;
-            case 'a':
-              let tagMatch = getURLFromAnchor(match[0]);
-              currentStartOffset = tagMatch.tag.length;
-              currentTotalOffset = currentCloseOffset + currentStartOffset;
-              textNode.setRangeHyperlink(start, end, {
-                type: 'URL',
-                value: tagMatch.href,
-              });
-              textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
-              setRangeNodeFills(textNode, start, end, '#5551ff');
-              globalOffset -= currentStartOffset;
-              textNode.deleteCharacters(start, start + currentStartOffset);
-              textNode.deleteCharacters(
-                end - currentTotalOffset,
-                end - currentStartOffset
-              );
-              globalOffset -= currentCloseOffset;
-              break;
-            default:
-              break;
-          }
-        });
-      });
-    }
+    setFlavoredTextOnFigmaNode(content, instance);
 
     return instance;
     //instance.set
