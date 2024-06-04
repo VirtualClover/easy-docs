@@ -30,11 +30,11 @@ export const PluginContainer = styled(Container, {
       height: 'auto',
     },
 
-    '& .tc-table--heading .tc-row:first-child, .tc-table--heading .tc-row:first-child [contenteditable]:empty:before': {
+    '& .tc-table--heading .tc-row:first-of-type, .tc-table--heading .tc-row:first-of-type [contenteditable]:empty:before': {
       color: theme.palette.text.primary
     },
 
-    '& .tc-table--heading .tc-row:nth-child(odd)': {
+    '& .tc-table--heading .tc-row:nth-of-type(odd)': {
       background: theme.palette.background.paper,
     }
 

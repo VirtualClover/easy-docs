@@ -1,7 +1,7 @@
 import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
 
 import { BaseFileData } from '../../constants';
-import { decodeStringForFigma } from '../../cleanseTextData';
+import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createListComponent(parent: FrameNode) {

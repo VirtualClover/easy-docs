@@ -20,7 +20,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';
 import { createNewPageJSON } from '../utils/docs/createNewPageJSON';
-import { decodeStringForFigma } from '../utils/cleanseTextData';
+import { decodeStringForFigma } from '../utils/general/cleanseTextData';
 import { pushNewDataToFigma } from '../utils/editor/pushNewDataToFigma';
 import { selectNewPageFromEditor } from '../utils/editor/selectNewPageFromEditor';
 

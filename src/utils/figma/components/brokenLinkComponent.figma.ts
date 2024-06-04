@@ -1,5 +1,5 @@
 import { BaseFileData, DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from "../../constants";
-import { cleanseString, decodeStringForFigma } from "../../cleanseTextData";
+import { cleanseString, decodeStringForFigma } from "../../general/cleanseTextData";
 
 import { setNodeFills } from "../setNodeFills";
 

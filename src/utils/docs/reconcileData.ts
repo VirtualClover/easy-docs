@@ -5,7 +5,7 @@ import {
   cleanseBlockData,
   cleanseString,
   cleanseTextData,
-} from '../cleanseTextData';
+} from '../general/cleanseTextData';
 
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';

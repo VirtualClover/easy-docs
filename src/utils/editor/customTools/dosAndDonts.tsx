@@ -9,7 +9,7 @@ import {
 import {
   decodeStringForFigma,
   encodeStringForHTML,
-} from '../../cleanseTextData';
+} from '../../general/cleanseTextData';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,

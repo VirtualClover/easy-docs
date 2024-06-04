@@ -2,7 +2,7 @@ import { Alert, Typography, styled } from '@mui/material';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
-} from '../../cleanseTextData';
+} from '../../general/cleanseTextData';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,

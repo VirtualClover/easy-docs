@@ -9,8 +9,9 @@ import {
   mapDosAndDontsToStatus,
 } from '../general/mapDosAndDontsToStatus';
 
-import { decodeStringForFigma } from '../cleanseTextData';
+import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateFigmaURL } from '../general/urlHandlers';
+import { getURLFromAnchor } from '../general/flavoredText';
 
 // TODO Add Nextra
 
@@ -57,6 +58,27 @@ let generateMDTableRow = (rowData: string[]): string => {
   return mdRow.join('');
 };
 
+let convertFlavoredText = (text: string) => {
+  text = text.replace(/<b>/g, '**');
+  text = text.replace(/<\/b>/g, '**');
+  text = text.replace(/<i>/g, '*');
+  text = text.replace(/<\/i>/g, '*');
+
+  let matches = [...text.matchAll(/<a[^>]*>([^<]+)<\/a>/g)];
+  if (matches.length) {
+    matches.forEach((match) => {
+      let url = getURLFromAnchor(match[0], 'html');
+      text =
+        text.slice(0, match.index) +
+        `[${match[1]}](${url.href})` +
+        text.slice(match.index + match[0].length);
+    });
+  }
+  console.log(matches);
+
+  return text;
+};
+
 let generateMDTable = (data) => {
   let md = [];
   let content: string[][] = data.content;
@@ -89,7 +111,7 @@ export function generateMarkdownPage(data: PageData): string {
         markdown.push(`${'#'.repeat(block.data.level)} ${block.data.text}`);
         break;
       case 'paragraph':
-        markdown.push(`${block.data.text}`);
+        markdown.push(`${convertFlavoredText(block.data.text)}`);
         break;
       case 'quote':
         markdown.push(`> ${block.data.text}  \n> ${block.data.caption}`);

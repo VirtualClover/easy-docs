@@ -1,3 +1,5 @@
+import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
+
 import { setRangeNodeFills } from '../figma/setNodeFills';
 
 export let matchFlavoredText = (string: string) => {
@@ -10,21 +12,24 @@ export let matchFlavoredText = (string: string) => {
   return matches;
 };
 
-export let getURLFromAnchor = (string: string, type = 'figma') => {
+export let getURLFromAnchor = (
+  string: string,
+  type: 'figma' | 'html' = 'figma'
+) => {
   if (type == 'figma') {
     let matches = string.match(
       /\[\[\[a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\]\]\]/
     );
     return { href: matches[2], tag: matches[0] };
   }
+  if (type == 'html') {
+    let matches = string.match(/\<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\>/);
+    return { href: matches[2], tag: matches[0] };
+  }
 };
 
 export let getFlavoredTextTags = (matchedString: string) => {
   return matchedString.match(/\<(.*?)(\>| )/i)[1];
-};
-
-let matchAnchorOnFigmaNode = (textNode: TextNode) => {
-  return textNode.getStyledTextSegments(['hyperlink']);
 };
 
 export let setFlavoredTextOnFigmaNode = async (
@@ -34,9 +39,15 @@ export let setFlavoredTextOnFigmaNode = async (
   let flavoredMatches = matchFlavoredText(string);
   if (flavoredMatches.length) {
     await Promise.all([
-      figma.loadFontAsync({ family: 'Inter', style: 'Bold' }),
-      figma.loadFontAsync({ family: 'Inter', style: 'Italic' }),
-      figma.loadFontAsync({ family: 'Inter', style: 'Regular' }),
+      figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }),
+      figma.loadFontAsync({
+        family: DEFAULT_FONT_FAMILIES[0],
+        style: 'Italic',
+      }),
+      figma.loadFontAsync({
+        family: DEFAULT_FONT_FAMILIES[0],
+        style: 'Regular',
+      }),
     ]).then(() => {
       //console.log('gets here');
       let textNode: TextNode;
@@ -61,7 +72,7 @@ export let setFlavoredTextOnFigmaNode = async (
         switch (tag) {
           case 'b':
             textNode.setRangeFontName(start, end, {
-              family: 'Inter',
+              family: DEFAULT_FONT_FAMILIES[0],
               style: 'Bold',
             });
 
@@ -75,10 +86,10 @@ export let setFlavoredTextOnFigmaNode = async (
             break;
           case 'i':
             textNode.setRangeFontName(start, end, {
-              family: 'Inter',
+              family: DEFAULT_FONT_FAMILIES[0],
               style: 'Italic',
             });
-            globalOffset += currentStartOffset;
+            globalOffset -= currentStartOffset;
             textNode.deleteCharacters(start, start + currentStartOffset);
             textNode.deleteCharacters(
               end - currentTotalOffset,
@@ -95,7 +106,12 @@ export let setFlavoredTextOnFigmaNode = async (
               value: tagMatch.href,
             });
             textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
-            setRangeNodeFills(textNode, start, end, '#5551ff');
+            setRangeNodeFills(
+              textNode,
+              start,
+              end,
+              BASE_STYLE_TOKENS.palette.onBackground.link
+            );
             globalOffset -= currentStartOffset;
             textNode.deleteCharacters(start, start + currentStartOffset);
             textNode.deleteCharacters(
@@ -147,6 +163,13 @@ export let setFlavoredTextOnEncodedString = (
     }
     if (style.fontName.style == 'Italic') {
       //console.log('italic');
+      textContent =
+        textContent.slice(0, currentStart) +
+        '[[[i]]]' +
+        textContent.slice(currentStart, currentEnd) +
+        '[[[/i]]]' +
+        textContent.slice(currentEnd);
+      globalOffset += 15;
     }
     if (style.hyperlink) {
       //console.log(textContent.slice(0, currentStart));

@@ -8,7 +8,7 @@ import {
 import { getFlavoredTextTags, matchFlavoredText } from '../general/flavoredText';
 
 import { createDocFrame } from '../figma/createDocFrame';
-import { decodeStringForFigma } from '../cleanseTextData';
+import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent.figma';
 import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';

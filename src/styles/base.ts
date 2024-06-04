@@ -8,7 +8,7 @@ const BASE_COLOR_PALETTE = {
     high: '#22264F',
     mid: '#626582',
     low: '#898C93',
-    link: '#2C7CD6',
+    link: '#5551ff',
   },
   surface: '#F0F5F8',
   onSurface: {
@@ -51,8 +51,10 @@ const BASE_COLOR_PALETTE = {
 
 export type ColorPalette = typeof BASE_COLOR_PALETTE;
 
+export const DEFAULT_FONT_FAMILIES = ['Inter', 'Arial', 'sans-serif'];
+
 export const BASE_STYLE_TOKENS = {
-  fontFamily: ['Inter', 'Arial', 'sans-serif'].join(','),
+  fontFamily: DEFAULT_FONT_FAMILIES.join(','),
   codeFontFamily: ['Consolas', 'Monaco', 'monospace'].join(','),
   baseFontSize: 12,
   units: {

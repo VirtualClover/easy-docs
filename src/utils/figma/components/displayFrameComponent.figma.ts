@@ -4,7 +4,7 @@ import {
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
 
-import { decodeStringForFigma } from '../../cleanseTextData';
+import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { generateBrokenLinkInstance } from './brokenLinkComponent.figma';
 import { generateFigmaURL } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';

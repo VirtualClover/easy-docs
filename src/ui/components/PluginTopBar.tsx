@@ -15,7 +15,7 @@ import { DocData, PluginData } from '../../utils/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
-} from '../../utils/cleanseTextData';
+} from '../../utils/general/cleanseTextData';
 
 import { ExportView } from './ExportView';
 import { PluginDataContext } from '../../utils/PluginDataContext';

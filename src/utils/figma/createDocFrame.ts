@@ -1,7 +1,7 @@
 import { DEFAULT_SETTINGS, PluginSettings } from '../constants';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
-import { decodeStringForFigma } from '../cleanseTextData';
+import { decodeStringForFigma } from '../general/cleanseTextData';
 import { setNodeFills } from './setNodeFills';
 
 /**

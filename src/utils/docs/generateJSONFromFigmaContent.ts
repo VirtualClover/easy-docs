@@ -13,7 +13,7 @@ import {
   getDetailsFromFigmaURL,
   validateFigmaURL,
 } from '../general/urlHandlers';
-import { encodeStringForHTML } from '../cleanseTextData';
+import { encodeStringForHTML } from '../general/cleanseTextData';
 import { clone } from '../clone';
 import { setFlavoredTextOnEncodedString } from '../general/flavoredText';
 
