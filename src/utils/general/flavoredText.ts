@@ -3,12 +3,19 @@ import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
 import { setRangeNodeFills } from '../figma/setNodeFills';
 
 export let matchFlavoredText = (string: string) => {
-  let matches = [
-    ...string.matchAll(
-      /\[\[\[(a|b|i)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(a|b|i)\]\]\]/gi
-    ),
+  let anchorMatches = [
+    ...string.matchAll(/\[\[\[(a)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(a)\]\]\]/gi),
+  ];
+  let boldMatches = [
+    ...string.matchAll(/\[\[\[(b)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(b)\]\]\]/gi),
+  ];
+  let italicMatches = [
+    ...string.matchAll(/\[\[\[(i)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(i)\]\]\]/gi),
   ];
   //console.log(matches);
+
+  let matches = [...anchorMatches, ...boldMatches, ...italicMatches];
+  matches.sort((a, b) => a.index - b.index);
   return matches;
 };
 

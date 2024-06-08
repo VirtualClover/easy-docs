@@ -59,22 +59,28 @@ let generateMDTableRow = (rowData: string[]): string => {
 };
 
 let convertFlavoredText = (text: string) => {
-  text = text.replace(/<b>/g, '**');
-  text = text.replace(/<\/b>/g, '**');
-  text = text.replace(/<i>/g, '*');
-  text = text.replace(/<\/i>/g, '*');
-
+  let globalOffset = 0;
   let matches = [...text.matchAll(/<a[^>]*>([^<]+)<\/a>/g)];
   if (matches.length) {
     matches.forEach((match) => {
       let url = getURLFromAnchor(match[0], 'html');
       text =
-        text.slice(0, match.index) +
+        text.slice(0, match.index + globalOffset) +
         `[${match[1]}](${url.href})` +
-        text.slice(match.index + match[0].length);
+        text.slice(match.index + globalOffset + match[0].length);
+      globalOffset -= 11;
+
+      console.log(match.index);
+      console.log(globalOffset);
+      console.log(match.index + globalOffset);
     });
   }
   console.log(matches);
+
+  text = text.replace(/<b>/g, '**');
+  text = text.replace(/<\/b>/g, '**');
+  text = text.replace(/<i>/g, '*');
+  text = text.replace(/<\/i>/g, '*');
 
   return text;
 };
