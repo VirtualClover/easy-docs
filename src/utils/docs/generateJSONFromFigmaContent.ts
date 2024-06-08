@@ -156,7 +156,8 @@ async function generatePageDataFromFrame(
             let unformattedContent = childNode.componentProperties[
               componentData.list.contentProp
             ].value as string;
-            let content = clone(encodeStringForHTML(unformattedContent));
+            let listTextContent = setFlavoredTextOnEncodedString(childNode);
+            let content = clone(encodeStringForHTML(listTextContent));
             //console.log('unformattedcontent');
             //console.log(unformattedContent);
             let emptyLastItem: boolean = false;
@@ -166,6 +167,9 @@ async function generatePageDataFromFrame(
             }
             let arr = [];
             if (content) {
+              content = content.replace(/\n\<\/b\>/g, '</b>\n');
+              content = content.replace(/\n\<\/i\>/g, '</i>\n');
+              content = content.replace(/\n\<\/a\>/g, '</a>\n');
               arr = content.split('\n');
             }
             let listStyle: string = 'unordered';
@@ -196,6 +200,8 @@ async function generatePageDataFromFrame(
                   });
               }
             }
+            console.log(arr);
+
             pageData.blocks.push({
               type: 'list',
               ...objEssentials,

@@ -2,6 +2,7 @@ import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
 
 import { BaseFileData } from '../../constants';
 import { decodeStringForFigma } from '../../general/cleanseTextData';
+import { setFlavoredTextOnFigmaNode } from '../../general/flavoredText';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createListComponent(parent: FrameNode) {
@@ -49,13 +50,18 @@ export async function generateListInstance(data): Promise<InstanceNode> {
     let instance = component.createInstance();
     let jointData = '';
     let jointDataDecoded = '';
+    console.log('data items');
+    
+    console.log(data.items);
+    
     //Get text node
     let textNode = instance.findOne((n) => n.type === 'TEXT');
     if (data.items.length) {
       jointData = data.items.join('\n');
-      jointDataDecoded = decodeStringForFigma(jointData);
+      jointDataDecoded = decodeStringForFigma(jointData, true);
       //console.log(data.items);
-      //console.log(jointData);
+      console.log('joint data');
+      console.log(jointData);
     }
     instance.setProperties({
       [componentData.list.contentProp]: jointDataDecoded,
@@ -70,6 +76,7 @@ export async function generateListInstance(data): Promise<InstanceNode> {
           });
         }
       });
+    await setFlavoredTextOnFigmaNode(jointDataDecoded, instance);
     return instance;
     //instance.set
   }
