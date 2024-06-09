@@ -173,9 +173,9 @@ export function generateMarkdownPage(data: PageData): string {
           for (let i = 0; i < block.data.items.length; i++) {
             const listItem = block.data.items[i];
             if (block.data.style == 'unordered') {
-              markdown.push(`* ${listItem}`);
+              markdown.push(`* ${convertFlavoredText(listItem)}`);
             } else {
-              markdown.push(`${i + 1}. ${listItem}`);
+              markdown.push(`${i + 1}. ${convertFlavoredText(listItem)}`);
             }
           }
         }

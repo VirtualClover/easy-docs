@@ -69,10 +69,10 @@ export let setFlavoredTextOnFigmaNode = async (
         //console.log('start wo offset ' + match.index);
         //console.log('start w offset ' + match.index);
         let start = match.index + globalOffset;
-        console.log(string);
-        console.log(match);
-        console.log(match.index);
-        console.log(start);
+        //console.log(string);
+        //console.log(match);
+        //console.log(match.index);
+        //console.log(start);
         let end = match.index + match[0].length + globalOffset;
         let currentStartOffset = 7;
         let currentCloseOffset = 8;
@@ -157,9 +157,6 @@ export let setFlavoredTextOnEncodedString = (
     'fontName',
     'hyperlink',
   ]);
-  console.log('flavored styles');
-
-  console.log(flavoredStyles);
   let globalOffset = 0;
   for (let i = 0; i < flavoredStyles.length; i++) {
     let style = flavoredStyles[i];

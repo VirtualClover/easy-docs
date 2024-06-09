@@ -14,8 +14,10 @@ import {
   validateFigmaURL,
 } from '../general/urlHandlers';
 import { encodeStringForHTML } from '../general/cleanseTextData';
-import { clone } from '../clone';
-import { setFlavoredTextOnEncodedString } from '../general/flavoredText';
+import { generateBlockDataFromParagraph } from '../figma/components/paragraphComponent.figma';
+import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
+import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
+import { generateBlockDataFromQuote } from '../figma/components/quoteComponent.figma';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
@@ -104,118 +106,39 @@ async function generatePageDataFromFrame(
 
         switch (mainCompId) {
           case componentData.header.id:
-            let headerContent = encodeStringForHTML(
-              childNode.componentProperties[componentData.header.contentProp]
-                .value as string
-            );
-            pageData.blocks.push({
-              type: 'header',
-              ...objEssentials,
-              data: {
-                text: headerContent,
-                level: parseInt(
-                  childNode.componentProperties[
-                    componentData.header.levelProp.key
-                  ].value as string,
-                  10
-                ),
-              },
-            });
+            generateBlockDataFromHeader(
+              childNode,
+              componentData,
+              editedDate,
+              childNode.id
+            ).then((data) => pageData.blocks.push(data));
             break;
           case componentData.paragraph.id:
-            //console.log(encodeStringForHTML(textContent));
-            let textContent = setFlavoredTextOnEncodedString(childNode);
-            pageData.blocks.push({
-              type: 'paragraph',
-              ...objEssentials,
-              data: {
-                text: encodeStringForHTML(textContent),
-              },
-            });
+            generateBlockDataFromParagraph(
+              childNode,
+              editedDate,
+              childNode.id
+            ).then((data) => pageData.blocks.push(data));
             break;
           case componentData.quote.id:
-            pageData.blocks.push({
-              type: 'quote',
-              ...objEssentials,
-              data: {
-                text: encodeStringForHTML(
-                  childNode.componentProperties[componentData.quote.contentProp]
-                    .value as string
-                ),
-                caption: encodeStringForHTML(
-                  childNode.componentProperties[componentData.quote.authorProp]
-                    .value as string
-                ),
-                alignment: 'left',
-              },
-            });
-            //console.log(pageData);
+            generateBlockDataFromQuote(
+              childNode,
+              componentData,
+              editedDate,
+              childNode.id
+            ).then((data) => pageData.blocks.push(data));
 
             break;
           case componentData.list.id:
-            let unformattedContent = childNode.componentProperties[
-              componentData.list.contentProp
-            ].value as string;
-            let listTextContent = setFlavoredTextOnEncodedString(childNode);
-            let content = clone(encodeStringForHTML(listTextContent));
-            //console.log('unformattedcontent');
-            //console.log(unformattedContent);
-            let emptyLastItem: boolean = false;
-            if (content.match(/\n+$/gm)) {
-              emptyLastItem = true;
-              //console.log('empty line true!');
-            }
-            let arr = [];
-            if (content) {
-              content = content.replace(/\n\<\/b\>/g, '</b>\n');
-              content = content.replace(/\n\<\/i\>/g, '</i>\n');
-              content = content.replace(/\n\<\/a\>/g, '</a>\n');
-              arr = content.split('\n');
-            }
-            let listStyle: string = 'unordered';
-            let textNode = childNode.findOne(
-              (n) => n.type === 'TEXT'
-            ) as TextNode;
-            if (textNode.characters.length) {
-              let unformattedStyle = textNode.getRangeListOptions(
-                0,
-                textNode.characters.length
-              );
-              if (
-                unformattedStyle != figma.mixed &&
-                unformattedStyle.type != 'NONE'
-              ) {
-                listStyle = unformattedStyle.type.toLowerCase();
-              } else {
-                await figma
-                  .loadFontAsync({ family: 'Inter', style: 'Regular' })
-                  .then(() => {
-                    textNode.setRangeListOptions(
-                      0,
-                      textNode.characters.length,
-                      {
-                        type: 'UNORDERED',
-                      }
-                    );
-                  });
-              }
-            }
-            console.log(arr);
-
-            pageData.blocks.push({
-              type: 'list',
-              ...objEssentials,
-              data: {
-                items: arr,
-                style: listStyle,
-              },
-            });
+            generateBlockDataFromList(childNode, editedDate, childNode.id).then(
+              (data) => pageData.blocks.push(data)
+            );
             break;
 
           default:
             break;
         }
-      } // If a comppnent is inside a frame like frame display
+      } // If a component is inside a frame like frame display
       else if (childNode.type == 'FRAME') {
         let instInsideAFrame: InstanceNode = scanInsideAFrame(childNode);
         let mainCompId: string;

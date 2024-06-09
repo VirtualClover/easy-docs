@@ -1,8 +1,16 @@
-import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
+import {
+  BlockData,
+  DEFAULT_SETTINGS,
+  FIGMA_COMPONENT_PREFIX,
+} from '../../constants';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
 
 import { BaseFileData } from '../../constants';
 import { clone } from '../../clone';
-import { decodeStringForFigma } from '../../general/cleanseTextData';
+import { setFlavoredTextOnEncodedString } from '../../general/flavoredText';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -33,7 +41,10 @@ export async function createQuoteComponent(parent: FrameNode) {
       innerWrapper.paddingBottom = 16;
       innerWrapper.itemSpacing = 8;
       innerWrapper.cornerRadius = 16;
-      setNodeStrokeColor(innerWrapper, DEFAULT_SETTINGS.customization.palette.divider.simple);
+      setNodeStrokeColor(
+        innerWrapper,
+        DEFAULT_SETTINGS.customization.palette.divider.simple
+      );
       setNodeFills(
         innerWrapper,
         DEFAULT_SETTINGS.customization.palette.status.neutral.muted
@@ -103,4 +114,27 @@ export async function generateQuoteInstance(data): Promise<InstanceNode> {
     //instance.set
   }
   return null;
+}
+
+export async function generateBlockDataFromQuote(
+  node: InstanceNode,
+  componentData: BaseFileData,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  return {
+    type: 'quote',
+    lastEdited,
+    figmaNodeId,
+    data: {
+      text: encodeStringForHTML(
+        node.componentProperties[componentData.quote.contentProp]
+          .value as string
+      ),
+      caption: encodeStringForHTML(
+        node.componentProperties[componentData.quote.authorProp].value as string
+      ),
+      alignment: 'left',
+    },
+  };
 }

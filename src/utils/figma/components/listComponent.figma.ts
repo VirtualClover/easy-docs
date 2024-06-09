@@ -1,8 +1,19 @@
-import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
+import {
+  BlockData,
+  DEFAULT_SETTINGS,
+  FIGMA_COMPONENT_PREFIX,
+} from '../../constants';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
+import {
+  setFlavoredTextOnEncodedString,
+  setFlavoredTextOnFigmaNode,
+} from '../../general/flavoredText';
 
 import { BaseFileData } from '../../constants';
-import { decodeStringForFigma } from '../../general/cleanseTextData';
-import { setFlavoredTextOnFigmaNode } from '../../general/flavoredText';
+import { clone } from '../../clone';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createListComponent(parent: FrameNode) {
@@ -50,18 +61,18 @@ export async function generateListInstance(data): Promise<InstanceNode> {
     let instance = component.createInstance();
     let jointData = '';
     let jointDataDecoded = '';
-    console.log('data items');
-    
-    console.log(data.items);
-    
+    //console.log('data items');
+
+    //console.log(data.items);
+
     //Get text node
     let textNode = instance.findOne((n) => n.type === 'TEXT');
     if (data.items.length) {
       jointData = data.items.join('\n');
       jointDataDecoded = decodeStringForFigma(jointData, true);
       //console.log(data.items);
-      console.log('joint data');
-      console.log(jointData);
+      //console.log('joint data');
+      //console.log(jointData);
     }
     instance.setProperties({
       [componentData.list.contentProp]: jointDataDecoded,
@@ -81,4 +92,57 @@ export async function generateListInstance(data): Promise<InstanceNode> {
     //instance.set
   }
   return null;
+}
+
+export async function generateBlockDataFromList(
+  node: InstanceNode,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  let listTextContent = setFlavoredTextOnEncodedString(node);
+  let content = clone(encodeStringForHTML(listTextContent));
+  //console.log('unformattedcontent');
+  //console.log(unformattedContent);
+  let emptyLastItem: boolean = false;
+  if (content.match(/\n+$/gm)) {
+    emptyLastItem = true;
+    //console.log('empty line true!');
+  }
+  let arr = [];
+  if (content) {
+    content = content.replace(/\n\<\/b\>/g, '</b>\n');
+    content = content.replace(/\n\<\/i\>/g, '</i>\n');
+    content = content.replace(/\n\<\/a\>/g, '</a>\n');
+    arr = content.split('\n');
+  }
+  let listStyle: string = 'unordered';
+  let textNode = node.findOne((n) => n.type === 'TEXT') as TextNode;
+  if (textNode.characters.length) {
+    let unformattedStyle = textNode.getRangeListOptions(
+      0,
+      textNode.characters.length
+    );
+    if (unformattedStyle != figma.mixed && unformattedStyle.type != 'NONE') {
+      listStyle = unformattedStyle.type.toLowerCase();
+    } else {
+      await figma
+        .loadFontAsync({ family: 'Inter', style: 'Regular' })
+        .then(() => {
+          textNode.setRangeListOptions(0, textNode.characters.length, {
+            type: 'UNORDERED',
+          });
+        });
+    }
+  }
+
+  return {
+    type: 'list',
+    lastEdited,
+    figmaNodeId,
+    data: {
+      items: arr,
+      style: listStyle,
+    },
+  };
+  //console.log(arr);
 }

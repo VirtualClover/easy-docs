@@ -1,13 +1,19 @@
-import { DEFAULT_SETTINGS, FIGMA_COMPONENT_PREFIX } from '../../constants';
-import { cleanseString, decodeStringForFigma } from '../../general/cleanseTextData';
 import {
-  getURLFromAnchor,
-  matchFlavoredText,
+  BlockData,
+  DEFAULT_SETTINGS,
+  FIGMA_COMPONENT_PREFIX,
+} from '../../constants';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
+import {
+  setFlavoredTextOnEncodedString,
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
-import { setNodeFills, setRangeNodeFills } from '../setNodeFills';
 
 import { BaseFileData } from '../../constants';
+import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -59,10 +65,26 @@ export async function generateParagraphInstance(data): Promise<InstanceNode> {
       [componentData.paragraph.contentProp]: content,
     });
 
-    setFlavoredTextOnFigmaNode(content, instance);
+    await setFlavoredTextOnFigmaNode(content, instance);
 
     return instance;
     //instance.set
   }
   return null;
+}
+
+export async function generateBlockDataFromParagraph(
+  node: InstanceNode,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  let content = setFlavoredTextOnEncodedString(node);
+  return {
+    type: 'paragraph',
+    lastEdited,
+    figmaNodeId,
+    data: {
+      text: encodeStringForHTML(content),
+    },
+  };
 }

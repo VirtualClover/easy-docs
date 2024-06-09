@@ -1,11 +1,15 @@
 import {
+  BlockData,
   DEFAULT_HEADING_SIZES,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
 
 import { BaseFileData } from '../../constants';
-import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
@@ -30,7 +34,10 @@ export async function createHeaderComponent(
       textNode.fontName = { family: 'Inter', style: 'Bold' };
       textNode.fontSize = currentSize;
       textNode.characters = 'Heading';
-      setNodeFills(textNode, DEFAULT_SETTINGS.customization.palette.onBackground.high);
+      setNodeFills(
+        textNode,
+        DEFAULT_SETTINGS.customization.palette.onBackground.high
+      );
       header.appendChild(textNode);
       textNode.layoutSizingHorizontal = 'FILL';
       contentProperty = header.addComponentProperty(
@@ -85,4 +92,29 @@ export async function generateHeaderInstance(data): Promise<InstanceNode> {
   }
 
   return null;
+}
+
+export async function generateBlockDataFromHeader(
+  node: InstanceNode,
+  componentData: BaseFileData,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  let headerContent = encodeStringForHTML(
+    node.componentProperties[componentData.header.contentProp].value as string
+  );
+
+  return {
+    type: 'header',
+    lastEdited,
+    figmaNodeId,
+    data: {
+      text: headerContent,
+      level: parseInt(
+        node.componentProperties[componentData.header.levelProp.key]
+          .value as string,
+        10
+      ),
+    },
+  };
 }
