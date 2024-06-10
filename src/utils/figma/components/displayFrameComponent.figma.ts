@@ -1,12 +1,20 @@
 import {
   BaseFileData,
+  BlockData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
 
-import { decodeStringForFigma } from '../../general/cleanseTextData';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
 import { generateBrokenLinkInstance } from './brokenLinkComponent.figma';
-import { generateFigmaURL } from '../../general/urlHandlers';
+import {
+  generateFigmaURL,
+  getDetailsFromFigmaURL,
+  validateFigmaURL,
+} from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 
@@ -219,4 +227,58 @@ export async function generateDisplayFrameInstance(
     //instance.set
   }
   return null;
+}
+
+export async function generateBlockDataFromDisplayFrame(
+  instNode: InstanceNode,
+  componentData: BaseFileData,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  let blockType = 'displayFrame';
+  let url =
+    instNode.componentProperties[componentData.displayFrame.sourceProp].value ??
+    '';
+  let frameDetails;
+  let frameExistsInFile: boolean = false;
+  let blockData = {
+    type: blockType,
+    lastEdited,
+    figmaNodeId,
+    data: {
+      frameId: '',
+      fileId: '',
+      frameExistsInFile,
+      caption: encodeStringForHTML(
+        instNode.componentProperties[componentData.displayFrame.captionProp]
+          .value as string
+      ),
+    },
+  };
+  if (validateFigmaURL(url as string)) {
+    frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
+    
+    await figma
+      .getNodeByIdAsync(frameDetails.frameId)
+      .then((node) => {
+        frameExistsInFile = node != null ? true : false;
+        blockData = {
+          type: blockType,
+          lastEdited,
+          figmaNodeId,
+          data: {
+            frameId: frameDetails.frameId,
+            fileId: frameDetails.fileId,
+            frameExistsInFile,
+            caption: encodeStringForHTML(
+              instNode.componentProperties[
+                componentData.displayFrame.captionProp
+              ].value as string
+            ),
+          },
+        };
+      })
+      .catch((e) => console.error(e));
+  }
+  return blockData;
 }

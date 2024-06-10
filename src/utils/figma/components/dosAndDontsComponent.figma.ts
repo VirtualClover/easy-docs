@@ -1,4 +1,5 @@
 import {
+  BlockData,
   DEFAULT_GUIDELINES,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
@@ -7,9 +8,16 @@ import {
 import { cautionIcon, doIcon, dontIcon } from '../../../assets/svgs';
 
 import { BaseFileData } from '../../constants';
-import { decodeStringForFigma } from '../../general/cleanseTextData';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
 import { generateBrokenLinkInstance } from './brokenLinkComponent.figma';
-import { generateFigmaURL } from '../../general/urlHandlers';
+import {
+  generateFigmaURL,
+  getDetailsFromFigmaURL,
+  validateFigmaURL,
+} from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 
@@ -290,4 +298,61 @@ export async function generateDosAndDontsInstance(
   }
 
   return null;
+}
+
+export async function generateBlockDataFromDosAndDonts(
+  instNode: InstanceNode,
+  componentData: BaseFileData,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  let url =
+    instNode.componentProperties[componentData.dosAndDonts.sourceProp].value ??
+    '';
+  let frameDetails;
+  let frameExistsInFile: boolean = false;
+  let blockData = {
+    type: 'dosAndDonts',
+    lastEdited,
+    figmaNodeId,
+    data: {
+      frameId: '',
+      fileId: '',
+      type: instNode.componentProperties[componentData.dosAndDonts.typeProp.key]
+        .value,
+      frameExistsInFile,
+      caption: encodeStringForHTML(
+        instNode.componentProperties[componentData.dosAndDonts.captionProp]
+          .value as string
+      ),
+    },
+  };
+  if (validateFigmaURL(url as string)) {
+    frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
+    await figma
+      .getNodeByIdAsync(frameDetails.frameId)
+      .then((node) => {
+        frameExistsInFile = node != null ? true : false;
+        blockData = {
+          type: 'dosAndDonts',
+          lastEdited,
+          figmaNodeId,
+          data: {
+            frameId: frameDetails.frameId,
+            fileId: frameDetails.fileId,
+            type: instNode.componentProperties[
+              componentData.dosAndDonts.typeProp.key
+            ].value,
+            frameExistsInFile,
+            caption: encodeStringForHTML(
+              instNode.componentProperties[
+                componentData.dosAndDonts.captionProp
+              ].value as string
+            ),
+          },
+        };
+      })
+      .catch((e) => console.error(e));
+  }
+  return blockData;
 }

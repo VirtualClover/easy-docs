@@ -1,11 +1,13 @@
 import {
   BaseFileData,
+  BlockData,
   DEFAULT_SETTINGS,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
 
 import { clone } from '../../clone';
+import { encodeStringForHTML } from '../../general/cleanseTextData';
 import { isOdd } from '../../general/isOdd';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
@@ -52,7 +54,7 @@ export async function createTableCellComponent(
       setNodeFills(
         textNode,
         DEFAULT_SETTINGS.customization.palette.onBackground[
-        isHeader ? 'high' : 'mid'
+          isHeader ? 'high' : 'mid'
         ]
       );
       cell.appendChild(textNode);
@@ -154,7 +156,6 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
     tableWrapper.name = `${FIGMA_COMPONENT_PREFIX}Table`;
     tableWrapper.paddingBottom = 32;
 
-
     if (data.content.length) {
       for (let i = 0; i < data.content.length; i++) {
         const row = data.content[i];
@@ -197,4 +198,60 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
   }
 
   return null;
+}
+
+export async function generateBlockDataFromTable(
+  instNode: InstanceNode,
+  mainCompId: string,
+  componentData: BaseFileData,
+  lastEdited: number = Date.now(),
+  figmaNodeId?: string
+): Promise<BlockData> {
+  let content: string[][] = [];
+  let row = instNode.parent;
+  let tableWrapper = row.parent;
+  let withHeadings = false;
+  for (let i = 0; i < tableWrapper.children.length; i++) {
+    let currentRow = tableWrapper.children[i];
+    if (currentRow.type === 'FRAME') {
+      let tempRowContent: string[] = [];
+      for (let ci = 0; ci < currentRow.children.length; ci++) {
+        const cell = currentRow.children[ci];
+        if (cell.type === 'INSTANCE') {
+          await instNode.getMainComponentAsync().then((component) => {
+            mainCompId =
+              component.parent.type == 'COMPONENT_SET'
+                ? component.parent.id
+                : component.id;
+
+            if (mainCompId === componentData.tableCell.id) {
+              // check if header
+              if (i == 0 && ci == 0) {
+                withHeadings =
+                  cell.componentProperties[componentData.tableCell.typeProp.key]
+                    .value == 'header';
+              }
+
+              tempRowContent.push(
+                encodeStringForHTML(
+                  cell.componentProperties[componentData.tableCell.contentProp]
+                    .value as string
+                )
+              );
+            }
+          });
+        }
+      }
+      content.push(tempRowContent);
+    }
+  }
+  return {
+    type: 'table',
+    lastEdited,
+    figmaNodeId,
+    data: {
+      content: content,
+      withHeadings,
+    },
+  };
 }

@@ -6,18 +6,21 @@ import {
   FIGMA_NAMESPACE,
   PageData,
 } from '../constants';
-
-import { formatPageData } from './formatPageData';
-import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 import {
   getDetailsFromFigmaURL,
   validateFigmaURL,
 } from '../general/urlHandlers';
+
 import { encodeStringForHTML } from '../general/cleanseTextData';
-import { generateBlockDataFromParagraph } from '../figma/components/paragraphComponent.figma';
-import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
+import { formatPageData } from './formatPageData';
+import { generateBlockDataFromDisplayFrame } from '../figma/components/displayFrameComponent.figma';
+import { generateBlockDataFromDosAndDonts } from '../figma/components/dosAndDontsComponent.figma';
 import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
+import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
+import { generateBlockDataFromParagraph } from '../figma/components/paragraphComponent.figma';
 import { generateBlockDataFromQuote } from '../figma/components/quoteComponent.figma';
+import { generateBlockDataFromTable } from '../figma/components/tableComponent.figma';
+import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
@@ -156,158 +159,36 @@ async function generatePageDataFromFrame(
 
           switch (mainCompId) {
             case componentData.displayFrame.id:
-              {
-                let url =
-                  instInsideAFrame.componentProperties[
-                    componentData.displayFrame.sourceProp
-                  ].value ?? '';
-                let frameDetails;
-                let frameExistsInFile: boolean = false;
-                if (validateFigmaURL(url as string)) {
-                  frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
-                  await figma
-                    .getNodeByIdAsync(frameDetails.frameId)
-                    .then((node) => {
-                      frameExistsInFile = node != null ? true : false;
-                      pageData.blocks.push({
-                        type: 'displayFrame',
-                        ...objEssentials,
-                        data: {
-                          frameId: frameDetails.frameId,
-                          fileId: frameDetails.fileId,
-                          frameExistsInFile,
-                          caption: encodeStringForHTML(
-                            instInsideAFrame.componentProperties[
-                              componentData.displayFrame.captionProp
-                            ].value as string
-                          ),
-                        },
-                      });
-                    })
-                    .catch((e) => console.error(e));
-                } else {
-                  pageData.blocks.push({
-                    type: 'displayFrame',
-                    ...objEssentials,
-                    data: {
-                      frameId: '',
-                      fileId: '',
-                      frameExistsInFile,
-                      caption: encodeStringForHTML(
-                        instInsideAFrame.componentProperties[
-                          componentData.displayFrame.captionProp
-                        ].value as string
-                      ),
-                    },
-                  });
-                }
-              }
+              generateBlockDataFromDisplayFrame(
+                instInsideAFrame,
+                componentData,
+                editedDate,
+                childNode.id
+              ).then((data) => {
+                pageData.blocks.push(data);
+              });
               break;
             case componentData.dosAndDonts.id:
-              {
-                let url =
-                  instInsideAFrame.componentProperties[
-                    componentData.dosAndDonts.sourceProp
-                  ].value ?? '';
-                let frameDetails;
-                let frameExistsInFile: boolean = false;
-                if (validateFigmaURL(url as string)) {
-                  frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
-                  await figma
-                    .getNodeByIdAsync(frameDetails.frameId)
-                    .then((node) => {
-                      frameExistsInFile = node != null ? true : false;
-                      pageData.blocks.push({
-                        type: 'dosAndDonts',
-                        ...objEssentials,
-                        data: {
-                          frameId: frameDetails.frameId,
-                          fileId: frameDetails.fileId,
-                          type: instInsideAFrame.componentProperties[
-                            componentData.dosAndDonts.typeProp.key
-                          ].value,
-                          frameExistsInFile,
-                          caption: encodeStringForHTML(
-                            instInsideAFrame.componentProperties[
-                              componentData.dosAndDonts.captionProp
-                            ].value as string
-                          ),
-                        },
-                      });
-                    })
-                    .catch((e) => console.error(e));
-                } else {
-                  pageData.blocks.push({
-                    type: 'dosAndDonts',
-                    ...objEssentials,
-                    data: {
-                      frameId: '',
-                      fileId: '',
-                      type: instInsideAFrame.componentProperties[
-                        componentData.dosAndDonts.typeProp.key
-                      ].value,
-                      frameExistsInFile,
-                      caption: encodeStringForHTML(
-                        instInsideAFrame.componentProperties[
-                          componentData.dosAndDonts.captionProp
-                        ].value as string
-                      ),
-                    },
-                  });
-                }
-              }
+              generateBlockDataFromDosAndDonts(
+                instInsideAFrame,
+                componentData,
+                editedDate,
+                childNode.id
+              ).then((data) => {
+                pageData.blocks.push(data);
+              });
 
               break;
             case componentData.tableCell.id:
-              let content: string[][] = [];
-              let row = instInsideAFrame.parent;
-              let tableWrapper = row.parent;
-              let withHeadings = false;
-              for (let i = 0; i < tableWrapper.children.length; i++) {
-                let currentRow = tableWrapper.children[i];
-                if (currentRow.type === 'FRAME') {
-                  let tempRowContent: string[] = [];
-                  for (let ci = 0; ci < currentRow.children.length; ci++) {
-                    const cell = currentRow.children[ci];
-                    if (cell.type === 'INSTANCE') {
-                      await instInsideAFrame
-                        .getMainComponentAsync()
-                        .then((component) => {
-                          mainCompId =
-                            component.parent.type == 'COMPONENT_SET'
-                              ? component.parent.id
-                              : component.id;
-
-                          if (mainCompId === componentData.tableCell.id) {
-                            // check if header
-                            if (i == 0 && ci == 0) {
-                              withHeadings =
-                                cell.componentProperties[
-                                  componentData.tableCell.typeProp.key
-                                ].value == 'header';
-                            }
-
-                            tempRowContent.push(
-                              encodeStringForHTML(
-                                cell.componentProperties[
-                                  componentData.tableCell.contentProp
-                                ].value as string
-                              )
-                            );
-                          }
-                        });
-                    }
-                  }
-                  content.push(tempRowContent);
-                }
-              }
-              pageData.blocks.push({
-                type: 'table',
-                ...objEssentials,
-                data: {
-                  content: content,
-                  withHeadings,
-                },
+              await generateBlockDataFromTable(
+                instInsideAFrame,
+                mainCompId,
+                componentData,
+                editedDate,
+                childNode.id
+              ).then((data) => {
+                console.log(data);
+                pageData.blocks.push(data);
               });
 
               break;
