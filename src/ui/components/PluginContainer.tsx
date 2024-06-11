@@ -119,4 +119,9 @@ export const PluginContainer = styled(Container, {
     borderLeft: `8px solid ${theme.palette.error.main}`,
     color: theme.palette.error.contrastText,
   },
+  '.ce-code__textarea': {
+    color: theme.palette.text.primary,
+    background: theme.palette.background.paper,
+    minHeight: '160px',
+  },
 }));

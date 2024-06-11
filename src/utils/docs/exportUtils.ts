@@ -187,8 +187,13 @@ export function generateMarkdownPage(data: PageData): string {
         break;
       case 'alert':
         markdown.push(
-          `> ${decideEmojiBasedOnStatus(block.data.type)} ${block.data.message}  \n`
+          `> ${decideEmojiBasedOnStatus(block.data.type)} ${
+            block.data.message
+          }  \n`
         );
+        break;
+      case 'code':
+        markdown.push(`${'```'}  \n${block.data.code}  \n${'```'}`);
         break;
       default:
         break;
@@ -246,6 +251,17 @@ let generateHTMLTable = (data, initialIndentation: number = 0) => {
   }
   html.push(`${addIndetation(initialIndentation)}</table>`);
   return html.join('\n');
+};
+
+let indentCodeBlock = (data: string, indentationLevel = 0): string => {
+  let lines = data.split('\n');
+  let formattedString = [];
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    line = `${addIndetation(indentationLevel)}${line}`;
+    formattedString.push(line);
+  }
+  return formattedString.join('\n');
 };
 
 export function generateHTMLPage(data: PageData): string {
@@ -363,6 +379,15 @@ export function generateHTMLPage(data: PageData): string {
           }"><b class="${classPrefix}alert-icon">${decideEmojiBasedOnStatus(
             block.data.type
           )} </b><span>${block.data.message}</span></div>`
+        );
+        break;
+      case 'code':
+        html.push(
+          `${addIndetation(3)}<pre class=${classPrefix}code>\n${addIndetation(
+            4
+          )}<code>\n${indentCodeBlock(block.data.code, 5)}\n${addIndetation(
+            4
+          )}</code>\n${addIndetation(3)}</pre>`
         );
         break;
       default:

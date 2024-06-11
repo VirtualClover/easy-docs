@@ -6,6 +6,7 @@ import Quote from '@editorjs/quote';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Alert from 'editorjs-alert';
+import Code from '@editorjs/code';
 
 /**
  * The base editor config
@@ -59,5 +60,9 @@ export const EDITOR_TOOLS = {
       defaultType: 'info',
       messagePlaceholder: 'Enter a message!',
     },
+  },
+  code: {
+    class: Code,
+    placeholder: 'Add your code snippet here!',
   },
 };

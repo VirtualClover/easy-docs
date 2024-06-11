@@ -87,6 +87,10 @@ export const BASE_FILE_DATA = {
     contentProp: '',
     typeProp: { key: '', variables: [] },
   },
+  code: {
+    id: '',
+    contentProp: '',
+  },
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 

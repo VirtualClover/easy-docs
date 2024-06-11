@@ -56,6 +56,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       quoteNode.fontName = { family: 'Inter', style: 'Medium Italic' };
       quoteNode.fontSize = 36;
       quoteNode.characters = 'Quote';
+      innerWrapper.name = 'innerWrapper';
       setNodeFills(
         quoteNode,
         DEFAULT_SETTINGS.customization.palette.onBackground.high

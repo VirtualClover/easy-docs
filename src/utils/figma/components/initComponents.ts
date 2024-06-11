@@ -1,6 +1,7 @@
 import { BaseFileData } from '../../constants';
 import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
+import { createCodeComponent } from './codeComponent.figma';
 import { createDisplayFrameComponent } from './displayFrameComponent.figma';
 import { createDosAndDontsComponent } from './dosAndDontsComponent.figma';
 import { createHeaderComponent } from './headerComponent.figma';
@@ -60,6 +61,7 @@ export async function initComponents(
     createListComponent(frame),
     createTableCellComponent(frame),
     createAlertComponent(frame),
+    createCodeComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
@@ -70,6 +72,7 @@ export async function initComponents(
     let list = values[6];
     let tableCell = values[7];
     let alert = values[8];
+    let code = values[9];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
@@ -79,6 +82,7 @@ export async function initComponents(
     componentData.list = list;
     componentData.tableCell = tableCell;
     componentData.alert = alert;
+    componentData.code = code;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',
