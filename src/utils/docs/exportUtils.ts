@@ -1,13 +1,9 @@
-import {
-  BlockData,
-  DEFAULT_SETTINGS,
-  ExportFileFormat,
-  PageData,
-} from '../constants';
+import { DEFAULT_SETTINGS, ExportFileFormat, PageData } from '../constants';
 import {
   decideEmojiBasedOnDosAndDonts,
+  decideEmojiBasedOnStatus,
   mapDosAndDontsToStatus,
-} from '../general/mapDosAndDontsToStatus';
+} from '../general/statusAssetsUtils';
 
 import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateFigmaURL } from '../general/urlHandlers';
@@ -120,7 +116,11 @@ export function generateMarkdownPage(data: PageData): string {
         markdown.push(`${convertFlavoredText(block.data.text)}`);
         break;
       case 'quote':
-        markdown.push(`> ${block.data.text}  \n> ${block.data.caption}`);
+        markdown.push(
+          `> ${block.data.text}${
+            block.data.caption ? `  \n> ${block.data.caption}` : ``
+          }  \n`
+        );
         break;
       case 'displayFrame':
         if (block.data.fileId && block.data.frameId) {
@@ -184,6 +184,11 @@ export function generateMarkdownPage(data: PageData): string {
         if (block.data.content.length) {
           markdown.push(generateMDTable(block.data));
         }
+        break;
+      case 'alert':
+        markdown.push(
+          `> ${decideEmojiBasedOnStatus(block.data.type)} ${block.data.message}  \n`
+        );
         break;
       default:
         break;
@@ -276,17 +281,17 @@ export function generateHTMLPage(data: PageData): string {
       case 'quote':
         html.push(
           `${addIndetation(
-            1
+            3
           )}<figure class="${classPrefix}quote">\n${addIndetation(
-            2
-          )}<blockquote>\n${addIndetation(3)}${
+            4
+          )}<blockquote>\n${addIndetation(5)}${
             block.data.text
-          }\n${addIndetation(4)}</blockquote>\n${
+          }\n${addIndetation(6)}</blockquote>\n${
             block.data.caption &&
-            `${addIndetation(4)}<figcaption>\n${addIndetation(5)}${
+            `${addIndetation(6)}<figcaption>\n${addIndetation(5)}${
               block.data.caption
-            }\n${addIndetation(4)}</figcaption>\n`
-          }${addIndetation(3)}</figure>`
+            }\n${addIndetation(6)}</figcaption>\n`
+          }${addIndetation(5)}</figure>`
         );
         break;
       case 'displayFrame':
@@ -348,6 +353,17 @@ export function generateHTMLPage(data: PageData): string {
         break;
       case 'table':
         html.push(generateHTMLTable(block.data, 3));
+        break;
+      case 'alert':
+        html.push(
+          `${addIndetation(
+            3
+          )}<div class="${classPrefix}alert ${classPrefix}alert-${
+            block.data.type
+          }"><b class="${classPrefix}alert-icon">${decideEmojiBasedOnStatus(
+            block.data.type
+          )} </b><span>${block.data.message}</span></div>`
+        );
         break;
       default:
         break;

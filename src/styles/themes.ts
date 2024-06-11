@@ -42,6 +42,26 @@ export const lightTheme = createTheme({
       paper: BASE_STYLE_TOKENS.palette.surface,
     },
     divider: BASE_STYLE_TOKENS.palette.divider.simple,
+    success: {
+      light: BASE_STYLE_TOKENS.palette.status.success.muted,
+      main: BASE_STYLE_TOKENS.palette.status.success.default,
+      contrastText: BASE_STYLE_TOKENS.palette.status.success.content,
+    },
+    info: {
+      light: BASE_STYLE_TOKENS.palette.status.info.muted,
+      main: BASE_STYLE_TOKENS.palette.status.info.default,
+      contrastText: BASE_STYLE_TOKENS.palette.status.info.content,
+    },
+    warning: {
+      light: BASE_STYLE_TOKENS.palette.status.warning.muted,
+      main: BASE_STYLE_TOKENS.palette.status.warning.default,
+      contrastText: BASE_STYLE_TOKENS.palette.status.warning.content,
+    },
+    error: {
+      light: BASE_STYLE_TOKENS.palette.status.error.muted,
+      main: BASE_STYLE_TOKENS.palette.status.error.default,
+      contrastText: BASE_STYLE_TOKENS.palette.status.error.content,
+    },
   },
   ...baseTheme,
 });

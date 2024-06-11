@@ -30,13 +30,14 @@ export const PluginContainer = styled(Container, {
       height: 'auto',
     },
 
-    '& .tc-table--heading .tc-row:first-of-type, .tc-table--heading .tc-row:first-of-type [contenteditable]:empty:before': {
-      color: theme.palette.text.primary
-    },
+    '& .tc-table--heading .tc-row:first-of-type, .tc-table--heading .tc-row:first-of-type [contenteditable]:empty:before':
+      {
+        color: theme.palette.text.primary,
+      },
 
     '& .tc-table--heading .tc-row:nth-of-type(odd)': {
       background: theme.palette.background.paper,
-    }
+    },
 
     //      color: theme.palette.text.primary
   },
@@ -92,5 +93,30 @@ export const PluginContainer = styled(Container, {
     '&:hover': {
       background: theme.palette.background.paper,
     },
+  },
+
+  '.cdx-alert-info': {
+    background: theme.palette.info.light,
+    border: 0,
+    borderLeft: `8px solid ${theme.palette.info.main}`,
+    color: theme.palette.info.contrastText,
+  },
+  '.cdx-alert-success': {
+    background: theme.palette.success.light,
+    border: 0,
+    borderLeft: `8px solid ${theme.palette.success.main}`,
+    color: theme.palette.success.contrastText,
+  },
+  '.cdx-alert-warning': {
+    background: theme.palette.warning.light,
+    border: 0,
+    borderLeft: `8px solid ${theme.palette.warning.main}`,
+    color: theme.palette.warning.contrastText,
+  },
+  '.cdx-alert-danger': {
+    background: theme.palette.error.light,
+    border: 0,
+    borderLeft: `8px solid ${theme.palette.error.main}`,
+    color: theme.palette.error.contrastText,
   },
 }));

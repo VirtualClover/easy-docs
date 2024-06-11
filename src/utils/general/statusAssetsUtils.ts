@@ -1,4 +1,4 @@
-import { GuidelineType } from '../constants';
+import { GuidelineType, StatusType } from '../constants';
 export const mapDosAndDontsToStatus = (type: GuidelineType): string => {
   switch (type) {
     case 'do':
@@ -29,6 +29,26 @@ export const decideEmojiBasedOnDosAndDonts = (type: GuidelineType): string => {
       break;
     default:
       return '✅';
+      break;
+  }
+};
+
+export const decideEmojiBasedOnStatus = (type: StatusType): string => {
+  switch (type) {
+    case 'success':
+      return '✅';
+      break;
+    case 'danger':
+      return '❌';
+      break;
+    case 'warning':
+      return '⚠';
+      break;
+    case 'info':
+      return 'ℹ';
+      break;
+    default:
+      return 'ℹ';
       break;
   }
 };

@@ -5,10 +5,14 @@ import {
   PageData,
   PluginSettings,
 } from '../constants';
-import { getFlavoredTextTags, matchFlavoredText } from '../general/flavoredText';
+import {
+  getFlavoredTextTags,
+  matchFlavoredText,
+} from '../general/flavoredText';
 
 import { createDocFrame } from '../figma/createDocFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
+import { generateAlertInstance } from '../figma/components/AlertComponent.figma';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent.figma';
 import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
@@ -79,9 +83,9 @@ async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
           lastEditedKey
         )
           ? parseInt(
-            figmaNode.getSharedPluginData(FIGMA_NAMESPACE, lastEditedKey),
-            10
-          )
+              figmaNode.getSharedPluginData(FIGMA_NAMESPACE, lastEditedKey),
+              10
+            )
           : 0;
 
         if (nodeLastEdited != block.lastEdited) {
@@ -103,7 +107,6 @@ async function generateBlockInstanceFromJSON(
   frame: FrameNode,
   indexInFrame: number
 ) {
-  
   let node: InstanceNode | FrameNode;
   switch (block.type) {
     case 'header':
@@ -151,6 +154,13 @@ async function generateBlockInstanceFromJSON(
       break;
     case 'table':
       await generateTableInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
+      break;
+    case 'alert':
+      await generateAlertInstance(block.data).then((n) => {
         if (n) {
           node = n;
         }
