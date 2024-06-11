@@ -6,10 +6,6 @@ import {
   FIGMA_NAMESPACE,
   PageData,
 } from '../constants';
-import {
-  getDetailsFromFigmaURL,
-  validateFigmaURL,
-} from '../general/urlHandlers';
 
 import { encodeStringForHTML } from '../general/cleanseTextData';
 import { formatPageData } from './formatPageData';
@@ -187,7 +183,6 @@ async function generatePageDataFromFrame(
                 editedDate,
                 childNode.id
               ).then((data) => {
-                console.log(data);
                 pageData.blocks.push(data);
               });
 

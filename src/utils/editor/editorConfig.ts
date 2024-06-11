@@ -5,6 +5,7 @@ import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
+import Alert from 'editorjs-alert';
 
 /**
  * The base editor config
@@ -48,6 +49,15 @@ export const EDITOR_TOOLS = {
     config: {
       rows: 1,
       cols: 1,
+    },
+  },
+  alert: {
+    class: Alert,
+    inlineToolbar: false,
+    config: {
+      alertTypes: ['info', 'success', 'warning', 'danger'],
+      defaultType: 'info',
+      messagePlaceholder: 'Enter a message!',
     },
   },
 };
