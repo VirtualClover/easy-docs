@@ -3,6 +3,7 @@ import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
 import { createCodeComponent } from './codeComponent.figma';
 import { createDisplayFrameComponent } from './displayFrameComponent.figma';
+import { createDividerComponent } from './dividerComponent.figma';
 import { createDosAndDontsComponent } from './dosAndDontsComponent.figma';
 import { createHeaderComponent } from './headerComponent.figma';
 import { createListComponent } from './listComponent.figma';
@@ -62,6 +63,7 @@ export async function initComponents(
     createTableCellComponent(frame),
     createAlertComponent(frame),
     createCodeComponent(frame),
+    createDividerComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
@@ -73,6 +75,7 @@ export async function initComponents(
     let tableCell = values[7];
     let alert = values[8];
     let code = values[9];
+    let divider = values[10];
     componentData.header = header;
     componentData.paragraph = paragraph;
     componentData.quote = quote;
@@ -83,6 +86,7 @@ export async function initComponents(
     componentData.tableCell = tableCell;
     componentData.alert = alert;
     componentData.code = code;
+    componentData.divider = divider;
     componentData.componentsPage.id = page.id;
     figma.root.setSharedPluginData(
       'EasyDocs',

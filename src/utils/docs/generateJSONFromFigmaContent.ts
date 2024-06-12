@@ -12,6 +12,7 @@ import { formatPageData } from './formatPageData';
 import { generateBlockDataFromAlert } from '../figma/components/AlertComponent.figma';
 import { generateBlockDataFromCode } from '../figma/components/codeComponent.figma';
 import { generateBlockDataFromDisplayFrame } from '../figma/components/displayFrameComponent.figma';
+import { generateBlockDataFromDivider } from '../figma/components/dividerComponent.figma';
 import { generateBlockDataFromDosAndDonts } from '../figma/components/dosAndDontsComponent.figma';
 import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
 import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
@@ -151,6 +152,11 @@ async function generatePageDataFromFrame(
               childNode.id
             ).then((data) => pageData.blocks.push(data));
             break;
+          case componentData.divider.id:
+            generateBlockDataFromDivider(editedDate, childNode.id).then(
+              (data) => pageData.blocks.push(data)
+            );
+            break;
 
           default:
             break;
@@ -173,7 +179,7 @@ async function generatePageDataFromFrame(
 
           switch (mainCompId) {
             case componentData.displayFrame.id:
-              generateBlockDataFromDisplayFrame(
+              await generateBlockDataFromDisplayFrame(
                 instInsideAFrame,
                 componentData,
                 editedDate,
@@ -183,7 +189,7 @@ async function generatePageDataFromFrame(
               });
               break;
             case componentData.dosAndDonts.id:
-              generateBlockDataFromDosAndDonts(
+              await generateBlockDataFromDosAndDonts(
                 instInsideAFrame,
                 componentData,
                 editedDate,

@@ -97,9 +97,8 @@ export async function generateBlockDataFromCode(
     lastEdited,
     figmaNodeId,
     data: {
-      code: encodeStringForHTML(
-        node.componentProperties[componentData.code.contentProp].value as string
-      ),
+      code: node.componentProperties[componentData.code.contentProp]
+        .value as string,
     },
   };
 }

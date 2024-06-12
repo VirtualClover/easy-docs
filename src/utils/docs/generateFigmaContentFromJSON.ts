@@ -15,6 +15,7 @@ import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateAlertInstance } from '../figma/components/AlertComponent.figma';
 import { generateCodeInstance } from '../figma/components/codeComponent.figma';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent.figma';
+import { generateDividerInstance } from '../figma/components/dividerComponent.figma';
 import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
 import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
 import { generateListInstance } from '../figma/components/listComponent.figma';
@@ -167,8 +168,15 @@ async function generateBlockInstanceFromJSON(
         }
       });
       break;
-      case 'code':
+    case 'code':
       await generateCodeInstance(block.data).then((n) => {
+        if (n) {
+          node = n;
+        }
+      });
+      break;
+    case 'divider':
+      await generateDividerInstance().then((n) => {
         if (n) {
           node = n;
         }

@@ -4,8 +4,11 @@ import {
   decideEmojiBasedOnStatus,
   mapDosAndDontsToStatus,
 } from '../general/statusAssetsUtils';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../general/cleanseTextData';
 
-import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateFigmaURL } from '../general/urlHandlers';
 import { getURLFromAnchor } from '../general/flavoredText';
 
@@ -194,6 +197,9 @@ export function generateMarkdownPage(data: PageData): string {
         break;
       case 'code':
         markdown.push(`${'```'}  \n${block.data.code}  \n${'```'}`);
+        break;
+      case 'divider':
+        markdown.push('---');
         break;
       default:
         break;
@@ -385,9 +391,15 @@ export function generateHTMLPage(data: PageData): string {
         html.push(
           `${addIndetation(3)}<pre class=${classPrefix}code>\n${addIndetation(
             4
-          )}<code>\n${indentCodeBlock(block.data.code, 5)}\n${addIndetation(
-            4
-          )}</code>\n${addIndetation(3)}</pre>`
+          )}<code>\n${indentCodeBlock(
+            encodeStringForHTML(block.data.code),
+            5
+          )}\n${addIndetation(4)}</code>\n${addIndetation(3)}</pre>`
+        );
+        break;
+      case 'divider':
+        html.push(
+          `${addIndetation(3)}<div class="${classPrefix}divider"><hr /></div>`
         );
         break;
       default:

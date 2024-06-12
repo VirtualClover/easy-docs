@@ -1,4 +1,5 @@
-import { Divider as DividerComp, styled } from '@mui/material';
+import { Divider as DividerComp, ThemeProvider, styled } from '@mui/material';
+import { darkTheme, lightTheme } from '../../../styles/themes';
 
 import { DEFAULT_SETTINGS } from '../../constants';
 import React from 'react';
@@ -11,15 +12,23 @@ import { dividerIcon } from '../../../assets/svgs';
 interface ComponentProps {}
 
 let BlockWrapper = styled('div')(({ theme }) => ({
-  margin: `${32} ${0}`,
+  padding: `16px 0 32px 0`,
   width: '100%',
   borderRadius: 4,
+}));
+
+let StyledDivider = styled(DividerComp)(({ theme }) => ({
+  marginLeft: 0,
+  marginRight: 0,
+  borderWidth: 1,
+  borderColor: theme.palette.divider,
+  width: '100%',
 }));
 
 const InputUI = (blockData: ComponentProps) => {
   return (
     <BlockWrapper>
-      <DividerComp variant="middle" />
+      <StyledDivider variant="middle" />
     </BlockWrapper>
   );
 };
@@ -40,9 +49,14 @@ export class Divider {
   }
 
   render() {
+    const themeMode = document.documentElement.className;
     let ui = document.createElement('div');
     let root = createRoot(ui);
-    root.render(<InputUI {...this.data} />);
+    root.render(
+      <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
+        <InputUI {...this.data} />
+      </ThemeProvider>
+    );
     //console.log('render');
     ui.classList.add('divider');
 
