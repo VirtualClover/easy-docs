@@ -1,5 +1,6 @@
 import { DisplayFrame } from './customTools/displayFrame';
 import { DosAndDonts } from './customTools/dosAndDonts';
+import { Divider } from './customTools/divider';
 import Header from '@editorjs/header';
 import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
@@ -64,5 +65,8 @@ export const EDITOR_TOOLS = {
   code: {
     class: Code,
     placeholder: 'Add your code snippet here!',
+  },
+  divider: {
+    class: <any>Divider,
   },
 };
