@@ -9,6 +9,8 @@ import {
   encodeStringForHTML,
 } from '../general/cleanseTextData';
 
+import { BASE_STYLE_TOKENS } from '../../styles/base';
+import { generateBaseExportStyles } from '../../styles/generateBaseExportStyles';
 import { generateFigmaURL } from '../general/urlHandlers';
 import { getURLFromAnchor } from '../general/flavoredText';
 
@@ -278,7 +280,10 @@ export function generateHTMLPage(data: PageData): string {
   html.push('<html>');
   let htmlHeadData = `${addIndetation(1)}<head><title>${
     data.title
-  }</title></head>`;
+  }</title>\n${generateBaseExportStyles(
+    BASE_STYLE_TOKENS.fontFamily,
+    BASE_STYLE_TOKENS.palette
+  )}\n</head>`;
   html.push(htmlHeadData);
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
   html.push(`${addIndetation(1)}<body>`);
