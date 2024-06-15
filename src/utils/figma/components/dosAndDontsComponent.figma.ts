@@ -356,3 +356,29 @@ export async function generateBlockDataFromDosAndDonts(
   }
   return blockData;
 }
+
+export async function hydrateDosAndDontsFrame(
+  instance: InstanceNode,
+  parentFrame: FrameNode,
+  indexInFrame: number,
+  componentData: BaseFileData
+) {
+  let block;
+  await generateBlockDataFromDosAndDonts(
+    instance,
+    componentData,
+    Date.now(),
+    instance.id
+  ).then((d: any) => {
+    block = d;
+    generateDosAndDontsInstance(block.data).then((n) => {
+      parentFrame.insertChild(indexInFrame, n);
+      n.layoutSizingHorizontal = 'FILL';
+      let dehydratedNode = parentFrame.children[indexInFrame + 1];
+      dehydratedNode.remove();
+      block.data.figmaNodeId = n.id;
+      block.data.frameExistsInFile = true;
+    });
+  });
+  return block;
+}

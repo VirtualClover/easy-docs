@@ -6,14 +6,21 @@ import {
   FIGMA_NAMESPACE,
   PageData,
 } from '../constants';
+import {
+  generateBlockDataFromDisplayFrame,
+  hydrateDisplayFrame,
+} from '../figma/components/displayFrameComponent.figma';
+import {
+  generateBlockDataFromDosAndDonts,
+  generateDosAndDontsInstance,
+  hydrateDosAndDontsFrame,
+} from '../figma/components/dosAndDontsComponent.figma';
 
 import { encodeStringForHTML } from '../general/cleanseTextData';
 import { formatPageData } from './formatPageData';
 import { generateBlockDataFromAlert } from '../figma/components/AlertComponent.figma';
 import { generateBlockDataFromCode } from '../figma/components/codeComponent.figma';
-import { generateBlockDataFromDisplayFrame } from '../figma/components/displayFrameComponent.figma';
 import { generateBlockDataFromDivider } from '../figma/components/dividerComponent.figma';
-import { generateBlockDataFromDosAndDonts } from '../figma/components/dosAndDontsComponent.figma';
 import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
 import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
 import { generateBlockDataFromParagraph } from '../figma/components/paragraphComponent.figma';
@@ -157,6 +164,21 @@ async function generatePageDataFromFrame(
               (data) => pageData.blocks.push(data)
             );
             break;
+          case componentData.dosAndDonts.id:
+            //Probably a dehydrated frame
+            await hydrateDosAndDontsFrame(
+              childNode,
+              frame,
+              i,
+              componentData
+            ).then((data) => pageData.blocks.push(data));
+            break;
+          case componentData.displayFrame.id:
+            //Probably a dehydrated frame
+            await hydrateDisplayFrame(childNode, frame, i, componentData).then(
+              (data) => pageData.blocks.push(data)
+            );
+            break;
 
           default:
             break;
@@ -165,6 +187,7 @@ async function generatePageDataFromFrame(
       else if (childNode.type == 'FRAME') {
         let instInsideAFrame: InstanceNode = scanInsideAFrame(childNode);
         let mainCompId: string;
+
         if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
           await getMainCompIdFromInstance(instInsideAFrame).then(
             (id) => (mainCompId = id)
@@ -194,9 +217,7 @@ async function generatePageDataFromFrame(
                 componentData,
                 editedDate,
                 childNode.id
-              ).then((data) => {
-                pageData.blocks.push(data);
-              });
+              ).then((data) => pageData.blocks.push(data));
 
               break;
             case componentData.tableCell.id:

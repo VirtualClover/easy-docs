@@ -257,7 +257,7 @@ export async function generateBlockDataFromDisplayFrame(
   };
   if (validateFigmaURL(url as string)) {
     frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
-    
+
     await figma
       .getNodeByIdAsync(frameDetails.frameId)
       .then((node) => {
@@ -281,4 +281,30 @@ export async function generateBlockDataFromDisplayFrame(
       .catch((e) => console.error(e));
   }
   return blockData;
+}
+
+export async function hydrateDisplayFrame(
+  instance: InstanceNode,
+  parentFrame: FrameNode,
+  indexInFrame: number,
+  componentData: BaseFileData
+) {
+  let block;
+  await generateBlockDataFromDisplayFrame(
+    instance,
+    componentData,
+    Date.now(),
+    instance.id
+  ).then((d: any) => {
+    block = d;
+    generateDisplayFrameInstance(block.data).then((n) => {
+      parentFrame.insertChild(indexInFrame, n);
+      n.layoutSizingHorizontal = 'FILL';
+      let dehydratedNode = parentFrame.children[indexInFrame + 1];
+      dehydratedNode.remove();
+      block.data.figmaNodeId = n.id;
+      block.data.frameExistsInFile = true;
+    });
+  });
+  return block;
 }
