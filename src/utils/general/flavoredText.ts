@@ -1,5 +1,6 @@
 import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
 
+import { StringFormats } from '../constants';
 import { setRangeNodeFills } from '../figma/setNodeFills';
 
 export let matchFlavoredText = (string: string) => {
@@ -21,7 +22,7 @@ export let matchFlavoredText = (string: string) => {
 
 export let getURLFromAnchor = (
   string: string,
-  type: 'figma' | 'html' = 'figma'
+  type: StringFormats = 'figma'
 ) => {
   if (type == 'figma') {
     let matches = string.match(
@@ -35,7 +36,7 @@ export let getURLFromAnchor = (
   }
 };
 
-export let getFlavoredTextTags = (matchedString: string) => {
+export let getFlavoredTextTags = (matchedString: string): string => {
   return matchedString.match(/\<(.*?)(\>| )/i)[1];
 };
 
@@ -144,7 +145,7 @@ export let setFlavoredTextOnFigmaNode = async (
 export let setFlavoredTextOnEncodedString = (
   node: TextNode | InstanceNode,
   customTextContent?: string
-) => {
+): string => {
   let textNode: TextNode;
   if (node.type === 'INSTANCE') {
     textNode = node.findOne((n) => n.type == 'TEXT') as TextNode;

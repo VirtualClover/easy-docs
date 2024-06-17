@@ -14,6 +14,8 @@ export const ENCODED_CHARS = {
 
 export type ChangesPlatform = 'figma' | 'editor';
 
+export type StringFormats = 'figma' | 'html';
+
 export const EMPTY_USER_AUTHOR_DATA = {
   id: '',
   name: '',
