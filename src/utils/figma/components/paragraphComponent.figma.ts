@@ -79,12 +79,15 @@ export async function generateBlockDataFromParagraph(
   figmaNodeId?: string
 ): Promise<BlockData> {
   let content = setFlavoredTextOnEncodedString(node);
+  console.log(content);
+  let formattedContet = encodeStringForHTML(content);
+  console.log(formattedContet);
   return {
     type: 'paragraph',
     lastEdited,
     figmaNodeId,
     data: {
-      text: encodeStringForHTML(content),
+      text: formattedContet,
     },
   };
 }

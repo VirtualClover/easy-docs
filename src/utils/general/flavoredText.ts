@@ -66,20 +66,19 @@ export let setFlavoredTextOnFigmaNode = async (
         textNode = node;
       }
       let globalOffset = 0;
+      let charDeletions = [];
       flavoredMatches.forEach((match) => {
         //console.log('start wo offset ' + match.index);
         //console.log('start w offset ' + match.index);
-        let start = match.index + globalOffset;
+        let start = match.index;
         //console.log(string);
         //console.log(match);
         //console.log(match.index);
         //console.log(start);
-        let end = match.index + match[0].length + globalOffset;
+        let end = match.index + match[0].length;
         let currentStartOffset = 7;
         let currentCloseOffset = 8;
         let currentTotalOffset = currentCloseOffset + currentStartOffset;
-        let startPlusCurrentStartOffset =
-          start + currentStartOffset >= 0 ? start + currentStartOffset : 0;
         //console.log('end wo offset ' + match.index + match[0].length);
         //console.log('end w offset ' + end);
         let tag = match[1];
@@ -89,27 +88,32 @@ export let setFlavoredTextOnFigmaNode = async (
               family: DEFAULT_FONT_FAMILIES[0],
               style: 'Bold',
             });
-
-            globalOffset -= currentStartOffset;
-            textNode.deleteCharacters(start, start + currentStartOffset);
-            textNode.deleteCharacters(
+            charDeletions.push({ start, end: start + currentStartOffset });
+            //textNode.deleteCharacters(start, start + currentStartOffset);
+            charDeletions.push({
+              start: end - currentCloseOffset,
+              end: end,
+            });
+            /*textNode.deleteCharacters(
               end - currentTotalOffset,
               end - currentStartOffset
-            );
-            globalOffset -= currentCloseOffset;
+            );*/
             break;
           case 'i':
             textNode.setRangeFontName(start, end, {
               family: DEFAULT_FONT_FAMILIES[0],
               style: 'Italic',
             });
-            globalOffset -= currentStartOffset;
-            textNode.deleteCharacters(start, start + currentStartOffset);
-            textNode.deleteCharacters(
+            charDeletions.push({ start, end: start + currentStartOffset });
+            //textNode.deleteCharacters(start, start + currentStartOffset);
+            charDeletions.push({
+              start: end - currentCloseOffset,
+              end: end,
+            });
+            /*textNode.deleteCharacters(
               end - currentTotalOffset,
               end - currentStartOffset
-            );
-            globalOffset -= currentCloseOffset;
+            );*/
             break;
           case 'a':
             let tagMatch = getURLFromAnchor(match[0]);
@@ -126,18 +130,44 @@ export let setFlavoredTextOnFigmaNode = async (
               end,
               BASE_STYLE_TOKENS.palette.onBackground.link
             );
-            globalOffset -= currentStartOffset;
-            textNode.deleteCharacters(start, start + currentStartOffset);
-            textNode.deleteCharacters(
+            charDeletions.push({ start, end: start + currentStartOffset });
+            //textNode.deleteCharacters(start, start + currentStartOffset);
+            charDeletions.push({
+              start: end - currentCloseOffset,
+              end: end,
+            });
+            /*textNode.deleteCharacters(
               end - currentTotalOffset,
               end - currentStartOffset
-            );
-            globalOffset -= currentCloseOffset;
+            );*/
             break;
           default:
             break;
         }
       });
+      console.log(charDeletions);
+      charDeletions.sort((a, b) => a.start - b.start);
+      console.log(textNode.characters);
+      charDeletions.forEach((range, i) => {
+        let adjustedRange = {
+          start:
+            range.start - globalOffset < 0 ? 0 : range.start - globalOffset,
+          end:
+            range.end - globalOffset > textNode.characters.length - 1
+              ? textNode.characters.length
+              : range.end - globalOffset,
+        };
+        let rangeCount = range.end - range.start;
+        console.log(globalOffset);
+
+        console.log(`${i}: ${rangeCount}`);
+        console.log(range);
+        console.log(adjustedRange);
+
+        textNode.deleteCharacters(adjustedRange.start, adjustedRange.end);
+        globalOffset += rangeCount;
+      });
+      console.log(textNode.characters);
     });
   }
 };
@@ -159,43 +189,41 @@ export let setFlavoredTextOnEncodedString = (
     'hyperlink',
   ]);
   let globalOffset = 0;
+  console.log(flavoredStyles);
   for (let i = 0; i < flavoredStyles.length; i++) {
     let style = flavoredStyles[i];
     //console.log(style);
     let currentStart = style.start + globalOffset;
     let currentEnd = style.end + globalOffset;
+    let openingTags = '';
+    let closeTags = '';
     if (style.fontName.style == 'Bold') {
-      textContent =
-        textContent.slice(0, currentStart) +
-        '[[[b]]]' +
-        textContent.slice(currentStart, currentEnd) +
-        '[[[/b]]]' +
-        textContent.slice(currentEnd);
+      openingTags = openingTags + '[[[b]]]';
+      closeTags = '[[[/b]]]' + closeTags;
       globalOffset += 15;
       //console.log('bold');
     }
     if (style.fontName.style == 'Italic') {
       //console.log('italic');
-      textContent =
-        textContent.slice(0, currentStart) +
-        '[[[i]]]' +
-        textContent.slice(currentStart, currentEnd) +
-        '[[[/i]]]' +
-        textContent.slice(currentEnd);
+      openingTags = openingTags + '[[[i]]]';
+      closeTags = '[[[/i]]]' + closeTags;
       globalOffset += 15;
     }
     if (style.hyperlink) {
       //console.log(textContent.slice(0, currentStart));
-      textContent =
-        textContent.slice(0, currentStart) +
-        `[[[a href="${style.hyperlink.value}"]]]` +
-        textContent.slice(currentStart, currentEnd) +
-        '[[[/a]]]' +
-        textContent.slice(currentEnd);
+      openingTags = openingTags + `[[[a href="${style.hyperlink.value}"]]]`;
+      closeTags = '[[[/a]]]' + closeTags;
       globalOffset += 23 + style.hyperlink.value.length;
       //console.log('link');
       //console.log(encodeStringForHTML(textContent));
     }
+
+    textContent =
+      textContent.slice(0, currentStart) +
+      openingTags +
+      textContent.slice(currentStart, currentEnd) +
+      closeTags +
+      textContent.slice(currentEnd);
   }
 
   return textContent;
