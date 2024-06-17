@@ -47,7 +47,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       );
       setNodeFills(
         innerWrapper,
-        DEFAULT_SETTINGS.customization.palette.status.neutral.muted
+        DEFAULT_SETTINGS.customization.palette.surface
       );
       component.appendChild(innerWrapper);
       innerWrapper.layoutSizingHorizontal = 'FILL';
@@ -59,7 +59,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       innerWrapper.name = 'innerWrapper';
       setNodeFills(
         quoteNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground.high
+        DEFAULT_SETTINGS.customization.palette.onSurface.high
       );
       innerWrapper.appendChild(quoteNode);
       quoteNode.layoutSizingHorizontal = 'FILL';
@@ -76,7 +76,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       authorNode.characters = '- Author';
       setNodeFills(
         authorNode,
-        DEFAULT_SETTINGS.customization.palette.status.neutral.content
+        DEFAULT_SETTINGS.customization.palette.onSurface.mid
       );
       innerWrapper.appendChild(authorNode);
       authorNode.layoutSizingHorizontal = 'FILL';

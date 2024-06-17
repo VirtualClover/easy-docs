@@ -18,14 +18,41 @@ export let generateBaseExportStyles = (
   styles.push(
     `pre{background-color: ${basePalette.surface}; color:${basePalette.onSurface.high}; border-radius:16px;}`
   );
-  styles.push(`.ed-figma-frame{margin:0;}`);
-  styles.push(`table {width:100%; border-radius: 30px; border-style: hidden; box-shadow: 0 0 0 1px ${basePalette.divider.simple}; border-radius:8px; border-collapse: collapse;}`);
-  styles.push(`th, td {border: 1px solid ${basePalette.divider.simple}; padding:8px;}`);
+  styles.push(`.ed-figma-frame{margin: 16px 0 48px 0;}`);
+  styles.push(`.ed-figma-frame figcaption{margin-top: 16px;}`);
+  styles.push(
+    `table {width:100%; border-radius: 30px; border-style: hidden; box-shadow: 0 0 0 1px ${basePalette.divider.simple}; border-radius:8px; border-collapse: collapse;}`
+  );
+  styles.push(
+    `th, td {border: 1px solid ${basePalette.divider.simple}; padding:8px;}`
+  );
   styles.push(
     `th {font-weight: 700; color: ${basePalette.onBackground.high}; background-color: ${basePalette.background.tonal_high}; text-align:left;}`
   );
   styles.push(
+    `.ed-quote {background: ${basePalette.surface}; margin: 16px 0; padding: 8px 8px 8px 16px; border-left: 12px solid ${basePalette.divider.simple}; border-radius: 8px;}`
+  );
+  styles.push(
+    `blockquote {margin: 8px 0; font-style: italic; font-size: 18px; color: ${basePalette.onSurface.high};}`
+  );
+  styles.push(`.ed-quote figcaption{color:${basePalette.onSurface.mid}}`);
+  styles.push(
     `tr:nth-of-type(odd) {background-color: ${basePalette.background.tonal_low};}`
+  );
+  styles.push(
+    `.ed-alert {padding: 16px 8px 16px 16px; border-radius: 8px; border-left:12px solid;}`
+  );
+  styles.push(
+    `.ed-alert-warning {background: ${basePalette.status.warning.muted}; color: ${basePalette.status.warning.content}; border-color: ${basePalette.status.warning.default};}`
+  );
+  styles.push(
+    `.ed-alert-info {background: ${basePalette.status.info.muted}; color: ${basePalette.status.info.content}; border-color: ${basePalette.status.info.default};}`
+  );
+  styles.push(
+    `.ed-alert-success {background: ${basePalette.status.success.muted}; color: ${basePalette.status.success.content}; border-color: ${basePalette.status.success.default}}`
+  );
+  styles.push(
+    `.ed-alert-danger {background: ${basePalette.status.error.muted}; color: ${basePalette.status.error.content}; border-color: ${basePalette.status.error.default}}`
   );
   styles.push('</style>');
 

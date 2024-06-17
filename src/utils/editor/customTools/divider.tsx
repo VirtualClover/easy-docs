@@ -12,7 +12,7 @@ import { dividerIcon } from '../../../assets/svgs';
 interface ComponentProps {}
 
 let BlockWrapper = styled('div')(({ theme }) => ({
-  padding: `16px 0 32px 0`,
+  padding: `16px 0`,
   width: '100%',
   borderRadius: 4,
 }));

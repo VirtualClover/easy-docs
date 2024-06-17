@@ -14,6 +14,10 @@ export const PluginContainer = styled(Container, {
     fontWeight: 700,
   },
 
+  a: {
+    color: theme.palette.primary.main,
+  },
+
   '.ce-popover--opened': {
     maxHeight: '500px',
   },

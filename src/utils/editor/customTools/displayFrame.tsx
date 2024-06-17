@@ -31,7 +31,7 @@ let IFrame = styled('iframe')(({ theme }) => ({
 }));
 
 let BlockWrapper = styled('div')(({ theme }) => ({
-  margin: `${32} ${0}`,
+  margin: `24px ${0}`,
   width: '100%',
   borderRadius: 4,
   display: 'flex',
@@ -77,6 +77,7 @@ const InputUI = (blockData: ComponentProps) => {
               frameDetails.frameId,
               'embed'
             )}
+            loading="lazy"
           ></IFrame>
           <input
             className="cdx-input"
