@@ -61,27 +61,65 @@ let generateMDTableRow = (rowData: string[]): string => {
 
 let convertFlavoredText = (text: string) => {
   let globalOffset = 0;
-  let matches = [...text.matchAll(/<a[^>]*>([^<]+)<\/a>/g)];
-  if (matches.length) {
-    matches.forEach((match) => {
-      let url = getURLFromAnchor(match[0], 'html');
-      text =
-        text.slice(0, match.index + globalOffset) +
-        `[${match[1]}](${url.href})` +
-        text.slice(match.index + globalOffset + match[0].length);
-      globalOffset -= 11;
+  let regularMatches = [
+    ...text.matchAll(/(?<!<(b|i)>)<a[^>]*>([^<]+)<\/a>(?!<\/(b|i)>)/g),
+  ];
+  let arrRegularMatches = regularMatches.map((m) => {
+    return { match: m, type: 'r' };
+  });
+  let boldMatches = [...text.matchAll(/<b><a[^>]*>([^<]+)<\/a><\/b>/g)];
+  let arrBoldMatches = boldMatches.map((m) => {
+    return { match: m, type: 'b' };
+  });
+  let italicMatches = [...text.matchAll(/<i><a[^>]*>([^<]+)<\/a><\/i>/g)];
+  let arrItalicMatches = italicMatches.map((m) => {
+    return { match: m, type: 'i' };
+  });
 
-      console.log(match.index);
-      console.log(globalOffset);
-      console.log(match.index + globalOffset);
+  let matches = [...arrRegularMatches, ...arrItalicMatches, ...arrBoldMatches];
+  matches.sort((a, b) => a.match.index - b.match.index);
+
+  if (matches.length) {
+    matches.forEach((item) => {
+      let url = getURLFromAnchor(item.match[0], 'html');
+
+      switch (item.type) {
+        case 'r':
+          text =
+            text.slice(0, item.match.index + globalOffset) +
+            `[${item.match[2]}](${url.href})` +
+            text.slice(item.match.index + globalOffset + item.match[0].length);
+          globalOffset -= 11;
+          break;
+        case 'b':
+          text =
+            text.slice(0, item.match.index + globalOffset) +
+            `[**${item.match[1]}**](${url.href})` +
+            text.slice(item.match.index + globalOffset + item.match[0].length);
+          globalOffset -= 14;
+          break;
+        case 'i':
+          text =
+            text.slice(0, item.match.index + globalOffset) +
+            `[*${item.match[1]}*](${url.href})` +
+            text.slice(item.match.index + globalOffset + item.match[0].length);
+          globalOffset -= 16;
+          break;
+        default:
+          break;
+      }
     });
   }
-  console.log(matches);
 
-  text = text.replace(/<b>/g, '**');
-  text = text.replace(/<\/b>/g, '**');
-  text = text.replace(/<i>/g, '*');
-  text = text.replace(/<\/i>/g, '*');
+  text = text.replace(/<b>(?!\s)(?!\[([^\]]*)\]\(([^)]*)\))/g, '**');
+  text = text.replace(/(?<!\s)(?<!\[.*\]\(.*?\))<\/b>/g, '**');
+  text = text.replace(/<i>(?!\s)(?!\[([^\]]*)\]\(([^)]*)\))/g, '*');
+  text = text.replace(/(?<!\s)(?<!\[.*\]\(.*?\))<\/i>/g, '*');
+  text = text.replace(/<i>(\s)/g, '*&ensp;');
+  text = text.replace(/(\s)<\/i>/g, '&ensp;*');
+  text = text.replace(/<b>(\s)/g, '**&ensp;');
+  text = text.replace(/(\s)<\/b>/g, '&ensp;**');
+
 
   return text;
 };
@@ -201,7 +239,7 @@ export function generateMarkdownPage(data: PageData): string {
         markdown.push(`${'```'}  \n${block.data.code}  \n${'```'}`);
         break;
       case 'divider':
-        markdown.push('---');
+        markdown.push('\n---\n');
         break;
       default:
         break;
@@ -441,3 +479,31 @@ export function generatePageExport(
     console.error(`The data provided didn't have any content`);
   }
 }
+
+/*
+
+  if (boldMatches.length) {
+    regularMatches.forEach((match) => {
+      let url = getURLFromAnchor(match[0], 'html');
+      text =
+        text.slice(0, match.index + globalOffset) +
+        `[**${match[1]}**](${url.href})` +
+        text.slice(match.index + globalOffset + match[0].length);
+      globalOffset -= 15;
+    });
+  }
+  if (italicMatches.length) {
+    regularMatches.forEach((match) => {
+      let url = getURLFromAnchor(match[0], 'html');
+      text =
+        text.slice(0, match.index + globalOffset) +
+        `[*${match[1]}*](${url.href})` +
+        text.slice(match.index + globalOffset + match[0].length);
+      globalOffset -= 13;
+    });
+  }
+
+
+
+
+*/

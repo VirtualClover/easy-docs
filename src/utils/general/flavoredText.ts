@@ -145,9 +145,7 @@ export let setFlavoredTextOnFigmaNode = async (
             break;
         }
       });
-      console.log(charDeletions);
       charDeletions.sort((a, b) => a.start - b.start);
-      console.log(textNode.characters);
       charDeletions.forEach((range, i) => {
         let adjustedRange = {
           start:
@@ -158,16 +156,10 @@ export let setFlavoredTextOnFigmaNode = async (
               : range.end - globalOffset,
         };
         let rangeCount = range.end - range.start;
-        console.log(globalOffset);
-
-        console.log(`${i}: ${rangeCount}`);
-        console.log(range);
-        console.log(adjustedRange);
 
         textNode.deleteCharacters(adjustedRange.start, adjustedRange.end);
         globalOffset += rangeCount;
       });
-      console.log(textNode.characters);
     });
   }
 };
@@ -189,7 +181,6 @@ export let setFlavoredTextOnEncodedString = (
     'hyperlink',
   ]);
   let globalOffset = 0;
-  console.log(flavoredStyles);
   for (let i = 0; i < flavoredStyles.length; i++) {
     let style = flavoredStyles[i];
     //console.log(style);
