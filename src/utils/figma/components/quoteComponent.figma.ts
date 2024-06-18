@@ -7,10 +7,13 @@ import {
   decodeStringForFigma,
   encodeStringForHTML,
 } from '../../general/cleanseTextData';
+import {
+  setFlavoredTextOnEncodedString,
+  setFlavoredTextOnFigmaNode,
+} from '../../general/flavoredText';
 
 import { BaseFileData } from '../../constants';
 import { clone } from '../../clone';
-import { setFlavoredTextOnEncodedString } from '../../general/flavoredText';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -19,7 +22,7 @@ export async function createQuoteComponent(parent: FrameNode) {
   let contentProperty: string;
   let authorProperty: string;
   await figma
-    .loadFontAsync({ family: 'Inter', style: 'Medium Italic' })
+    .loadFontAsync({ family: 'Inter', style: 'Regular' })
     .then(() => {
       component = figma.createComponent();
       component.resizeWithoutConstraints(400, 20);
@@ -53,7 +56,7 @@ export async function createQuoteComponent(parent: FrameNode) {
       innerWrapper.layoutSizingHorizontal = 'FILL';
       //Quote
       let quoteNode = figma.createText();
-      quoteNode.fontName = { family: 'Inter', style: 'Medium Italic' };
+      quoteNode.fontName = { family: 'Inter', style: 'Regular' };
       quoteNode.fontSize = 36;
       quoteNode.characters = 'Quote';
       innerWrapper.name = 'innerWrapper';
@@ -103,14 +106,20 @@ export async function generateQuoteInstance(data): Promise<InstanceNode> {
   await figma.getNodeByIdAsync(componentData.quote.id).then((node) => {
     component = node;
   });
+
+  let quoteText = decodeStringForFigma(data.text, true);
+
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.quote.contentProp]: decodeStringForFigma(data.text),
+      [componentData.quote.contentProp]: quoteText,
     });
     instance.setProperties({
       [componentData.quote.authorProp]: decodeStringForFigma(data.caption),
     });
+
+    await setFlavoredTextOnFigmaNode(quoteText, instance);
+
     return instance;
     //instance.set
   }
@@ -123,15 +132,13 @@ export async function generateBlockDataFromQuote(
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
+  let quoteText = setFlavoredTextOnEncodedString(node);
   return {
     type: 'quote',
     lastEdited,
     figmaNodeId,
     data: {
-      text: encodeStringForHTML(
-        node.componentProperties[componentData.quote.contentProp]
-          .value as string
-      ),
+      text: encodeStringForHTML(quoteText),
       caption: encodeStringForHTML(
         node.componentProperties[componentData.quote.authorProp].value as string
       ),

@@ -175,7 +175,7 @@ export async function generateMarkdownPage(data: PageData): Promise<string> {
         break;
       case 'quote':
         markdown.push(
-          `> ${block.data.text}${
+          `> ${convertFlavoredText(block.data.text)}${
             block.data.caption ? `  \n> ${block.data.caption}` : ``
           }  \n`
         );

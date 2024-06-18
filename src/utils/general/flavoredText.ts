@@ -45,6 +45,8 @@ export let setFlavoredTextOnFigmaNode = async (
   node: TextNode | InstanceNode
 ) => {
   let flavoredMatches = matchFlavoredText(string);
+  console.log(flavoredMatches);
+  
   if (flavoredMatches.length) {
     await Promise.all([
       figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }),
