@@ -52,7 +52,7 @@ let generateIFrame = (
 let generateMDTableRow = (rowData: string[]): string => {
   let mdRow = [];
   for (let i = 0; i < rowData.length; i++) {
-    const cell = rowData[i];
+    const cell = convertFlavoredText(rowData[i]);
     mdRow.push(`${i == 0 ? '|' : ' '}${cell}|`);
   }
 

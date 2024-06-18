@@ -5,9 +5,16 @@ import {
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants';
+import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
+import {
+  setFlavoredTextOnEncodedString,
+  setFlavoredTextOnFigmaNode,
+} from '../../general/flavoredText';
 
 import { clone } from '../../clone';
-import { encodeStringForHTML } from '../../general/cleanseTextData';
 import { isOdd } from '../../general/isOdd';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
@@ -161,7 +168,7 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
         const row = data.content[i];
         let rowWrapper = await generateTableRow(i);
         for (let ci = 0; ci < row.length; ci++) {
-          const cellContent = row[ci];
+          const cellContent = decodeStringForFigma(row[ci],true);
           let cellInstance = component.createInstance();
 
           cellInstance.setProperties({
@@ -169,6 +176,9 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
             [componentData.tableCell.typeProp.key]:
               data.withHeadings && i == 0 ? 'header' : 'body',
           });
+
+          await setFlavoredTextOnFigmaNode(cellContent, cellInstance);
+
           rowWrapper.appendChild(cellInstance);
           cellInstance.layoutSizingHorizontal = 'FILL';
         }
@@ -231,13 +241,8 @@ export async function generateBlockDataFromTable(
                   cell.componentProperties[componentData.tableCell.typeProp.key]
                     .value == 'header';
               }
-
-              tempRowContent.push(
-                encodeStringForHTML(
-                  cell.componentProperties[componentData.tableCell.contentProp]
-                    .value as string
-                )
-              );
+              let cellContent = setFlavoredTextOnEncodedString(cell);
+              tempRowContent.push(encodeStringForHTML(cellContent));
             }
           });
         }
