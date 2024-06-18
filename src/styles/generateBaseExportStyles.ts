@@ -21,7 +21,7 @@ export let generateBaseExportStyles = (
   styles.push(`.ed-figma-frame{margin: 16px 0 48px 0;}`);
   styles.push(`.ed-figma-frame figcaption{margin-top: 16px;}`);
   styles.push(
-    `table {width:100%; border-radius: 30px; border-style: hidden; box-shadow: 0 0 0 1px ${basePalette.divider.simple}; border-radius:8px; border-collapse: collapse;}`
+    `table {width:100%; border-radius: 30px; border-style: hidden; box-shadow: 0 0 0 1px ${basePalette.divider.simple}; border-radius:8px; border-collapse: collapse; margin: 32px 0;}`
   );
   styles.push(
     `th, td {border: 1px solid ${basePalette.divider.simple}; padding:8px;}`
@@ -54,6 +54,9 @@ export let generateBaseExportStyles = (
   styles.push(
     `.ed-alert-danger {background: ${basePalette.status.error.muted}; color: ${basePalette.status.error.content}; border-color: ${basePalette.status.error.default}}`
   );
+  styles.push(`.ed-text-center {text-align: center;}`);
+  styles.push(`.ed-text-left {text-align: left;}`);
+  styles.push(`.ed-text-right {text-align: right;}`);
   styles.push('</style>');
 
   return styles.join('');

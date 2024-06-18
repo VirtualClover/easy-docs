@@ -163,6 +163,13 @@ export async function generateAlertInstance(
       [componentData.alert.typeProp.key]: `${data.type}`,
     });
 
+    let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
+    await figma
+      .loadFontAsync({ family: 'Inter', style: 'Regular' })
+      .then(
+        () => (textNode.textAlignHorizontal = data.align.toLocaleUpperCase())
+      );
+
     return instance;
   }
 
@@ -175,6 +182,7 @@ export async function generateBlockDataFromAlert(
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
+  let textNode = instNode.findOne((n) => n.type == 'TEXT') as TextNode;
   return {
     type: 'alert',
     lastEdited,
@@ -186,7 +194,7 @@ export async function generateBlockDataFromAlert(
         instNode.componentProperties[componentData.alert.contentProp]
           .value as string
       ),
-      align: 'left',
+      align: textNode.textAlignHorizontal.toLocaleLowerCase(),
     },
   };
 }

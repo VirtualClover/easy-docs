@@ -431,6 +431,8 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
             3
           )}<div class="${classPrefix}alert ${classPrefix}alert-${
             block.data.type
+          } ${classPrefix}text-${
+            block.data.align
           }"><b class="${classPrefix}alert-icon">${decideEmojiBasedOnStatus(
             block.data.type
           )} </b><span>${block.data.message}</span></div>`
