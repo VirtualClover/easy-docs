@@ -3,21 +3,26 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/components/prism-markup';
 
+import { ExportSkeleton } from './skeletons/ExportSkeleton';
 import { PrimsWrapper } from '../../styles/prism_styles';
 import React from 'react';
 
 declare var Prism: any;
 
-export const CodeBlock = ({ code, language }) => {
+export const CodeBlock = ({ code, language, loading }) => {
   React.useEffect(() => {
     Prism.highlightAll();
   }, [code, language]);
 
   return (
     <PrimsWrapper sx={{}}>
-      <pre>
-        <code className={`language-${language}`}>{code}</code>
-      </pre>
+      {!loading ? (
+        <pre>
+          <code className={`language-${language}`}>{code}</code>
+        </pre>
+      ) : (
+        <ExportSkeleton />
+      )}
     </PrimsWrapper>
   );
 };

@@ -24,6 +24,7 @@ import { generatePageExport } from '../../utils/docs/exportUtils';
 
 export const ExportView = (): JSX.Element => {
   const [format, setFormat] = React.useState('md' as ExportFileFormat);
+  const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(false);
   const pluginContext = React.useContext(PluginDataContext);
   //Freezing data so it doesnt mutate if something's changes in figma
@@ -33,13 +34,15 @@ export const ExportView = (): JSX.Element => {
   const [mountedActiveTab, setMountedActiveTab] = React.useState(
     pluginContext.activeTab
   );
-  const [previewData, setPreviewdata] = React.useState(
-    generatePageExport(mountedData.pages[mountedActiveTab], format)
-  );
+  const [previewData, setPreviewdata] = React.useState('');
 
   React.useEffect(() => {
-    setPreviewdata(
-      generatePageExport(mountedData.pages[mountedActiveTab], format)
+    setLoading(true);
+    generatePageExport(mountedData.pages[mountedActiveTab], format).then(
+      (data) => {
+        setPreviewdata(data);
+        setLoading(false);
+      }
     );
   }, [format]);
 
@@ -75,15 +78,15 @@ export const ExportView = (): JSX.Element => {
       <Typography variant="caption">
         {_.snakeCase(mountedData.pages[mountedActiveTab].title)}.{format}
       </Typography>
-      <CodeBlock code={previewData} language={format} />
+      <CodeBlock code={previewData} language={format} loading={loading} />
       <Stack
         direction="row-reverse"
         sx={{ position: 'relative', bottom: 0, mt: 32 }}
         gap={8}
       >
-        <ExportButton />
+        <ExportButton disabled={loading} />
         <CopyToClipboard text={previewData} onCopy={() => setOpen(true)}>
-          <Button>Copy to clipboard</Button>
+          <Button disabled={loading}>Copy to clipboard</Button>
         </CopyToClipboard>
         <Snackbar
           open={open}

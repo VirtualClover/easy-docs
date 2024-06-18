@@ -17,7 +17,7 @@ const options = [
   'Generate doc site',
 ];
 
-export const ExportButton = () => {
+export const ExportButton = ({ disabled = false }) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -56,8 +56,11 @@ export const ExportButton = () => {
         ref={anchorRef}
         aria-label="Button group with a nested menu"
       >
-        <Button onClick={handleClick}>{options[selectedIndex]}</Button>
+        <Button onClick={handleClick} disabled={disabled}>
+          {options[selectedIndex]}
+        </Button>
         <Button
+          disabled={disabled}
           aria-controls={open ? 'split-button-menu' : undefined}
           aria-expanded={open ? 'true' : undefined}
           aria-label="select merge strategy"

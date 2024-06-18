@@ -120,11 +120,10 @@ let convertFlavoredText = (text: string) => {
   text = text.replace(/<b>(\s)/g, '**&ensp;');
   text = text.replace(/(\s)<\/b>/g, '&ensp;**');
 
-
   return text;
 };
 
-let generateMDTable = (data) => {
+let generateMDTable = (data): string => {
   let md = [];
   let content: string[][] = data.content;
   for (let i = 0; i < content.length; i++) {
@@ -138,12 +137,28 @@ let generateMDTable = (data) => {
   return md.join('\n');
 };
 
+let generateMDList = (data): string => {
+  let items = [];
+  if (data.items.length) {
+    for (let i = 0; i < data.items.length; i++) {
+      const listItem = data.items[i];
+      if (data.style == 'unordered') {
+        items.push(`* ${convertFlavoredText(listItem)}`);
+      } else {
+        items.push(`${i + 1}. ${convertFlavoredText(listItem)}`);
+      }
+    }
+  }
+
+  return items.join('  \n');
+};
+
 /**
  * Generates markdown from the JSON page doc object
  * @param data
  * @returns
  */
-export function generateMarkdownPage(data: PageData): string {
+export async function generateMarkdownPage(data: PageData): Promise<string> {
   //console.log(data);
 
   let markdown = [];
@@ -173,7 +188,7 @@ export function generateMarkdownPage(data: PageData): string {
             'embed'
           );
           markdown.push(
-            generateIFrame(
+            `${generateIFrame(
               src,
               block.data.caption,
               0,
@@ -182,7 +197,7 @@ export function generateMarkdownPage(data: PageData): string {
                 3
               ),
               'display-frame'
-            )
+            )}  \n`
           );
         }
         break;
@@ -194,7 +209,7 @@ export function generateMarkdownPage(data: PageData): string {
             'embed'
           );
           markdown.push(
-            generateIFrame(
+            `${generateIFrame(
               src,
               `${decideEmojiBasedOnDosAndDonts(block.data.type)} ${
                 block.data.caption
@@ -207,21 +222,12 @@ export function generateMarkdownPage(data: PageData): string {
                 3
               ),
               `${block.data.type}-frame`
-            )
+            )}  \n`
           );
         }
         break;
       case 'list':
-        if (block.data.items.length) {
-          for (let i = 0; i < block.data.items.length; i++) {
-            const listItem = block.data.items[i];
-            if (block.data.style == 'unordered') {
-              markdown.push(`* ${convertFlavoredText(listItem)}`);
-            } else {
-              markdown.push(`${i + 1}. ${convertFlavoredText(listItem)}`);
-            }
-          }
-        }
+        markdown.push(generateMDList(block.data));
         break;
       case 'table':
         if (block.data.content.length) {
@@ -249,7 +255,7 @@ export function generateMarkdownPage(data: PageData): string {
   return decodeStringForFigma(markdown.join('  \n'));
 }
 
-export function generateJSONPage(data: PageData): string {
+export async function generateJSONPage(data: PageData): Promise<string> {
   return JSON.stringify(data, null, 2);
 }
 
@@ -310,7 +316,7 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
   return formattedString.join('\n');
 };
 
-export function generateHTMLPage(data: PageData): string {
+export async function generateHTMLPage(data: PageData): Promise<string> {
   //console.log(data);
 
   let html = [];
@@ -457,11 +463,12 @@ export function generateHTMLPage(data: PageData): string {
   return html.join('  \n');
 }
 
-export function generatePageExport(
+export async function generatePageExport(
   data: PageData,
   format: ExportFileFormat
-): string {
-  let exportFunc: (data: PageData) => string;
+): Promise<string> {
+  let exportFunc: (data: PageData) => Promise<string>;
+  let exportData = '';
   switch (format) {
     case 'md':
       exportFunc = generateMarkdownPage;
@@ -474,10 +481,11 @@ export function generatePageExport(
   }
 
   if (data && data.blocks) {
-    return exportFunc(data);
+    await exportFunc(data).then((string) => (exportData = string));
   } else {
     console.error(`The data provided didn't have any content`);
   }
+  return exportData;
 }
 
 /*
