@@ -49,7 +49,7 @@ export async function generateJSONFromFigmaContent(
     let children = section.children;
 
     for (let i = 0; i < children.length; i++) {
-      let child = children[i];
+      let child = children[i];      
       if (child.type == 'FRAME') {
         JSONData.pages.push(
           await generatePageDataFromFrame(child, componentData)
@@ -107,6 +107,7 @@ async function generatePageDataFromFrame(
       if (childNode.type == 'INSTANCE') {
         let mainCompId: string;
         await childNode.getMainComponentAsync().then((component) => {
+ // TODO Add check for component parent
           mainCompId =
             component.parent.type == 'COMPONENT_SET'
               ? component.parent.id

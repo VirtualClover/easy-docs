@@ -7,7 +7,7 @@ import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
 import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
 import { pluginInit } from './utils/figma/pluginInit';
-import { reconcileDocData } from './utils/docs/reconcileData';
+import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 
@@ -77,7 +77,7 @@ figma.ui.onmessage = (msg) => {
   //Push updates from figma
   if (msg.type === 'node-update') {
     if (!context.stopSendingUpdates) {
-      pushFigmaUpdates().then((res) => {
+      pushFigmaUpdates(context).then((res) => {
         if (res.type === 'new-node-data') {
           console.log('push figma updates');
           console.log(res.type);
@@ -148,78 +148,3 @@ figma.ui.onmessage = (msg) => {
   
   */
 };
-
-export async function pushFigmaUpdates() {
-  let selectedFrame: number = 0;
-  let selection = figma.currentPage.selection[0];
-  let parentSection: SectionNode;
-  let parentFrame: FrameNode;
-  if (selection) {
-    switch (selection.type) {
-      case 'SECTION':
-        parentSection = selection;
-        break;
-      case 'FRAME':
-        if (selection.parent.type == 'SECTION') {
-          parentSection = selection.parent;
-          parentFrame = selection;
-        }
-        break;
-      case 'INSTANCE':
-        if (selection.parent.type == 'FRAME') {
-          if (selection.parent.parent.type == 'SECTION') {
-            parentSection = selection.parent.parent;
-            parentFrame = selection.parent;
-          }
-        }
-        break;
-      case 'TEXT':
-        if (selection.parent.type == 'INSTANCE') {
-          if (selection.parent.parent.type == 'FRAME') {
-            if (selection.parent.parent.parent.type == 'SECTION') {
-              parentSection = selection.parent.parent.parent;
-              parentFrame = selection.parent.parent;
-            }
-          }
-        }
-        break;
-      default:
-        return { type: 'no-node', data: '', selectedFrame };
-        break;
-    }
-
-    if (parentSection) {
-      let generatedDoc: DocData;
-      await generateJSONFromFigmaContent(parentSection).then(
-        (data) => (generatedDoc = data)
-      );
-      //console.log('Generated doc');
-      //console.log(generatedDoc);
-
-      if (parentFrame) {
-        selectedFrame = parentSection.children
-          .map((node) => node.id)
-          .indexOf(parentFrame.id);
-      }
-
-      if (generatedDoc.pages) {
-        let reconciliation = reconcileDocData(
-          generatedDoc,
-          context.lastFetchDoc
-        );
-
-        if (reconciliation.changesNumber) {
-          context.lastFetchDoc = <DocData>reconciliation.data;
-          return {
-            type: 'new-node-data',
-            data: context.lastFetchDoc,
-            selectedFrame,
-          };
-        } else {
-          return { type: 'same-node-data', data: '', selectedFrame };
-        }
-      }
-    }
-  }
-  return { type: 'no-node', data: '', selectedFrame };
-}
