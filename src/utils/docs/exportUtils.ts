@@ -10,15 +10,12 @@ import {
 } from '../general/cleanseTextData';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
+import { addIndentation } from '../general/addIndentation';
 import { generateBaseExportStyles } from '../../styles/generateBaseExportStyles';
 import { generateFigmaURL } from '../general/urlHandlers';
 import { getURLFromAnchor } from '../general/flavoredText';
 
 // TODO Add Nextra
-
-let addIndetation = (level) => {
-  return '  '.repeat(level);
-};
 
 let generateIFrameStyle = (
   borderColor: string,
@@ -35,18 +32,18 @@ let generateIFrame = (
   extraClass: string = '',
   classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
 ) => {
-  return `${addIndetation(
+  return `${addIndentation(
     identation
   )}<figure class="${classPrefix}figma-frame ${
     extraClass ? `${classPrefix}${extraClass}` : ''
-  }">\n${addIndetation(
+  }">\n${addIndentation(
     identation + 2
   )}<iframe style="${style}"  width="100%" height="300px" src="${iframeSrc}" allowfullscreen></iframe>\n${
     iFrameCaption &&
-    `${addIndetation(identation + 2)}<figcaption>\n${addIndetation(
+    `${addIndentation(identation + 2)}<figcaption>\n${addIndentation(
       identation + 3
-    )}${iFrameCaption}\n${addIndetation(identation + 2)}</figcaption>\n`
-  }${addIndetation(identation)}</figure>`;
+    )}${iFrameCaption}\n${addIndentation(identation + 2)}</figcaption>\n`
+  }${addIndentation(identation)}</figure>`;
 };
 
 let generateMDTableRow = (rowData: string[]): string => {
@@ -266,19 +263,19 @@ let generateHTMLTableRow = (
   classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
 ): string => {
   let htmlRow = [];
-  htmlRow.push(`${addIndetation(initialIndentation + 1)}<tr>`);
+  htmlRow.push(`${addIndentation(initialIndentation + 1)}<tr>`);
   if (rowData.length) {
     for (let i = 0; i < rowData.length; i++) {
       let cell = rowData[i];
       let cellTag = isHeader ? 'th' : 'td';
       htmlRow.push(
-        `${addIndetation(initialIndentation + 2)}<${cellTag} ${
+        `${addIndentation(initialIndentation + 2)}<${cellTag} ${
           isHeader ? `class="${classPrefix}table-header"` : ''
         }>${cell}</${cellTag}>`
       );
     }
   }
-  htmlRow.push(`${addIndetation(initialIndentation + 1)}</tr>`);
+  htmlRow.push(`${addIndentation(initialIndentation + 1)}</tr>`);
   return htmlRow.join('\n');
 };
 
@@ -287,7 +284,7 @@ let generateHTMLTable = (data, initialIndentation: number = 0) => {
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
   let content: string[][] = data.content;
   html.push(
-    `${addIndetation(initialIndentation)}<table class="${classPrefix}table">`
+    `${addIndentation(initialIndentation)}<table class="${classPrefix}table">`
   );
   if (data.content.length) {
     for (let i = 0; i < content.length; i++) {
@@ -301,7 +298,7 @@ let generateHTMLTable = (data, initialIndentation: number = 0) => {
       );
     }
   }
-  html.push(`${addIndetation(initialIndentation)}</table>`);
+  html.push(`${addIndentation(initialIndentation)}</table>`);
   return html.join('\n');
 };
 
@@ -310,7 +307,7 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
   let formattedString = [];
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
-    line = `${addIndetation(indentationLevel)}${line}`;
+    line = `${addIndentation(indentationLevel)}${line}`;
     formattedString.push(line);
   }
   return formattedString.join('\n');
@@ -322,16 +319,17 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
   let html = [];
   html.push('<!DOCTYPE html>');
   html.push('<html>');
-  let htmlHeadData = `${addIndetation(1)}<head><title>${
+  let htmlHeadData = `${addIndentation(1)}<head>\n${addIndentation(2)}<title>${
     data.title
   }</title>\n${generateBaseExportStyles(
     BASE_STYLE_TOKENS.fontFamily,
-    BASE_STYLE_TOKENS.palette
-  )}\n</head>`;
+    BASE_STYLE_TOKENS.palette,
+    2
+  )}\n${addIndentation(1)}</head>`;
   html.push(htmlHeadData);
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
-  html.push(`${addIndetation(1)}<body>`);
-  html.push(`${addIndetation(2)}<main class="${classPrefix}body">`);
+  html.push(`${addIndentation(1)}<body>`);
+  html.push(`${addIndentation(2)}<main class="${classPrefix}body">`);
 
   for (let i = 0; i < data.blocks.length; i++) {
     const block = data.blocks[i];
@@ -339,30 +337,32 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
     switch (block.type) {
       case 'header':
         html.push(
-          `${addIndetation(3)}<h${block.data.level} class="${classPrefix}h${
+          `${addIndentation(3)}<h${block.data.level} class="${classPrefix}h${
             block.data.level
           }">${block.data.text}</h${block.data.level}>`
         );
         break;
       case 'paragraph':
         html.push(
-          `${addIndetation(3)}<p class="${classPrefix}p">${block.data.text}</p>`
+          `${addIndentation(3)}<p class="${classPrefix}p">${
+            block.data.text
+          }</p>`
         );
         break;
       case 'quote':
         html.push(
-          `${addIndetation(
+          `${addIndentation(
             3
-          )}<figure class="${classPrefix}quote">\n${addIndetation(
+          )}<figure class="${classPrefix}quote">\n${addIndentation(
             4
-          )}<blockquote>\n${addIndetation(5)}${
+          )}<blockquote>\n${addIndentation(5)}${
             block.data.text
-          }\n${addIndetation(6)}</blockquote>\n${
+          }\n${addIndentation(6)}</blockquote>\n${
             block.data.caption &&
-            `${addIndetation(6)}<figcaption>\n${addIndetation(5)}${
+            `${addIndentation(6)}<figcaption>\n${addIndentation(5)}${
               block.data.caption
-            }\n${addIndetation(6)}</figcaption>\n`
-          }${addIndetation(5)}</figure>`
+            }\n${addIndentation(6)}</figcaption>\n`
+          }${addIndentation(5)}</figure>`
         );
         break;
       case 'displayFrame':
@@ -413,21 +413,21 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
         break;
       case 'list':
         let tag = block.data.style == 'unordered' ? 'ul' : 'ol';
-        html.push(`${addIndetation(3)}<${tag} class="${classPrefix}${tag}">`);
+        html.push(`${addIndentation(3)}<${tag} class="${classPrefix}${tag}">`);
         if (block.data.items.length) {
           for (let i = 0; i < block.data.items.length; i++) {
             const listItem = block.data.items[i];
-            html.push(`${addIndetation(4)}<li>${listItem}</li>`);
+            html.push(`${addIndentation(4)}<li>${listItem}</li>`);
           }
         }
-        html.push(`${addIndetation(3)}</${tag}>`);
+        html.push(`${addIndentation(3)}</${tag}>`);
         break;
       case 'table':
         html.push(generateHTMLTable(block.data, 3));
         break;
       case 'alert':
         html.push(
-          `${addIndetation(
+          `${addIndentation(
             3
           )}<div class="${classPrefix}alert ${classPrefix}alert-${
             block.data.type
@@ -440,17 +440,17 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
         break;
       case 'code':
         html.push(
-          `${addIndetation(3)}<pre class=${classPrefix}code>\n${addIndetation(
+          `${addIndentation(3)}<pre class=${classPrefix}code>\n${addIndentation(
             4
           )}<code>\n${indentCodeBlock(
             encodeStringForHTML(block.data.code),
             5
-          )}\n${addIndetation(4)}</code>\n${addIndetation(3)}</pre>`
+          )}\n${addIndentation(4)}</code>\n${addIndentation(3)}</pre>`
         );
         break;
       case 'divider':
         html.push(
-          `${addIndetation(3)}<div class="${classPrefix}divider"><hr /></div>`
+          `${addIndentation(3)}<div class="${classPrefix}divider"><hr /></div>`
         );
         break;
       default:
@@ -458,8 +458,8 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
     }
   }
 
-  html.push(`${addIndetation(2)}</main>`);
-  html.push(`${addIndetation(1)}</body>`);
+  html.push(`${addIndentation(2)}</main>`);
+  html.push(`${addIndentation(1)}</body>`);
   html.push(`</html>`);
 
   return html.join('  \n');

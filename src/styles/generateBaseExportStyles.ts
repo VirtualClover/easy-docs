@@ -1,11 +1,16 @@
-import { BASE_STYLE_TOKENS, ColorPalette } from './base';
+import { ColorPalette } from './base';
+import { addIndentation } from '../utils/general/addIndentation';
 
 export let generateBaseExportStyles = (
   baseFontFamily: string,
-  basePalette: ColorPalette
+  basePalette: ColorPalette,
+  identation: number = 0
 ): string => {
   let styles: string[] = [];
-  styles.push('<style>');
+  styles.push(
+    `${addIndentation(identation)}<link rel="preconnect" href="https://fonts.googleapis.com">\n${addIndentation(identation)}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n${addIndentation(identation)}<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">\n`
+  );
+  styles.push(`${addIndentation(identation)}<style>`);
   styles.push(
     `body {font-family: ${baseFontFamily}; color: ${basePalette.onBackground.mid}; padding:8px; margin: 0;}`
   );
