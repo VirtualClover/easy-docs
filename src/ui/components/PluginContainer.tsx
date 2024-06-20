@@ -26,6 +26,10 @@ export const PluginContainer = styled(Container, {
     zIndex: 1200,
   },
 
+  '.codex-editor .custom-icon path': {
+    stroke: 'transparent',
+  },
+
   '.cdx-block': {
     color: theme.palette.text.secondary,
 
@@ -45,12 +49,10 @@ export const PluginContainer = styled(Container, {
 
     //      color: theme.palette.text.primary
   },
-  '.cdx-block, .ce-header': {
-    '&::selection': {
+  '.codex-editor ::selection': {
       background: theme.palette.info.main,
       color: theme.palette.info.contrastText,
     },
-  },
   '.ce-inline-toolbar': {
     background: theme.palette.background.default,
     color: theme.palette.text.primary,
@@ -62,11 +64,11 @@ export const PluginContainer = styled(Container, {
       background: theme.palette.background.paper,
     },
   },
-  '.ce-popover': {
+  '.ce-popover, .ce-conversion-toolbar': {
     background: theme.palette.background.default,
     borderColor: theme.palette.divider,
   },
-  '.ce-popover-item': {
+  '.ce-popover-item, .ce-conversion-tool': {
     background: theme.palette.background.default,
     color: theme.palette.text.primary,
     '&:hover': {
@@ -76,7 +78,7 @@ export const PluginContainer = styled(Container, {
       background: theme.palette.background.paper,
     },
   },
-  '.ce-popover-item__icon': {
+  '.ce-popover-item__icon, .ce-conversion-tool__icon': {
     background: theme.palette.background.paper,
     color: theme.palette.text.primary,
     border: `1px solid ${theme.palette.divider}`,
@@ -128,4 +130,9 @@ export const PluginContainer = styled(Container, {
     background: theme.palette.background.paper,
     minHeight: '160px',
   },
+
+'.ce-conversion-toolbar__label' {
+  color: theme.palette.text.secondary,
+}
+
 }));

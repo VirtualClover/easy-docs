@@ -310,7 +310,7 @@ export async function generateBlockDataFromDosAndDonts(
     instNode.componentProperties[componentData.dosAndDonts.sourceProp].value ??
     '';
   let frameDetails;
-  let frameExistsInFile: boolean = false;
+  let frameExistsInFile: boolean | undefined = undefined;
   let blockData = {
     type: 'dosAndDonts',
     lastEdited,

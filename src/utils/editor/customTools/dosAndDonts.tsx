@@ -26,7 +26,7 @@ interface ComponentProps {
   frameId: string;
   fileId: string;
   type: GuidelineType;
-  frameExistsInFile: boolean;
+  frameExistsInFile: boolean | undefined;
   caption: string;
 }
 
@@ -73,11 +73,13 @@ const InputUI = (blockData: ComponentProps) => {
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
         <>
-          {blockData && !frameExistsInFile && (
-            <Alert severity="error">
-              The frame referenced in this block was possibly deleted.
-            </Alert>
-          )}
+          {blockData &&
+            typeof frameExistsInFile !== 'undefined' &&
+            !frameExistsInFile && (
+              <Alert severity="error">
+                The frame referenced in this block was possibly deleted.
+              </Alert>
+            )}
           <IFrame
             src={generateFigmaURL(
               frameDetails.fileId,
@@ -177,8 +179,7 @@ export class DosAndDonts {
       frameId: data.frameId || '',
       fileId: data.fileId || '',
       type: data.type || 'do',
-      frameExistsInFile:
-        data.frameExistsInFile !== undefined ? data.frameExistsInFile : true,
+      frameExistsInFile: data.frameExistsInFile,
       caption: data.caption || '',
     };
   }

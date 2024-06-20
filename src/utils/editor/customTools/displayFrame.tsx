@@ -19,7 +19,7 @@ import { figmaIcon } from '../../../assets/svgs';
 interface ComponentProps {
   frameId: string;
   fileId: string;
-  frameExistsInFile: boolean;
+  frameExistsInFile: boolean | undefined;
   caption: string;
 }
 
@@ -66,11 +66,13 @@ const InputUI = (blockData: ComponentProps) => {
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
         <>
-          {blockData && !frameExistsInFile && (
-            <Alert severity="error">
-              The frame referenced in this block was possibly deleted.
-            </Alert>
-          )}
+          {blockData &&
+            typeof frameExistsInFile !== 'undefined' &&
+            !frameExistsInFile && (
+              <Alert severity="error">
+                The frame referenced in this block was possibly deleted.
+              </Alert>
+            )}
           <IFrame
             src={generateFigmaURL(
               frameDetails.fileId,

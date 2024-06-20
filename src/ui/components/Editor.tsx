@@ -45,7 +45,8 @@ export const Editor = () => {
                     .frameId,
               },
               pluginContext.currentDocData.pages[pluginContext.activeTab],
-              true
+              true,
+              {new:'editor', current: pluginContext.currentDocData.author.changesMadeIn}
             );
 
             if (reconciliation.changesNumber) {

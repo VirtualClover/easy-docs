@@ -240,7 +240,7 @@ export async function generateBlockDataFromDisplayFrame(
     instNode.componentProperties[componentData.displayFrame.sourceProp].value ??
     '';
   let frameDetails;
-  let frameExistsInFile: boolean = false;
+  let frameExistsInFile: boolean | undefined = undefined;
   let blockData = {
     type: blockType,
     lastEdited,

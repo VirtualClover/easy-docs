@@ -82,14 +82,16 @@ let inspectFrame = async (
   loopLimit: number = 5
 ): Promise<{ section: SectionNode; frame: FrameNode | InstanceNode }> => {
   let currentParent = selection.parent;
-  while (loopLimit > 0 && currentParent.type != 'SECTION') {
+  while (
+    loopLimit > 0 &&
+    (currentParent.type === 'FRAME' || currentParent.type == 'INSTANCE')
+  ) {
     selection = currentParent;
     currentParent = currentParent.parent;
     loopLimit--;
   }
 
   if (currentParent.type == 'SECTION' && selection.type === 'FRAME') {
-
     return {
       section: currentParent,
       frame: selection,

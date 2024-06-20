@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 
-import { DocData, PageData, Reconciliation } from '../constants';
 import {
-  cleanseBlockData,
-  cleanseString,
-  cleanseTextData,
-} from '../general/cleanseTextData';
+  ChangesPlatform,
+  DocData,
+  PageData,
+  Reconciliation,
+} from '../constants';
 
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';
@@ -38,7 +38,11 @@ export function reconcileDocData(
       let pageRecon = reconcilePageData(
         newPage,
         currentDataPage,
-        useCurrentDataFramesId
+        useCurrentDataFramesId,
+        {
+          new: newData.author.changesMadeIn,
+          current: currentData.author.changesMadeIn,
+        }
       );
 
       let pageData = pageRecon.data as PageData;
@@ -79,7 +83,8 @@ export function reconcileDocData(
 export function reconcilePageData(
   newData: PageData,
   currentData: PageData,
-  useCurrentDataFrameId: boolean = false
+  useCurrentDataFrameId: boolean = false,
+  editor?: { new: ChangesPlatform; current: ChangesPlatform }
 ): Reconciliation {
   let clonedCurrentData: PageData = clone(currentData); //Data stored in context
   let changesNumber = 0;
@@ -100,6 +105,10 @@ export function reconcilePageData(
         !_.isEqual(newBlock.data, currentDataBlock.data) ||
         newBlock.type != currentDataBlock.type
       ) {
+        console.log('data not equal');
+        console.log('new', newBlock.data, editor.new);
+        console.log('current', currentDataBlock.data, editor.current);
+
         changesNumber++;
         currentDataBlock.data = newBlock.data;
         currentDataBlock.lastEdited = Date.now();
