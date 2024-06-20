@@ -131,7 +131,7 @@ export const PluginContainer = styled(Container, {
     minHeight: '160px',
   },
 
-'.ce-conversion-toolbar__label' {
+'.ce-conversion-toolbar__label': {
   color: theme.palette.text.secondary,
 }
 
