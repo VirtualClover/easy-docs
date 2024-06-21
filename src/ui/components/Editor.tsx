@@ -162,6 +162,8 @@ export const Editor = () => {
             zIndex: 1300,
             bgcolor: 'background.default',
             left: 0,
+            top:50,
+            pt: 32,
             pl: 16,
           }}
         >

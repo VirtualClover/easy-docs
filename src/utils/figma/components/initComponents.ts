@@ -20,7 +20,8 @@ import { createTableCellComponent } from './tableComponent.figma';
  */
 export async function initComponents(
   componentData: BaseComponentData,
-  wholeObjectisMissing: Boolean = true
+  wholeObjectisMissing: Boolean = true,
+  context
 ) {
   figma.notify(
     wholeObjectisMissing
@@ -31,14 +32,16 @@ export async function initComponents(
     }
   );
   let currentComponentPage: BaseNode;
-  await figma.getNodeByIdAsync(componentData.componentsPage.id).then((node) => {
-    currentComponentPage = node;
-  });
+  await figma
+    .getNodeByIdAsync(componentData.components.componentsPage.id)
+    .then((node) => {
+      currentComponentPage = node;
+    });
   if (currentComponentPage) {
     if (figma.currentPage == currentComponentPage) {
       let pages = figma.root.children;
       for (let i = 0; i < pages.length; i++) {
-        if (pages[i].id != componentData.componentsPage.id) {
+        if (pages[i].id != componentData.components.componentsPage.id) {
           figma.currentPage = pages[i];
           break;
         }
@@ -89,7 +92,7 @@ export async function initComponents(
     componentData.components.alert = alert;
     componentData.components.code = code;
     componentData.components.divider = divider;
-    componentData.componentsPage.id = page.id;
+    componentData.components.componentsPage.id = page.id;
     componentData.lastGenerated = Date.now();
     figma.root.setSharedPluginData(
       FIGMA_NAMESPACE,
@@ -97,6 +100,7 @@ export async function initComponents(
       JSON.stringify(componentData)
     );
   });
+  context.componentData = componentData;
   await page.loadAsync();
   page.appendChild(frame);
 }

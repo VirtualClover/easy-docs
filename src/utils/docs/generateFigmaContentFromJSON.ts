@@ -4,8 +4,12 @@ import {
   PageData,
   PluginSettings,
 } from '../constants/constants';
+import {
+  FIGMA_COMPONENT_VERSION_KEY,
+  FIGMA_LAST_EDITED_KEY,
+  FIGMA_NAMESPACE,
+} from '../constants';
 
-import { FIGMA_NAMESPACE } from '../constants';
 import { createPageFrame } from '../figma/createPageFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateAlertInstance } from '../figma/components/AlertComponent.figma';
@@ -21,17 +25,17 @@ import { generateTableInstance } from '../figma/components/tableComponent.figma'
 import { resizeSection } from '../figma/resizeSection';
 import { selectNode } from '../figma/selectNode';
 
-let lastEditedKey = 'lastEdited';
-
 export async function generateFigmaContentFromJSON(
   data: DocData,
   parentSection: SectionNode,
-  settings: PluginSettings
+  settings: PluginSettings,
+  componentVersion: number
 ) {
   let pages = data.pages;
   let docTitle = decodeStringForFigma(data.title);
   parentSection.name = docTitle;
   console.log('editor data');
+  
   console.log(data);
 
   for (let i = 0; i < pages.length; i++) {
@@ -44,8 +48,8 @@ export async function generateFigmaContentFromJSON(
         .then(async (node) => {
           if (node.type === 'FRAME') {
             frame = node;
-            await generateFrameDataFromJSON(page, frame).then(() =>
-              resizeSection(parentSection)
+            await generateFrameDataFromJSON(page, frame, componentVersion).then(
+              () => resizeSection(parentSection)
             );
           }
         })
@@ -53,7 +57,7 @@ export async function generateFigmaContentFromJSON(
     } else {
       frame = createPageFrame(parentSection, page.title, settings);
       selectNode(frame);
-      await generateFrameDataFromJSON(page, frame).then(() =>
+      await generateFrameDataFromJSON(page, frame, componentVersion).then(() =>
         resizeSection(parentSection)
       );
     }
@@ -62,7 +66,11 @@ export async function generateFigmaContentFromJSON(
   return 'done!';
 }
 
-async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
+async function generateFrameDataFromJSON(
+  data: PageData,
+  frame: FrameNode,
+  componentVersion: number
+) {
   if (frame.layoutMode != 'VERTICAL') {
     frame.layoutMode = 'VERTICAL';
   }
@@ -81,24 +89,35 @@ async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
       if (i < blocks.length) {
         let nodeLastEdited = figmaNode.getSharedPluginData(
           FIGMA_NAMESPACE,
-          lastEditedKey
+          FIGMA_LAST_EDITED_KEY
         )
           ? parseInt(
-              figmaNode.getSharedPluginData(FIGMA_NAMESPACE, lastEditedKey),
+              figmaNode.getSharedPluginData(
+                FIGMA_NAMESPACE,
+                FIGMA_LAST_EDITED_KEY
+              ),
               10
             )
           : 0;
 
         if (nodeLastEdited != block.lastEdited) {
-          await generateBlockInstanceFromJSON(block, frame, indexInFrame).then(
-            () => figmaNode.remove()
-          );
+          await generateBlockInstanceFromJSON(
+            block,
+            frame,
+            indexInFrame,
+            componentVersion
+          ).then(() => figmaNode.remove());
         }
       } else {
         figmaNode.remove();
       }
     } else {
-      await generateBlockInstanceFromJSON(block, frame, indexInFrame);
+      await generateBlockInstanceFromJSON(
+        block,
+        frame,
+        indexInFrame,
+        componentVersion
+      );
     }
   }
 }
@@ -106,7 +125,8 @@ async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
 async function generateBlockInstanceFromJSON(
   block: BlockData,
   frame: FrameNode,
-  indexInFrame: number
+  indexInFrame: number,
+  componentVersion: number
 ) {
   let node: InstanceNode | FrameNode;
   switch (block.type) {
@@ -189,11 +209,10 @@ async function generateBlockInstanceFromJSON(
   if (node) {
     frame.insertChild(indexInFrame, node);
     node.layoutSizingHorizontal = 'FILL';
-
     node.setSharedPluginData(
       FIGMA_NAMESPACE,
-      lastEditedKey,
-      block.lastEdited ? block.lastEdited.toString() : Date.now.toString()
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
     );
   }
 }

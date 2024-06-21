@@ -8,6 +8,7 @@ import { darkTheme, lightTheme } from '../styles/themes';
 import { BottomSheet } from './components/BottomSheet';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
+import { OutDatedComponentsView } from './components/OutdatedComponentsView';
 import { PluginContainer } from './components/PluginContainer';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
@@ -84,10 +85,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
       if (navigation.currentView != 'SETTINGS' && loadingState != 'MAYOR') {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
-                    
           if (event.data.pluginMessage) {
             switch (event.data.pluginMessage.type) {
-
               case 'new-node-data':
                 //console.log('new doc data');
                 //console.log(incomingEditorChanges);
@@ -143,6 +142,16 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 console.log('set editor changes false');
 
                 setIncomingEditorChanges(false);
+                break;
+
+              case 'outdated-components':
+                setSheetOpen(true);
+                setSheetContent(<OutDatedComponentsView />);
+                //console.log('Theres some components that are outdated reload?');
+                break;
+
+              case 'close-outdated-overlay':
+                setSheetOpen(false);
                 break;
 
               default:

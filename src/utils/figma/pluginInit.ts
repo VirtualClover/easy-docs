@@ -15,7 +15,7 @@ import { objectIsNull } from '../objectisNull';
 /**
  * The initialization func of the plugin
  */
-export async function pluginInit() {
+export async function pluginInit(context) {
   let stringComponentData = figma.root.getSharedPluginData(
     FIGMA_NAMESPACE,
     FIGMA_COMPONENT_DATA_KEY
@@ -25,25 +25,28 @@ export async function pluginInit() {
   let componentData: BaseComponentData = stringComponentData
     ? JSON.parse(stringComponentData)
     : BASE_COMPONENT_DATA;
+
+  context.componentData = componentData;
   //console.log(componentData);
   //Check if object exists
   if (objectIsNull(componentData)) {
-    initComponents(componentData);
+    initComponents(componentData, true, context);
   } else {
     //Check if the components have not been deleted
-    for (const key in componentData) {
-      if (componentData.hasOwnProperty(key)) {
+    for (const key in componentData.components) {
+      if (componentData.components.hasOwnProperty(key)) {
         let currentNode: BaseNode;
-        await figma.getNodeByIdAsync(componentData[key].id).then((node) => {
-          currentNode = node;
-          if (
-            !currentNode ||
-            (currentNode.type != 'PAGE' && !currentNode.parent)
-          ) {
-            initComponents(componentData, false);
-            //console.log('Component missing: ' + key);
-          }
-        });
+        await figma
+          .getNodeByIdAsync(componentData.components[key].id)
+          .then((node) => {
+            currentNode = node;
+            if (
+              !currentNode ||
+              (currentNode.type != 'PAGE' && !currentNode.parent)
+            ) {
+              initComponents(componentData, false, context);
+            }
+          });
         break;
       }
     }

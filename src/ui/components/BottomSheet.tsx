@@ -16,6 +16,7 @@ export const BottomSheet = () => {
       anchor={'bottom'}
       open={pluginContext.sheetOpen}
       onClose={() => pluginContext.setSheetOpen(false)}
+      sx={{ zIndex: 1400 }}
       PaperProps={{
         sx: {
           p: 16,

@@ -44,6 +44,9 @@ export interface BlockData extends OutputBlockData {
 
 export const BASE_COMPONENT_DATA = {
   components: {
+    componentsPage: {
+      id: '',
+    },
     header: {
       id: '',
       levelProp: { key: '', variables: [] },
@@ -94,9 +97,6 @@ export const BASE_COMPONENT_DATA = {
     divider: {
       id: '',
     },
-  },
-  componentsPage: {
-    id: '',
   },
   lastGenerated: 0,
 };

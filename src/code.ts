@@ -1,7 +1,12 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import { DEFAULT_SETTINGS, DocData, EMPTY_DOC_OBJECT } from './utils/constants/constants';
+import {
+  BASE_COMPONENT_DATA,
+  DEFAULT_SETTINGS,
+  DocData,
+  EMPTY_DOC_OBJECT,
+} from './utils/constants/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
@@ -10,6 +15,7 @@ import { pluginInit } from './utils/figma/pluginInit';
 import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
+import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -24,7 +30,8 @@ let context = {
   settings: DEFAULT_SETTINGS,
   stopSendingUpdates: false,
   stopIncomingUpdates: false,
-  lastFetchDoc: EMPTY_DOC_OBJECT, // Latest data pulled from editor
+  lastFetchDoc: EMPTY_DOC_OBJECT,
+  componentData: BASE_COMPONENT_DATA, // Latest data pulled from editor
 };
 
 // Calls to "parent.postMessage" from within the HTML page will trigger this
@@ -55,13 +62,18 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'load-data') {
     //Get keys
-    pluginInit();
+    pluginInit(context);
   }
 
   if (msg.type === 'create-new-doc') {
     context.stopSendingUpdates = true;
     let section: SectionNode;
-    createNewDoc(createNewDocJSON(), context.settings).then((s) => {
+    console.log(context);
+    createNewDoc(
+      createNewDocJSON(),
+      context.settings,
+      context.componentData.lastGenerated
+    ).then((s) => {
       section = s;
       generateJSONFromFigmaContent(section, context.settings).then((data) => {
         context.stopSendingUpdates = false;
@@ -105,22 +117,33 @@ figma.ui.onmessage = (msg) => {
         if (section && section.type === 'SECTION') {
           //console.log('generate');
 
-          generateFigmaContentFromJSON(data, section, context.settings).then(
-            (m) => {
-              let selectedFrame: BaseNode;
-              figma.getNodeByIdAsync(msg.editedFrame).then((node) => {
-                selectedFrame = node;
-                if (selectedFrame && selectedFrame.type === 'FRAME') {
-                  figma.currentPage.selection = [selectedFrame];
-                }
+          generateFigmaContentFromJSON(
+            data,
+            section,
+            context.settings,
+            context.componentData.lastGenerated
+          ).then((m) => {
+            let selectedFrame: BaseNode;
+            figma.getNodeByIdAsync(msg.editedFrame).then((node) => {
+              selectedFrame = node;
+              if (selectedFrame && selectedFrame.type === 'FRAME') {
+                figma.currentPage.selection = [selectedFrame];
+              }
 
-                context.stopSendingUpdates = false;
-                figma.ui.postMessage({ type: 'finished-figma-update' });
-              });
-            }
-          );
+              context.stopSendingUpdates = false;
+              figma.ui.postMessage({ type: 'finished-figma-update' });
+            });
+          });
         }
       }
+    });
+  }
+
+  if (msg.type === 'update-outdated-components') {
+    context.stopSendingUpdates = true;
+    slowUpdateOutdatedComponentBlocks(context.componentData).then(() => {
+      figma.ui.postMessage({ type: 'close-outdated-overlay' });
+      context.stopSendingUpdates = false;
     });
   }
 
@@ -128,5 +151,4 @@ figma.ui.onmessage = (msg) => {
   // Make sure to close the plugin when you're done. Otherwise the plugin will
   // keep running, which shows the cancel button at the bottom of the screen.
   //figma.closePlugin();
-
 };

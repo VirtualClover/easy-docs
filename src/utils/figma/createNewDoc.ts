@@ -11,7 +11,8 @@ import { setNodeFills } from './setNodeFills';
  */
 export async function createNewDoc(
   data: DocData,
-  settings: PluginSettings
+  settings: PluginSettings,
+  componentVersion: number
 ): Promise<SectionNode> {
   let parentSection = figma.createSection();
   parentSection.x = figma.viewport.center.x;
@@ -20,8 +21,14 @@ export async function createNewDoc(
     settings.customization.section.padding,
     settings.customization.section.padding
   );
+  console.log(componentVersion);
   parentSection.name = data.title;
   setNodeFills(parentSection, settings.customization.section.backgroundColor);
-  await generateFigmaContentFromJSON(data, parentSection, settings);
+  await generateFigmaContentFromJSON(
+    data,
+    parentSection,
+    settings,
+    componentVersion
+  );
   return parentSection;
 }
