@@ -1,4 +1,5 @@
 import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
+import { TextAlignment, UpperCaseTextAligment } from '../constants';
 
 import { StringFormats } from '../constants/constants';
 import { setRangeNodeFills } from '../figma/setNodeFills';
@@ -42,11 +43,12 @@ export let getFlavoredTextTags = (matchedString: string): string => {
 
 export let setFlavoredTextOnFigmaNode = async (
   string: string,
-  node: TextNode | InstanceNode
+  node: TextNode | InstanceNode,
+  textAlign: TextAlignment | false = false
 ) => {
   let flavoredMatches = matchFlavoredText(string);
   console.log(flavoredMatches);
-  
+
   if (flavoredMatches.length) {
     await Promise.all([
       figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }),
@@ -162,6 +164,11 @@ export let setFlavoredTextOnFigmaNode = async (
         textNode.deleteCharacters(adjustedRange.start, adjustedRange.end);
         globalOffset += rangeCount;
       });
+
+      if (textAlign) {
+        textNode.textAlignHorizontal =
+          textAlign.toLocaleUpperCase() as UpperCaseTextAligment;
+      }
     });
   }
 };

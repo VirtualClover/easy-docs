@@ -1,4 +1,4 @@
-import { BlockData, QuoteBlockData } from '../../constants';
+import { BlockData, QuoteBlockData, TextAlignment } from '../../constants';
 import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
@@ -114,7 +114,7 @@ export async function generateQuoteInstance(
       [componentData.quote.authorProp]: decodeStringForFigma(data.caption),
     });
 
-    await setFlavoredTextOnFigmaNode(quoteText, instance);
+    await setFlavoredTextOnFigmaNode(quoteText, instance, data.alignment);
 
     return instance;
     //instance.set
@@ -129,6 +129,7 @@ export async function generateBlockDataFromQuote(
   figmaNodeId?: string
 ): Promise<BlockData> {
   let quoteText = setFlavoredTextOnEncodedString(node);
+  let textNode = node.findOne((n) => n.type == 'TEXT') as TextNode;
   return {
     type: 'quote',
     lastEdited,
@@ -138,7 +139,10 @@ export async function generateBlockDataFromQuote(
       caption: encodeStringForHTML(
         node.componentProperties[componentData.quote.authorProp].value as string
       ),
-      alignment: 'left',
+      alignment:
+        textNode.textAlignHorizontal.toLocaleLowerCase() != 'right'
+          ? (textNode.textAlignHorizontal.toLocaleLowerCase() as TextAlignment)
+          : 'left',
     },
   };
 }
