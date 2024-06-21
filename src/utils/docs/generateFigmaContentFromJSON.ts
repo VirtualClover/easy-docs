@@ -5,10 +5,6 @@ import {
   PageData,
   PluginSettings,
 } from '../constants';
-import {
-  getFlavoredTextTags,
-  matchFlavoredText,
-} from '../general/flavoredText';
 
 import { createDocFrame } from '../figma/createDocFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
@@ -67,6 +63,9 @@ export async function generateFigmaContentFromJSON(
 }
 
 async function generateFrameDataFromJSON(data: PageData, frame: FrameNode) {
+  if (frame.layoutMode != 'VERTICAL') {
+    frame.layoutMode = 'VERTICAL';
+  }
   let blocks = data.blocks;
   frame.name = decodeStringForFigma(data.title);
   let totalLength =

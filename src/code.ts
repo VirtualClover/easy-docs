@@ -63,7 +63,7 @@ figma.ui.onmessage = (msg) => {
     let section: SectionNode;
     createNewDoc(createNewDocJSON(), context.settings).then((s) => {
       section = s;
-      generateJSONFromFigmaContent(section).then((data) => {
+      generateJSONFromFigmaContent(section, context.settings).then((data) => {
         context.stopSendingUpdates = false;
         context.lastFetchDoc = data;
         figma.ui.postMessage({
@@ -129,22 +129,4 @@ figma.ui.onmessage = (msg) => {
   // keep running, which shows the cancel button at the bottom of the screen.
   //figma.closePlugin();
 
-  /*
-  
-    if (msg.type === 'start-inspection') {
-    globalThis.firstNode = msg.inspectionType === 'screen' ? true : false;
-    globalThis.evaluation = { nodes: [], totalNodes: 0 };
-    const selection = <any>figma.currentPage.selection;
-    selection.forEach((element) => {});
-
-    figma.ui.postMessage(globalThis.evaluation);
-    /onst globalStyles = figma.getLocalPaintStyles();
-    const stylesJSON = [];
-    for (let i = 0; i < globalStyles.length; i++) {
-      stylesJSON.push(globalStyles[i].id);
-    }
-    //console.log(stylesJSON);
-  }
-  
-  */
 };

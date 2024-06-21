@@ -1,8 +1,5 @@
-import { DEFAULT_SETTINGS, PluginSettings } from '../constants';
-
-import { BASE_STYLE_TOKENS } from '../../styles/base';
-import { decodeStringForFigma } from '../general/cleanseTextData';
-import { setNodeFills } from './setNodeFills';
+import { PluginSettings } from '../constants';
+import { styleFrame } from './styleFrame';
 
 /**
  * Creates a doc frame
@@ -18,21 +15,7 @@ export function createDocFrame(
 ): FrameNode {
   //Create Frame
   const frame: FrameNode = figma.createFrame();
-  frame.layoutMode = 'VERTICAL';
-  frame.horizontalPadding = settings.customization.frame.padding;
-  frame.minWidth = settings.customization.frame.minWidth;
-  frame.minHeight = settings.customization.frame.minHeight;
-  frame.verticalPadding = settings.customization.frame.padding;
-  setNodeFills(frame, DEFAULT_SETTINGS.customization.palette.background.default);
-  frame.primaryAxisSizingMode = 'AUTO';
-  frame.counterAxisSizingMode = 'AUTO';
-  frame.name = decodeStringForFigma(name);
-  frame.cornerRadius = BASE_STYLE_TOKENS.units.u16;
-  /*createInstance(componentIDs.header).then((mainHeader) => {
-    mainHeader.setProperties({ 'value#1:0': name });
-    frame.appendChild(mainHeader);
-    mainHeader.layoutSizingHorizontal = 'FILL';
-  });*/
+  styleFrame(frame, settings, name);
   //Append frame to parent
   if (parent.children.length) {
     let lastChild = parent.children[parent.children.length - 1];

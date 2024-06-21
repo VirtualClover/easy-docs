@@ -1,4 +1,4 @@
-import { DocData } from '../constants';
+import { DocData, PluginSettings } from '../constants';
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { reconcileDocData } from '../docs/reconcileData';
 
@@ -6,9 +6,11 @@ import { reconcileDocData } from '../docs/reconcileData';
  * Generates doc data from a section and then pushes it
  * @returns
  */
-export async function pushFigmaUpdates(
-  context
-): Promise<{ type: string; data: any; selectedFrame: number }> {
+export async function pushFigmaUpdates(context): Promise<{
+  type: string;
+  data: any;
+  selectedFrame: number;
+}> {
   let selectedFrame: number = 0;
   let selection = figma.currentPage.selection[0];
   let parentSection: SectionNode;
@@ -41,9 +43,9 @@ export async function pushFigmaUpdates(
         break;
     }
 
-    if (parentSection) {
+    if (parentSection && parentSection.children.length) {
       let generatedDoc: DocData;
-      await generateJSONFromFigmaContent(parentSection).then(
+      await generateJSONFromFigmaContent(parentSection, context.settings).then(
         (data) => (generatedDoc = data)
       );
       //console.log('Generated doc');

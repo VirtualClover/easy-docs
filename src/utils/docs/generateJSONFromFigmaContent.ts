@@ -5,6 +5,7 @@ import {
   FIGMA_LAST_EDITED_KEY,
   FIGMA_NAMESPACE,
   PageData,
+  PluginSettings,
 } from '../constants';
 import {
   generateBlockDataFromDisplayFrame,
@@ -27,9 +28,11 @@ import { generateBlockDataFromParagraph } from '../figma/components/paragraphCom
 import { generateBlockDataFromQuote } from '../figma/components/quoteComponent.figma';
 import { generateBlockDataFromTable } from '../figma/components/tableComponent.figma';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
+import { styleFrame } from '../figma/styleFrame';
 
 export async function generateJSONFromFigmaContent(
-  section: SectionNode
+  section: SectionNode,
+  settings: PluginSettings
 ): Promise<DocData> {
   let JSONData: DocData = {
     title: encodeStringForHTML(section.name),
@@ -49,10 +52,10 @@ export async function generateJSONFromFigmaContent(
     let children = section.children;
 
     for (let i = 0; i < children.length; i++) {
-      let child = children[i];      
+      let child = children[i];
       if (child.type == 'FRAME') {
         JSONData.pages.push(
-          await generatePageDataFromFrame(child, componentData)
+          await generatePageDataFromFrame(child, componentData, settings)
         );
       }
     }
@@ -84,14 +87,18 @@ async function getMainCompIdFromInstance(instance: InstanceNode) {
 
 async function generatePageDataFromFrame(
   frame: FrameNode,
-  componentData: BaseFileData
+  componentData: BaseFileData,
+  settings: PluginSettings
 ): Promise<PageData> {
   let pageData: PageData = {
     blocks: [],
     title: '',
     frameId: frame.id,
   };
-  if (frame.children) {
+  if (frame.layoutMode != 'VERTICAL') {
+    styleFrame(frame, settings);
+  }
+  if (frame.children.length) {
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
@@ -107,7 +114,7 @@ async function generatePageDataFromFrame(
       if (childNode.type == 'INSTANCE') {
         let mainCompId: string;
         await childNode.getMainComponentAsync().then((component) => {
- // TODO Add check for component parent
+          // TODO Add check for component parent
           mainCompId =
             component.parent.type == 'COMPONENT_SET'
               ? component.parent.id
