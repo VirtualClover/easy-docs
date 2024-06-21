@@ -1,5 +1,5 @@
 import {
-  BaseFileData,
+  BaseComponentData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
@@ -16,7 +16,12 @@ import {
 } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
-import { BlockData, DisplayFrameBlockData } from '../../constants';
+import {
+  BlockData,
+  DisplayFrameBlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+} from '../../constants';
 
 export async function createDisplayFrameComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -142,7 +147,7 @@ async function generateOuterWrapper(
     });
     let image = figma.createImage(bytes);
     let frame = figma.createFrame();
-    frame.name = `[EASY-DOCS]displaying: ${nodeToDisplay.name}`;
+    frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${nodeToDisplay.name}`;
     frame.x = maxWidth;
     frame.resize(
       nodeToDisplay.width * scaleFactor,
@@ -172,13 +177,13 @@ async function generateOuterWrapper(
 export async function generateDisplayFrameInstance(
   data: DisplayFrameBlockData
 ): Promise<FrameNode | null> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let component: BaseNode;
 
   await figma
-    .getNodeByIdAsync(componentData.displayFrame.id)
+    .getNodeByIdAsync(componentData.components.displayFrame.id)
     .then((node) => {
       component = node;
     })
@@ -203,10 +208,10 @@ export async function generateDisplayFrameInstance(
     }
 
     instance.setProperties({
-      [componentData.displayFrame.captionProp]: decodeStringForFigma(
+      [componentData.components.displayFrame.captionProp]: decodeStringForFigma(
         data.caption
       ),
-      [componentData.displayFrame.sourceProp]: sourceURL,
+      [componentData.components.displayFrame.sourceProp]: sourceURL,
     });
 
     let nodeToDisplay: FrameNode;
@@ -231,14 +236,15 @@ export async function generateDisplayFrameInstance(
 
 export async function generateBlockDataFromDisplayFrame(
   instNode: InstanceNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
   let blockType = 'displayFrame';
   let url =
-    instNode.componentProperties[componentData.displayFrame.sourceProp].value ??
-    '';
+    instNode.componentProperties[
+      componentData.components.displayFrame.sourceProp
+    ].value ?? '';
   let frameDetails;
   let frameExistsInFile: boolean | undefined = undefined;
   let blockData = {
@@ -250,8 +256,9 @@ export async function generateBlockDataFromDisplayFrame(
       fileId: '',
       frameExistsInFile,
       caption: encodeStringForHTML(
-        instNode.componentProperties[componentData.displayFrame.captionProp]
-          .value as string
+        instNode.componentProperties[
+          componentData.components.displayFrame.captionProp
+        ].value as string
       ),
     },
   };
@@ -272,7 +279,7 @@ export async function generateBlockDataFromDisplayFrame(
             frameExistsInFile,
             caption: encodeStringForHTML(
               instNode.componentProperties[
-                componentData.displayFrame.captionProp
+                componentData.components.displayFrame.captionProp
               ].value as string
             ),
           },
@@ -287,7 +294,7 @@ export async function hydrateDisplayFrame(
   instance: InstanceNode,
   parentFrame: FrameNode,
   indexInFrame: number,
-  componentData: BaseFileData
+  componentData: BaseComponentData
 ) {
   let block;
   await generateBlockDataFromDisplayFrame(

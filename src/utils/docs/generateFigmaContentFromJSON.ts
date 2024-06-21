@@ -1,11 +1,11 @@
 import {
   BlockData,
   DocData,
-  FIGMA_NAMESPACE,
   PageData,
   PluginSettings,
 } from '../constants/constants';
 
+import { FIGMA_NAMESPACE } from '../constants';
 import { createPageFrame } from '../figma/createPageFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateAlertInstance } from '../figma/components/AlertComponent.figma';

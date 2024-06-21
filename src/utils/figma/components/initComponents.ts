@@ -1,4 +1,6 @@
-import { BaseFileData } from '../../constants/constants';
+import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
+
+import { BaseComponentData } from '../../constants/constants';
 import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
 import { createCodeComponent } from './codeComponent.figma';
@@ -17,7 +19,7 @@ import { createTableCellComponent } from './tableComponent.figma';
  * @param wholeObjectisMissing
  */
 export async function initComponents(
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   wholeObjectisMissing: Boolean = true
 ) {
   figma.notify(
@@ -76,21 +78,22 @@ export async function initComponents(
     let alert = values[8];
     let code = values[9];
     let divider = values[10];
-    componentData.header = header;
-    componentData.paragraph = paragraph;
-    componentData.quote = quote;
-    componentData.displayFrame = displayFrame;
-    componentData.dosAndDonts = dosAndDonts;
-    componentData.brokenLink = brokenLink;
-    componentData.list = list;
-    componentData.tableCell = tableCell;
-    componentData.alert = alert;
-    componentData.code = code;
-    componentData.divider = divider;
+    componentData.components.header = header;
+    componentData.components.paragraph = paragraph;
+    componentData.components.quote = quote;
+    componentData.components.displayFrame = displayFrame;
+    componentData.components.dosAndDonts = dosAndDonts;
+    componentData.components.brokenLink = brokenLink;
+    componentData.components.list = list;
+    componentData.components.tableCell = tableCell;
+    componentData.components.alert = alert;
+    componentData.components.code = code;
+    componentData.components.divider = divider;
     componentData.componentsPage.id = page.id;
+    componentData.lastGenerated = Date.now();
     figma.root.setSharedPluginData(
-      'EasyDocs',
-      'components',
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_DATA_KEY,
       JSON.stringify(componentData)
     );
   });

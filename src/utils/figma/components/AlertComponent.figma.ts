@@ -1,10 +1,13 @@
 import {
   AlertBlockData,
   BlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
   TextAlignment,
   UpperCaseTextAligment,
 } from '../../constants';
 import {
+  BaseComponentData,
   DEFAULT_SETTINGS,
   DEFAULT_STATUSES,
   FIGMA_COMPONENT_PREFIX,
@@ -17,7 +20,6 @@ import {
   warningIcon,
 } from '../../../assets/svgs';
 
-import { BaseFileData } from '../../constants/constants';
 import { encodeStringForHTML } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
@@ -127,7 +129,6 @@ export async function createAlertComponent(
     componentSet.itemSpacing = 90;
     componentSet.name = `${FIGMA_COMPONENT_PREFIX}Alert`;
   });
-  console.log(componentSet.componentPropertyDefinitions);
   return {
     id: componentSet.id,
     contentProp: Object.keys(componentSet.componentPropertyDefinitions)[0],
@@ -142,12 +143,12 @@ export async function createAlertComponent(
 export async function generateAlertInstance(
   data: AlertBlockData
 ): Promise<InstanceNode | null> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let componentSet: BaseNode;
   await figma
-    .getNodeByIdAsync(componentData.alert.id)
+    .getNodeByIdAsync(componentData.components.alert.id)
     .then((node) => {
       componentSet = node;
     })
@@ -161,8 +162,8 @@ export async function generateAlertInstance(
     let instance = component.createInstance();
 
     instance.setProperties({
-      [componentData.alert.contentProp]: data.message,
-      [componentData.alert.typeProp.key]: `${data.type}`,
+      [componentData.components.alert.contentProp]: data.message,
+      [componentData.components.alert.typeProp.key]: `${data.type}`,
     });
 
     let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
@@ -182,7 +183,7 @@ export async function generateAlertInstance(
 
 export async function generateBlockDataFromAlert(
   instNode: InstanceNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
@@ -192,10 +193,11 @@ export async function generateBlockDataFromAlert(
     lastEdited,
     figmaNodeId,
     data: {
-      type: instNode.componentProperties[componentData.dosAndDonts.typeProp.key]
-        .value as StatusType,
+      type: instNode.componentProperties[
+        componentData.components.dosAndDonts.typeProp.key
+      ].value as StatusType,
       message: encodeStringForHTML(
-        instNode.componentProperties[componentData.alert.contentProp]
+        instNode.componentProperties[componentData.components.alert.contentProp]
           .value as string
       ),
       align: textNode.textAlignHorizontal.toLocaleLowerCase() as TextAlignment,

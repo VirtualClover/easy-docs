@@ -1,9 +1,12 @@
 import {
   AuthorUser,
+  BASE_COMPONENT_DATA,
   BASE_FILE_DATA,
+  BaseComponentData,
   BaseFileData,
   DEFAULT_SETTINGS,
 } from '../constants/constants';
+import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../constants';
 
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { initComponents } from './components/initComponents';
@@ -13,12 +16,15 @@ import { objectIsNull } from '../objectisNull';
  * The initialization func of the plugin
  */
 export async function pluginInit() {
-  let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
+  let stringComponentData = figma.root.getSharedPluginData(
+    FIGMA_NAMESPACE,
+    FIGMA_COMPONENT_DATA_KEY
+  );
   let userData: AuthorUser = getUserDetailsInFigma();
-  
-  let componentData: BaseFileData = stringData
-    ? JSON.parse(stringData)
-    : BASE_FILE_DATA;
+
+  let componentData: BaseComponentData = stringComponentData
+    ? JSON.parse(stringComponentData)
+    : BASE_COMPONENT_DATA;
   //console.log(componentData);
   //Check if object exists
   if (objectIsNull(componentData)) {
@@ -42,7 +48,7 @@ export async function pluginInit() {
       }
     }
   }
-  
+
   figma.ui.postMessage({
     type: 'data-loaded',
     data: { settings: DEFAULT_SETTINGS, user: userData },

@@ -1,10 +1,16 @@
 import {
+  BaseComponentData,
   BaseFileData,
   DEFAULT_SETTINGS,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
-import { BlockData, TableBlockData } from '../../constants';
+import {
+  BlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+  TableBlockData,
+} from '../../constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -138,12 +144,12 @@ async function generateTableRow(index: number, hasHeader: boolean = false) {
 export async function generateTableInstance(
   data: TableBlockData
 ): Promise<FrameNode | null> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let componentSet: BaseNode;
   await figma
-    .getNodeByIdAsync(componentData.tableCell.id)
+    .getNodeByIdAsync(componentData.components.tableCell.id)
     .then((node) => {
       componentSet = node;
     })
@@ -174,8 +180,8 @@ export async function generateTableInstance(
           let cellInstance = component.createInstance();
 
           cellInstance.setProperties({
-            [componentData.tableCell.contentProp]: cellContent,
-            [componentData.tableCell.typeProp.key]:
+            [componentData.components.tableCell.contentProp]: cellContent,
+            [componentData.components.tableCell.typeProp.key]:
               data.withHeadings && i == 0 ? 'header' : 'body',
           });
 
@@ -193,8 +199,8 @@ export async function generateTableInstance(
       let cellInstance = component.createInstance();
 
       cellInstance.setProperties({
-        [componentData.tableCell.contentProp]: cellContent,
-        [componentData.tableCell.typeProp.key]: data.withHeadings
+        [componentData.components.tableCell.contentProp]: cellContent,
+        [componentData.components.tableCell.typeProp.key]: data.withHeadings
           ? 'header'
           : 'body',
       });
@@ -215,7 +221,7 @@ export async function generateTableInstance(
 export async function generateBlockDataFromTable(
   instNode: InstanceNode,
   mainCompId: string,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
@@ -236,12 +242,13 @@ export async function generateBlockDataFromTable(
                 ? component.parent.id
                 : component.id;
 
-            if (mainCompId === componentData.tableCell.id) {
+            if (mainCompId === componentData.components.tableCell.id) {
               // check if header
               if (i == 0 && ci == 0) {
                 withHeadings =
-                  cell.componentProperties[componentData.tableCell.typeProp.key]
-                    .value == 'header';
+                  cell.componentProperties[
+                    componentData.components.tableCell.typeProp.key
+                  ].value == 'header';
               }
               let cellContent = setFlavoredTextOnEncodedString(cell);
               tempRowContent.push(encodeStringForHTML(cellContent));

@@ -1,15 +1,20 @@
-import { BlockData, HeaderBlockData } from '../../constants';
 import {
+  BaseComponentData,
   DEFAULT_HEADING_SIZES,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
+  BlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+  HeaderBlockData,
+} from '../../constants';
+import {
   decodeStringForFigma,
   encodeStringForHTML,
 } from '../../general/cleanseTextData';
 
-import { BaseFileData } from '../../constants/constants';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
@@ -69,12 +74,12 @@ export async function createHeaderComponent(
 export async function generateHeaderInstance(
   data: HeaderBlockData
 ): Promise<InstanceNode> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let componentSet: BaseNode;
   await figma
-    .getNodeByIdAsync(componentData.header.id)
+    .getNodeByIdAsync(componentData.components.header.id)
     .then((node) => {
       componentSet = node;
     })
@@ -86,8 +91,10 @@ export async function generateHeaderInstance(
     let component = componentSet.children[0] as ComponentNode;
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.header.contentProp]: decodeStringForFigma(data.text),
-      [componentData.header.levelProp.key]: `${data.level}`,
+      [componentData.components.header.contentProp]: decodeStringForFigma(
+        data.text
+      ),
+      [componentData.components.header.levelProp.key]: `${data.level}`,
     });
     return instance;
     //instance.set
@@ -98,12 +105,13 @@ export async function generateHeaderInstance(
 
 export async function generateBlockDataFromHeader(
   node: InstanceNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
   let headerContent = encodeStringForHTML(
-    node.componentProperties[componentData.header.contentProp].value as string
+    node.componentProperties[componentData.components.header.contentProp]
+      .value as string
   );
 
   return {
@@ -113,7 +121,7 @@ export async function generateBlockDataFromHeader(
     data: {
       text: headerContent,
       level: parseInt(
-        node.componentProperties[componentData.header.levelProp.key]
+        node.componentProperties[componentData.components.header.levelProp.key]
           .value as string,
         10
       ),

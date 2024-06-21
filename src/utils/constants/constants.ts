@@ -42,60 +42,69 @@ export interface BlockData extends OutputBlockData {
   lastEdited: number;
 }
 
-export const BASE_FILE_DATA = {
+export const BASE_COMPONENT_DATA = {
+  components: {
+    header: {
+      id: '',
+      levelProp: { key: '', variables: [] },
+      contentProp: '',
+    },
+    paragraph: {
+      id: '',
+      contentProp: '',
+    },
+    quote: {
+      id: '',
+      contentProp: '',
+      authorProp: '',
+    },
+    displayFrame: {
+      id: '',
+      captionProp: '',
+      sourceProp: '',
+    },
+    dosAndDonts: {
+      id: '',
+      captionProp: '',
+      sourceProp: '',
+      typeProp: { key: '', variables: [] },
+    },
+    brokenLink: {
+      id: '',
+      captionProp: '',
+    },
+    list: {
+      id: '',
+      contentProp: '',
+    },
+    tableCell: {
+      id: '',
+      contentProp: '',
+      typeProp: { key: '', variables: [''] },
+    },
+    alert: {
+      id: '',
+      contentProp: '',
+      typeProp: { key: '', variables: [] },
+    },
+    code: {
+      id: '',
+      contentProp: '',
+    },
+    divider: {
+      id: '',
+    },
+  },
   componentsPage: {
     id: '',
   },
-  header: {
-    id: '',
-    levelProp: { key: '', variables: [] },
-    contentProp: '',
-  },
-  paragraph: {
-    id: '',
-    contentProp: '',
-  },
-  quote: {
-    id: '',
-    contentProp: '',
-    authorProp: '',
-  },
-  displayFrame: {
-    id: '',
-    captionProp: '',
-    sourceProp: '',
-  },
-  dosAndDonts: {
-    id: '',
-    captionProp: '',
-    sourceProp: '',
-    typeProp: { key: '', variables: [] },
-  },
-  brokenLink: {
-    id: '',
-    captionProp: '',
-  },
-  list: {
-    id: '',
-    contentProp: '',
-  },
-  tableCell: {
-    id: '',
-    contentProp: '',
-    typeProp: { key: '', variables: [''] },
-  },
-  alert: {
-    id: '',
-    contentProp: '',
-    typeProp: { key: '', variables: [] },
-  },
-  code: {
-    id: '',
-    contentProp: '',
-  },
-  divider: {
-    id: '',
-  },
+  lastGenerated: 0,
+};
+
+export type BaseComponentData = typeof BASE_COMPONENT_DATA;
+
+export const BASE_FILE_DATA = {
+  componentData: BASE_COMPONENT_DATA,
 };
 export type BaseFileData = typeof BASE_FILE_DATA;
 
@@ -259,9 +268,6 @@ export const DEFAULT_PLUGIN_DATA = {
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 
 export const FIGMA_COMPONENT_PREFIX = '.[EASY-DOCS]';
-
-export const FIGMA_NAMESPACE = 'EasyDocs';
-export const FIGMA_LAST_EDITED_KEY = 'lastEdited';
 
 export interface FrameDetailsFromURL {
   frameId: string;

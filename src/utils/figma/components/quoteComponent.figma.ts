@@ -1,8 +1,15 @@
-import { BlockData, QuoteBlockData, TextAlignment } from '../../constants';
 import {
+  BaseComponentData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
+import {
+  BlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+  QuoteBlockData,
+  TextAlignment,
+} from '../../constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -12,7 +19,6 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { BaseFileData } from '../../constants/constants';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -95,23 +101,27 @@ export async function createQuoteComponent(parent: FrameNode) {
 export async function generateQuoteInstance(
   data: QuoteBlockData
 ): Promise<InstanceNode> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let component: BaseNode;
-  await figma.getNodeByIdAsync(componentData.quote.id).then((node) => {
-    component = node;
-  });
+  await figma
+    .getNodeByIdAsync(componentData.components.quote.id)
+    .then((node) => {
+      component = node;
+    });
 
   let quoteText = decodeStringForFigma(data.text, true);
 
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.quote.contentProp]: quoteText,
+      [componentData.components.quote.contentProp]: quoteText,
     });
     instance.setProperties({
-      [componentData.quote.authorProp]: decodeStringForFigma(data.caption),
+      [componentData.components.quote.authorProp]: decodeStringForFigma(
+        data.caption
+      ),
     });
 
     await setFlavoredTextOnFigmaNode(quoteText, instance, data.alignment);
@@ -124,7 +134,7 @@ export async function generateQuoteInstance(
 
 export async function generateBlockDataFromQuote(
   node: InstanceNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
@@ -137,7 +147,8 @@ export async function generateBlockDataFromQuote(
     data: {
       text: encodeStringForHTML(quoteText),
       caption: encodeStringForHTML(
-        node.componentProperties[componentData.quote.authorProp].value as string
+        node.componentProperties[componentData.components.quote.authorProp]
+          .value as string
       ),
       alignment:
         textNode.textAlignHorizontal.toLocaleLowerCase() != 'right'

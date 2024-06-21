@@ -1,12 +1,11 @@
 import {
+  BaseComponentData,
   DEFAULT_GUIDELINES,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
   GuidelineType,
 } from '../../constants/constants';
 import { cautionIcon, doIcon, dontIcon } from '../../../assets/svgs';
-
-import { BaseFileData } from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -19,7 +18,12 @@ import {
 } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
-import { BlockData, DosAndDontsBlockData } from '../../constants';
+import {
+  BlockData,
+  DosAndDontsBlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+} from '../../constants';
 
 function decideAssetsToDisplay(type: GuidelineType) {
   switch (type) {
@@ -239,12 +243,12 @@ async function generateOuterWrapper(
 export async function generateDosAndDontsInstance(
   data: DosAndDontsBlockData
 ): Promise<FrameNode | null> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let componentSet: BaseNode;
   await figma
-    .getNodeByIdAsync(componentData.dosAndDonts.id)
+    .getNodeByIdAsync(componentData.components.dosAndDonts.id)
     .then((node) => {
       componentSet = node;
     })
@@ -272,11 +276,11 @@ export async function generateDosAndDontsInstance(
     }
 
     instance.setProperties({
-      [componentData.dosAndDonts.sourceProp]: sourceURL,
-      [componentData.dosAndDonts.captionProp]: decodeStringForFigma(
+      [componentData.components.dosAndDonts.sourceProp]: sourceURL,
+      [componentData.components.dosAndDonts.captionProp]: decodeStringForFigma(
         data.caption
       ),
-      [componentData.dosAndDonts.typeProp.key]: `${data.type}`,
+      [componentData.components.dosAndDonts.typeProp.key]: `${data.type}`,
     });
 
     let nodeToDisplay: FrameNode;
@@ -302,13 +306,14 @@ export async function generateDosAndDontsInstance(
 
 export async function generateBlockDataFromDosAndDonts(
   instNode: InstanceNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
   let url =
-    instNode.componentProperties[componentData.dosAndDonts.sourceProp].value ??
-    '';
+    instNode.componentProperties[
+      componentData.components.dosAndDonts.sourceProp
+    ].value ?? '';
   let frameDetails;
   let frameExistsInFile: boolean | undefined = undefined;
   let blockData = {
@@ -318,12 +323,14 @@ export async function generateBlockDataFromDosAndDonts(
     data: {
       frameId: '',
       fileId: '',
-      type: instNode.componentProperties[componentData.dosAndDonts.typeProp.key]
-        .value,
+      type: instNode.componentProperties[
+        componentData.components.dosAndDonts.typeProp.key
+      ].value,
       frameExistsInFile,
       caption: encodeStringForHTML(
-        instNode.componentProperties[componentData.dosAndDonts.captionProp]
-          .value as string
+        instNode.componentProperties[
+          componentData.components.dosAndDonts.captionProp
+        ].value as string
       ),
     },
   };
@@ -341,12 +348,12 @@ export async function generateBlockDataFromDosAndDonts(
             frameId: frameDetails.frameId,
             fileId: frameDetails.fileId,
             type: instNode.componentProperties[
-              componentData.dosAndDonts.typeProp.key
+              componentData.components.dosAndDonts.typeProp.key
             ].value,
             frameExistsInFile,
             caption: encodeStringForHTML(
               instNode.componentProperties[
-                componentData.dosAndDonts.captionProp
+                componentData.components.dosAndDonts.captionProp
               ].value as string
             ),
           },
@@ -361,7 +368,7 @@ export async function hydrateDosAndDontsFrame(
   instance: InstanceNode,
   parentFrame: FrameNode,
   indexInFrame: number,
-  componentData: BaseFileData
+  componentData: BaseComponentData
 ) {
   let block;
   await generateBlockDataFromDosAndDonts(

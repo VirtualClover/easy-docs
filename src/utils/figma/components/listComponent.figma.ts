@@ -1,13 +1,16 @@
 import {
+  BaseComponentData,
+  DEFAULT_SETTINGS,
+  FIGMA_COMPONENT_PREFIX,
+} from '../../constants/constants';
+import {
   BlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
   ListBlockData,
   ListOrder,
   UpperCaseListOrder,
 } from '../../constants';
-import {
-  DEFAULT_SETTINGS,
-  FIGMA_COMPONENT_PREFIX,
-} from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -17,7 +20,6 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { BaseFileData } from '../../constants/constants';
 import { clone } from '../../clone';
 import { setNodeFills } from '../setNodeFills';
 
@@ -57,13 +59,15 @@ export async function createListComponent(parent: FrameNode) {
 export async function generateListInstance(
   data: ListBlockData
 ): Promise<InstanceNode> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let component: BaseNode;
-  await figma.getNodeByIdAsync(componentData.list.id).then((node) => {
-    component = node;
-  });
+  await figma
+    .getNodeByIdAsync(componentData.components.list.id)
+    .then((node) => {
+      component = node;
+    });
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     let jointData = '';
@@ -82,7 +86,7 @@ export async function generateListInstance(
       //console.log(jointData);
     }
     instance.setProperties({
-      [componentData.list.contentProp]: jointDataDecoded,
+      [componentData.components.list.contentProp]: jointDataDecoded,
     });
     //console.log('here');
     await figma

@@ -1,10 +1,11 @@
 import {
+  BaseComponentData,
   BlockData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
+import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
 
-import { BaseFileData } from '../../constants/constants';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
 export async function createDividerComponent(parent: FrameNode) {
@@ -32,13 +33,15 @@ export async function createDividerComponent(parent: FrameNode) {
 }
 
 export async function generateDividerInstance(): Promise<InstanceNode> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let component: BaseNode;
-  await figma.getNodeByIdAsync(componentData.divider.id).then((node) => {
-    component = node;
-  });
+  await figma
+    .getNodeByIdAsync(componentData.components.divider.id)
+    .then((node) => {
+      component = node;
+    });
 
   //console.log(content);
 

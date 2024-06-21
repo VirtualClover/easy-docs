@@ -1,10 +1,15 @@
-import { BlockData, CodeBlockData } from '../../constants';
 import {
+  BaseComponentData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
+import {
+  BlockData,
+  CodeBlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+} from '../../constants';
 
-import { BaseFileData } from '../../constants/constants';
 import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
@@ -67,17 +72,21 @@ export async function createCodeComponent(parent: FrameNode) {
 export async function generateCodeInstance(
   data: CodeBlockData
 ): Promise<InstanceNode> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let component: BaseNode;
-  await figma.getNodeByIdAsync(componentData.code.id).then((node) => {
-    component = node;
-  });
+  await figma
+    .getNodeByIdAsync(componentData.components.code.id)
+    .then((node) => {
+      component = node;
+    });
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.code.contentProp]: decodeStringForFigma(data.code),
+      [componentData.components.code.contentProp]: decodeStringForFigma(
+        data.code
+      ),
     });
     return instance;
     //instance.set
@@ -87,7 +96,7 @@ export async function generateCodeInstance(
 
 export async function generateBlockDataFromCode(
   node: InstanceNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
@@ -96,7 +105,7 @@ export async function generateBlockDataFromCode(
     lastEdited,
     figmaNodeId,
     data: {
-      code: node.componentProperties[componentData.code.contentProp]
+      code: node.componentProperties[componentData.components.code.contentProp]
         .value as string,
     },
   };

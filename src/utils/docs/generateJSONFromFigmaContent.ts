@@ -1,19 +1,21 @@
 import {
-  BaseFileData,
+  BaseComponentData,
   DocData,
   EMPTY_DOC_OBJECT,
-  FIGMA_LAST_EDITED_KEY,
-  FIGMA_NAMESPACE,
   PageData,
   PluginSettings,
 } from '../constants/constants';
+import {
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_LAST_EDITED_KEY,
+  FIGMA_NAMESPACE,
+} from '../constants';
 import {
   generateBlockDataFromDisplayFrame,
   hydrateDisplayFrame,
 } from '../figma/components/displayFrameComponent.figma';
 import {
   generateBlockDataFromDosAndDonts,
-  generateDosAndDontsInstance,
   hydrateDosAndDontsFrame,
 } from '../figma/components/dosAndDontsComponent.figma';
 
@@ -45,8 +47,11 @@ export async function generateJSONFromFigmaContent(
     lastEdited: Date.now().toString(),
   };
 
-  let stringData = figma.root.getSharedPluginData('EasyDocs', 'components');
-  let componentData: BaseFileData = JSON.parse(stringData);
+  let stringComponentData = figma.root.getSharedPluginData(
+    FIGMA_NAMESPACE,
+    FIGMA_COMPONENT_DATA_KEY
+  );
+  let componentData: BaseComponentData = JSON.parse(stringComponentData);
 
   if (section.children) {
     let children = section.children;
@@ -87,7 +92,7 @@ async function getMainCompIdFromInstance(instance: InstanceNode) {
 
 async function generatePageDataFromFrame(
   frame: FrameNode,
-  componentData: BaseFileData,
+  componentData: BaseComponentData,
   settings: PluginSettings
 ): Promise<PageData> {
   let pageData: PageData = {
@@ -122,7 +127,7 @@ async function generatePageDataFromFrame(
         });
 
         switch (mainCompId) {
-          case componentData.header.id:
+          case componentData.components.header.id:
             generateBlockDataFromHeader(
               childNode,
               componentData,
@@ -130,14 +135,14 @@ async function generatePageDataFromFrame(
               childNode.id
             ).then((data) => pageData.blocks.push(data));
             break;
-          case componentData.paragraph.id:
+          case componentData.components.paragraph.id:
             generateBlockDataFromParagraph(
               childNode,
               editedDate,
               childNode.id
             ).then((data) => pageData.blocks.push(data));
             break;
-          case componentData.quote.id:
+          case componentData.components.quote.id:
             generateBlockDataFromQuote(
               childNode,
               componentData,
@@ -146,12 +151,12 @@ async function generatePageDataFromFrame(
             ).then((data) => pageData.blocks.push(data));
 
             break;
-          case componentData.list.id:
+          case componentData.components.list.id:
             generateBlockDataFromList(childNode, editedDate, childNode.id).then(
               (data) => pageData.blocks.push(data)
             );
             break;
-          case componentData.alert.id:
+          case componentData.components.alert.id:
             generateBlockDataFromAlert(
               childNode,
               componentData,
@@ -159,7 +164,7 @@ async function generatePageDataFromFrame(
               childNode.id
             ).then((data) => pageData.blocks.push(data));
             break;
-          case componentData.code.id:
+          case componentData.components.code.id:
             generateBlockDataFromCode(
               childNode,
               componentData,
@@ -167,12 +172,12 @@ async function generatePageDataFromFrame(
               childNode.id
             ).then((data) => pageData.blocks.push(data));
             break;
-          case componentData.divider.id:
+          case componentData.components.divider.id:
             generateBlockDataFromDivider(editedDate, childNode.id).then(
               (data) => pageData.blocks.push(data)
             );
             break;
-          case componentData.dosAndDonts.id:
+          case componentData.components.dosAndDonts.id:
             //Probably a dehydrated frame
             await hydrateDosAndDontsFrame(
               childNode,
@@ -181,7 +186,7 @@ async function generatePageDataFromFrame(
               componentData
             ).then((data) => pageData.blocks.push(data));
             break;
-          case componentData.displayFrame.id:
+          case componentData.components.displayFrame.id:
             //Probably a dehydrated frame
             await hydrateDisplayFrame(childNode, frame, i, componentData).then(
               (data) => pageData.blocks.push(data)
@@ -201,7 +206,7 @@ async function generatePageDataFromFrame(
             (id) => (mainCompId = id)
           );
 
-          if (mainCompId == componentData.brokenLink.id) {
+          if (mainCompId == componentData.components.brokenLink.id) {
             instInsideAFrame = scanInsideAFrame(childNode, instInsideAFrame.id);
             await getMainCompIdFromInstance(instInsideAFrame).then(
               (id) => (mainCompId = id)
@@ -209,7 +214,7 @@ async function generatePageDataFromFrame(
           }
 
           switch (mainCompId) {
-            case componentData.displayFrame.id:
+            case componentData.components.displayFrame.id:
               await generateBlockDataFromDisplayFrame(
                 instInsideAFrame,
                 componentData,
@@ -219,7 +224,7 @@ async function generatePageDataFromFrame(
                 pageData.blocks.push(data);
               });
               break;
-            case componentData.dosAndDonts.id:
+            case componentData.components.dosAndDonts.id:
               await generateBlockDataFromDosAndDonts(
                 instInsideAFrame,
                 componentData,
@@ -228,7 +233,7 @@ async function generatePageDataFromFrame(
               ).then((data) => pageData.blocks.push(data));
 
               break;
-            case componentData.tableCell.id:
+            case componentData.components.tableCell.id:
               await generateBlockDataFromTable(
                 instInsideAFrame,
                 mainCompId,

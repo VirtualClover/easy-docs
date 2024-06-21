@@ -1,8 +1,14 @@
-import { BlockData, ParagraphBlockData } from '../../constants';
 import {
+  BaseComponentData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
+import {
+  BlockData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+  ParagraphBlockData,
+} from '../../constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -50,13 +56,15 @@ export async function createParagraphComponent(parent: FrameNode) {
 export async function generateParagraphInstance(
   data: ParagraphBlockData
 ): Promise<InstanceNode> {
-  let componentData: BaseFileData = JSON.parse(
-    figma.root.getSharedPluginData('EasyDocs', 'components')
+  let componentData: BaseComponentData = JSON.parse(
+    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let component: BaseNode;
-  await figma.getNodeByIdAsync(componentData.paragraph.id).then((node) => {
-    component = node;
-  });
+  await figma
+    .getNodeByIdAsync(componentData.components.paragraph.id)
+    .then((node) => {
+      component = node;
+    });
   let content = decodeStringForFigma(data.text, true);
 
   //console.log(content);
@@ -64,7 +72,7 @@ export async function generateParagraphInstance(
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({
-      [componentData.paragraph.contentProp]: content,
+      [componentData.components.paragraph.contentProp]: content,
     });
 
     await setFlavoredTextOnFigmaNode(content, instance);
