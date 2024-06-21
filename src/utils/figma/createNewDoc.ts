@@ -1,4 +1,4 @@
-import { DocData, PluginSettings } from '../constants';
+import { DocData, PluginSettings } from '../constants/constants';
 
 import { generateFigmaContentFromJSON } from '../docs/generateFigmaContentFromJSON';
 import { setNodeFills } from './setNodeFills';
@@ -14,6 +14,8 @@ export async function createNewDoc(
   settings: PluginSettings
 ): Promise<SectionNode> {
   let parentSection = figma.createSection();
+  parentSection.x = figma.viewport.center.x;
+  parentSection.y = figma.viewport.center.y;
   parentSection.resizeWithoutConstraints(
     settings.customization.section.padding,
     settings.customization.section.padding

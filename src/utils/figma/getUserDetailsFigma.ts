@@ -1,4 +1,4 @@
-import { AuthorUser } from '../constants';
+import { AuthorUser } from '../constants/constants';
 
 /**
  * Gets the user details from the Figma to create and authro user obj

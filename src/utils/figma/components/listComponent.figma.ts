@@ -1,8 +1,13 @@
 import {
   BlockData,
+  ListBlockData,
+  ListOrder,
+  UpperCaseListOrder,
+} from '../../constants';
+import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
+} from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -12,7 +17,7 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
 import { clone } from '../../clone';
 import { setNodeFills } from '../setNodeFills';
 
@@ -49,7 +54,9 @@ export async function createListComponent(parent: FrameNode) {
   };
 }
 
-export async function generateListInstance(data): Promise<InstanceNode> {
+export async function generateListInstance(
+  data: ListBlockData
+): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
@@ -83,7 +90,7 @@ export async function generateListInstance(data): Promise<InstanceNode> {
       .then(() => {
         if (textNode.type == 'TEXT' && jointDataDecoded.length) {
           textNode.setRangeListOptions(0, jointDataDecoded.length, {
-            type: data.style.toUpperCase(),
+            type: data.style.toUpperCase() as UpperCaseListOrder,
           });
         }
       });
@@ -115,7 +122,7 @@ export async function generateBlockDataFromList(
     content = content.replace(/\n\<\/a\>/g, '</a>\n');
     arr = content.split('\n');
   }
-  let listStyle: string = 'unordered';
+  let listStyle: ListOrder = 'unordered';
   let textNode = node.findOne((n) => n.type === 'TEXT') as TextNode;
   if (textNode.characters.length) {
     let unformattedStyle = textNode.getRangeListOptions(
@@ -123,13 +130,13 @@ export async function generateBlockDataFromList(
       textNode.characters.length
     );
     if (unformattedStyle != figma.mixed && unformattedStyle.type != 'NONE') {
-      listStyle = unformattedStyle.type.toLowerCase();
+      listStyle = unformattedStyle.type.toLowerCase() as ListOrder;
     } else {
       await figma
         .loadFontAsync({ family: 'Inter', style: 'Regular' })
         .then(() => {
           textNode.setRangeListOptions(0, textNode.characters.length, {
-            type: 'UNORDERED',
+            type: listStyle.toUpperCase() as UpperCaseListOrder,
           });
         });
     }

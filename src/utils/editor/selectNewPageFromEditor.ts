@@ -1,4 +1,4 @@
-import { PluginData } from '../constants';
+import { PluginData } from '../constants/constants';
 
 export const selectNewPageFromEditor = (
   pageIndex: number,

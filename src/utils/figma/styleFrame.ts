@@ -1,4 +1,4 @@
-import { PluginSettings } from '../constants';
+import { PluginSettings } from '../constants/constants';
 import { decodeStringForFigma } from '../general/cleanseTextData';
 import { setNodeFills } from './setNodeFills';
 /**

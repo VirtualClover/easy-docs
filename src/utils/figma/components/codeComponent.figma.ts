@@ -1,14 +1,11 @@
+import { BlockData, CodeBlockData } from '../../constants';
 import {
-  BlockData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
-import {
-  decodeStringForFigma,
-  encodeStringForHTML,
-} from '../../general/cleanseTextData';
+} from '../../constants/constants';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
+import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createCodeComponent(parent: FrameNode) {
@@ -67,7 +64,9 @@ export async function createCodeComponent(parent: FrameNode) {
   };
 }
 
-export async function generateCodeInstance(data): Promise<InstanceNode> {
+export async function generateCodeInstance(
+  data: CodeBlockData
+): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );

@@ -1,7 +1,7 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import { DEFAULT_SETTINGS, DocData, EMPTY_DOC_OBJECT } from './utils/constants';
+import { DEFAULT_SETTINGS, DocData, EMPTY_DOC_OBJECT } from './utils/constants/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';

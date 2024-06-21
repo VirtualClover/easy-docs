@@ -4,9 +4,9 @@ import {
   FIGMA_NAMESPACE,
   PageData,
   PluginSettings,
-} from '../constants';
+} from '../constants/constants';
 
-import { createDocFrame } from '../figma/createDocFrame';
+import { createPageFrame } from '../figma/createPageFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateAlertInstance } from '../figma/components/AlertComponent.figma';
 import { generateCodeInstance } from '../figma/components/codeComponent.figma';
@@ -51,7 +51,7 @@ export async function generateFigmaContentFromJSON(
         })
         .catch((e) => console.error(e));
     } else {
-      frame = createDocFrame(parentSection, page.title, settings);
+      frame = createPageFrame(parentSection, page.title, settings);
       selectNode(frame);
       await generateFrameDataFromJSON(page, frame).then(() =>
         resizeSection(parentSection)

@@ -1,5 +1,5 @@
 import { Alert, Stack, Typography, styled } from '@mui/material';
-import { DEFAULT_SETTINGS, GuidelineType } from '../../constants';
+import { DEFAULT_SETTINGS, GuidelineType } from '../../constants/constants';
 import {
   cautionIcon,
   doIcon,

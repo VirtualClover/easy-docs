@@ -1,6 +1,6 @@
 import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
 
-import { StringFormats } from '../constants';
+import { StringFormats } from '../constants/constants';
 import { setRangeNodeFills } from '../figma/setNodeFills';
 
 export let matchFlavoredText = (string: string) => {

@@ -1,9 +1,8 @@
 import {
   BaseFileData,
-  BlockData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
+} from '../../constants/constants';
 
 import {
   decodeStringForFigma,
@@ -17,6 +16,7 @@ import {
 } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
+import { BlockData, DisplayFrameBlockData } from '../../constants';
 
 export async function createDisplayFrameComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -170,7 +170,7 @@ async function generateOuterWrapper(
 }
 
 export async function generateDisplayFrameInstance(
-  data
+  data: DisplayFrameBlockData
 ): Promise<FrameNode | null> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')

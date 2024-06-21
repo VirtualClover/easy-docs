@@ -1,4 +1,4 @@
-import { FrameDetailsFromURL } from '../constants';
+import { FrameDetailsFromURL } from '../constants/constants';
 
 type FrameIdTreatment = 'encode' | 'decode';
 type FigmaURLType = 'embed' | 'share';

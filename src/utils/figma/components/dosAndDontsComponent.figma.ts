@@ -1,13 +1,12 @@
 import {
-  BlockData,
   DEFAULT_GUIDELINES,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
   GuidelineType,
-} from '../../constants';
+} from '../../constants/constants';
 import { cautionIcon, doIcon, dontIcon } from '../../../assets/svgs';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -20,6 +19,7 @@ import {
 } from '../../general/urlHandlers';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
+import { BlockData, DosAndDontsBlockData } from '../../constants';
 
 function decideAssetsToDisplay(type: GuidelineType) {
   switch (type) {
@@ -237,7 +237,7 @@ async function generateOuterWrapper(
 }
 
 export async function generateDosAndDontsInstance(
-  data
+  data: DosAndDontsBlockData
 ): Promise<FrameNode | null> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')

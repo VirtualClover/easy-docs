@@ -1,6 +1,6 @@
 import './ui.css';
 
-import { DEFAULT_PLUGIN_DATA, PluginData } from './utils/constants';
+import { DEFAULT_PLUGIN_DATA, PluginData } from './utils/constants/constants';
 
 import App from './ui/App';
 import { BASE_STYLE_TOKENS } from './styles/base';

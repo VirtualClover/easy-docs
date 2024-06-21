@@ -1,4 +1,4 @@
-import { AuthorUser, ChangesPlatform, DocData } from '../constants';
+import { AuthorUser, ChangesPlatform, DocData } from '../constants/constants';
 
 /**
  * Formats a doc data, mostyl the date an the author

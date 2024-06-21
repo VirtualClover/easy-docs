@@ -1,4 +1,4 @@
-import { DocData, EMPTY_AUTHOR_DATA } from '../constants';
+import { DocData, EMPTY_AUTHOR_DATA } from '../constants/constants';
 
 import { createNewPageJSON } from './createNewPageJSON';
 

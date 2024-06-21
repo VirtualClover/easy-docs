@@ -1,15 +1,15 @@
+import { BlockData, HeaderBlockData } from '../../constants';
 import {
-  BlockData,
   DEFAULT_HEADING_SIZES,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
+} from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
 } from '../../general/cleanseTextData';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
@@ -66,7 +66,9 @@ export async function createHeaderComponent(
   };
 }
 
-export async function generateHeaderInstance(data): Promise<InstanceNode> {
+export async function generateHeaderInstance(
+  data: HeaderBlockData
+): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );

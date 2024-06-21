@@ -1,7 +1,7 @@
 import { Divider as DividerComp, ThemeProvider, styled } from '@mui/material';
 import { darkTheme, lightTheme } from '../../../styles/themes';
 
-import { DEFAULT_SETTINGS } from '../../constants';
+import { DEFAULT_SETTINGS } from '../../constants/constants';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { dividerIcon } from '../../../assets/svgs';

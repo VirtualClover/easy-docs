@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ArrowBack, Close, SettingsOutlined } from '@mui/icons-material';
-import { DocData, PluginData } from '../../utils/constants';
+import { DocData, PluginData } from '../../utils/constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,

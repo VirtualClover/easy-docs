@@ -8,7 +8,7 @@ import {
   getDetailsFromFigmaURL,
 } from '../../general/urlHandlers';
 
-import { DEFAULT_SETTINGS } from '../../constants';
+import { DEFAULT_SETTINGS } from '../../constants/constants';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { figmaIcon } from '../../../assets/svgs';

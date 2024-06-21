@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, SectionSettings } from '../constants';
+import { DEFAULT_SETTINGS, SectionSettings } from '../constants/constants';
 
 /**
  * Resizes a section

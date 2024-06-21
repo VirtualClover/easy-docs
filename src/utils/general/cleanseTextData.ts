@@ -1,4 +1,4 @@
-import { ENCODED_CHARS } from '../constants';
+import { ENCODED_CHARS } from '../constants/constants';
 
 /**
  * Cleans a text obj within a data obj for Figma

@@ -1,4 +1,4 @@
-import { PageData } from '../constants';
+import { PageData } from '../constants/constants';
 
 /**
  * Formats the page data, mostly updates the header

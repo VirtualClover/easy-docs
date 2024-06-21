@@ -1,8 +1,8 @@
+import { BlockData, ParagraphBlockData } from '../../constants';
 import {
-  BlockData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
+} from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -12,7 +12,7 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
@@ -47,7 +47,9 @@ export async function createParagraphComponent(parent: FrameNode) {
   return { id: component.id, contentProp: contentProperty };
 }
 
-export async function generateParagraphInstance(data): Promise<InstanceNode> {
+export async function generateParagraphInstance(
+  data: ParagraphBlockData
+): Promise<InstanceNode> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );

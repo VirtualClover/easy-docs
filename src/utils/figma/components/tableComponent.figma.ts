@@ -1,10 +1,10 @@
 import {
   BaseFileData,
-  BlockData,
   DEFAULT_SETTINGS,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
+} from '../../constants/constants';
+import { BlockData, TableBlockData } from '../../constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -135,7 +135,9 @@ async function generateTableRow(index: number, hasHeader: boolean = false) {
   return outerWrapper;
 }
 
-export async function generateTableInstance(data): Promise<FrameNode | null> {
+export async function generateTableInstance(
+  data: TableBlockData
+): Promise<FrameNode | null> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
   );
@@ -168,7 +170,7 @@ export async function generateTableInstance(data): Promise<FrameNode | null> {
         const row = data.content[i];
         let rowWrapper = await generateTableRow(i);
         for (let ci = 0; ci < row.length; ci++) {
-          const cellContent = decodeStringForFigma(row[ci],true);
+          const cellContent = decodeStringForFigma(row[ci], true);
           let cellInstance = component.createInstance();
 
           cellInstance.setProperties({

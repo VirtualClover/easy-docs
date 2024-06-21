@@ -1,4 +1,4 @@
-import { PluginSettings } from '../constants';
+import { PluginSettings } from '../constants/constants';
 import { styleFrame } from './styleFrame';
 
 /**
@@ -8,23 +8,24 @@ import { styleFrame } from './styleFrame';
  * @param footer
  * @param logo
  */
-export function createDocFrame(
+export function createPageFrame(
   parent: SectionNode,
   name: string,
   settings: PluginSettings
 ): FrameNode {
   //Create Frame
   const frame: FrameNode = figma.createFrame();
+  parent.appendChild(frame);
   styleFrame(frame, settings, name);
   //Append frame to parent
-  if (parent.children.length) {
-    let lastChild = parent.children[parent.children.length - 1];
+  // If theres elements in the array it is becasue the frame is not the first one
+  if (parent.children.length > 1) {
+    let lastChild = parent.children[parent.children.length - 2];
     frame.x =
       lastChild.x + lastChild.width + settings.customization.section.docGap;
   } else {
-    frame.x = parent.x + settings.customization.section.padding;
+    frame.x = settings.customization.section.padding;
   }
-  parent.appendChild(frame);
   frame.y = settings.customization.section.padding;
   //figma.viewport.scrollAndZoomIntoView([frame]);
   return frame;

@@ -17,7 +17,7 @@ import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { CodeBlock } from './CodeBlock';
 import { CopyToClipboard } from 'react-copy-to-clipboard'; // Using a library because for the life of me I cannot find a native workaround
 import { ExportButton } from './ExportButton';
-import { ExportFileFormat } from '../../utils/constants';
+import { ExportFileFormat } from '../../utils/constants/constants';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 import { generatePageExport } from '../../utils/docs/exportUtils';

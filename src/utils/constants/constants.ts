@@ -1,6 +1,6 @@
 import { OutputBlockData, OutputData } from '@editorjs/editorjs';
 
-import { BASE_STYLE_TOKENS } from '../styles/base';
+import { BASE_STYLE_TOKENS } from '../../styles/base';
 
 export const PLUGIN_VIEWS = ['INSPECT', 'EDITOR', 'SETTINGS'] as const;
 export type PluginViews = (typeof PLUGIN_VIEWS)[number];

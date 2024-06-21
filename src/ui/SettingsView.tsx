@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import { SETTINGS_GROUPS } from '../utils/constants';
+import { SETTINGS_GROUPS } from '../utils/constants/constants';
 import { ViewContainer } from './components/ViewContainer';
 import { generateA11yProps } from '../utils/editor/generateA11yProps';
 

@@ -6,7 +6,7 @@ import {
   FIGMA_NAMESPACE,
   PageData,
   PluginSettings,
-} from '../constants';
+} from '../constants/constants';
 import {
   generateBlockDataFromDisplayFrame,
   hydrateDisplayFrame,

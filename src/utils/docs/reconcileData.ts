@@ -5,7 +5,7 @@ import {
   DocData,
   PageData,
   Reconciliation,
-} from '../constants';
+} from '../constants/constants';
 
 import { clone } from '../clone';
 import { formatPageData } from './formatPageData';

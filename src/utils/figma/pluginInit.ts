@@ -3,7 +3,7 @@ import {
   BASE_FILE_DATA,
   BaseFileData,
   DEFAULT_SETTINGS,
-} from '../constants';
+} from '../constants/constants';
 
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { initComponents } from './components/initComponents';

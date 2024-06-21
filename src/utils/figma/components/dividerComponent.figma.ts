@@ -2,9 +2,9 @@ import {
   BlockData,
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants';
+} from '../../constants/constants';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
 export async function createDividerComponent(parent: FrameNode) {

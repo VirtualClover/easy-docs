@@ -1,4 +1,4 @@
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
 import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
 import { createCodeComponent } from './codeComponent.figma';

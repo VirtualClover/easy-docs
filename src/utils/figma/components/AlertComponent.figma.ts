@@ -1,14 +1,15 @@
 import {
+  AlertBlockData,
   BlockData,
+  TextAlignment,
+  UpperCaseTextAligment,
+} from '../../constants';
+import {
   DEFAULT_SETTINGS,
   DEFAULT_STATUSES,
   FIGMA_COMPONENT_PREFIX,
   StatusType,
-} from '../../constants';
-import {
-  decodeStringForFigma,
-  encodeStringForHTML,
-} from '../../general/cleanseTextData';
+} from '../../constants/constants';
 import {
   errorIcon,
   infoIcon,
@@ -16,7 +17,8 @@ import {
   warningIcon,
 } from '../../../assets/svgs';
 
-import { BaseFileData } from '../../constants';
+import { BaseFileData } from '../../constants/constants';
+import { encodeStringForHTML } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -138,7 +140,7 @@ export async function createAlertComponent(
 }
 
 export async function generateAlertInstance(
-  data
+  data: AlertBlockData
 ): Promise<InstanceNode | null> {
   let componentData: BaseFileData = JSON.parse(
     figma.root.getSharedPluginData('EasyDocs', 'components')
@@ -167,7 +169,9 @@ export async function generateAlertInstance(
     await figma
       .loadFontAsync({ family: 'Inter', style: 'Regular' })
       .then(
-        () => (textNode.textAlignHorizontal = data.align.toLocaleUpperCase())
+        () =>
+          (textNode.textAlignHorizontal =
+            data.align.toLocaleUpperCase() as UpperCaseTextAligment)
       );
 
     return instance;
@@ -189,12 +193,12 @@ export async function generateBlockDataFromAlert(
     figmaNodeId,
     data: {
       type: instNode.componentProperties[componentData.dosAndDonts.typeProp.key]
-        .value,
+        .value as StatusType,
       message: encodeStringForHTML(
         instNode.componentProperties[componentData.alert.contentProp]
           .value as string
       ),
-      align: textNode.textAlignHorizontal.toLocaleLowerCase(),
+      align: textNode.textAlignHorizontal.toLocaleLowerCase() as TextAlignment,
     },
   };
 }

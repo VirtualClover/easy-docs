@@ -1,4 +1,4 @@
-import { PageData } from '../constants';
+import { PageData } from '../constants/constants';
 
 /**
  * Creates a new page JSON

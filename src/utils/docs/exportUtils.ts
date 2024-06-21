@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, ExportFileFormat, PageData } from '../constants';
+import { DEFAULT_SETTINGS, ExportFileFormat, PageData } from '../constants/constants';
 import {
   decideEmojiBasedOnDosAndDonts,
   decideEmojiBasedOnStatus,
