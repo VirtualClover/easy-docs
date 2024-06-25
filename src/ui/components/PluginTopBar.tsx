@@ -152,6 +152,7 @@ const EditorBar = () => {
             disabled={disableActions}
             size="small"
             onClick={() => {
+              pluginContext.setSheetZIndex(0);
               pluginContext.setSheetOpen(true);
               pluginContext.setSheetContent(() => <ExportView />);
               //console.log(markdown);

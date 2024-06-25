@@ -77,7 +77,7 @@ export async function generateFigmaContentFromJSON(
     }
   }
 
-  return 'done!';
+  return parentSection;
 }
 
 async function generateFrameDataFromJSON(
@@ -85,6 +85,8 @@ async function generateFrameDataFromJSON(
   frame: FrameNode,
   componentVersion: number
 ) {
+  selectNode(frame);
+  frame.opacity = .5;
   if (frame.layoutMode != 'VERTICAL') {
     frame.layoutMode = 'VERTICAL';
   }
@@ -134,6 +136,7 @@ async function generateFrameDataFromJSON(
       );
     }
   }
+  frame.opacity = 1;
 }
 
 async function generateBlockInstanceFromJSON(
@@ -229,4 +232,6 @@ async function generateBlockInstanceFromJSON(
       componentVersion.toString()
     );
   }
+  console.log('done generating block!');
+  
 }

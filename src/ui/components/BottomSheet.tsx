@@ -2,7 +2,7 @@ import { Drawer } from '@mui/material';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
 
-export const BottomSheet = () => {
+export const BottomSheet = ({ zIndex = 0 }) => {
   const pluginContext = React.useContext(PluginDataContext);
 
   React.useEffect(() => {
@@ -16,7 +16,7 @@ export const BottomSheet = () => {
       anchor={'bottom'}
       open={pluginContext.sheetOpen}
       onClose={() => pluginContext.setSheetOpen(false)}
-      sx={{ zIndex: 1400 }}
+      sx={zIndex ? { zIndex: zIndex } : {}}
       PaperProps={{
         sx: {
           p: 16,

@@ -16,6 +16,7 @@ import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
+import { setNodeFills } from './utils/figma/setNodeFills';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -30,6 +31,7 @@ let context = {
   settings: DEFAULT_SETTINGS,
   stopSendingUpdates: false,
   stopIncomingUpdates: false,
+  stopUpdates: false,
   lastFetchDoc: EMPTY_DOC_OBJECT,
   componentData: BASE_COMPONENT_DATA, // Latest data pulled from editor
 };
@@ -66,7 +68,7 @@ figma.ui.onmessage = (msg) => {
   }
 
   if (msg.type === 'create-new-doc') {
-    context.stopSendingUpdates = true;
+    context.stopUpdates = true;
     let section: SectionNode;
     console.log(context);
     createNewDoc(
@@ -76,7 +78,7 @@ figma.ui.onmessage = (msg) => {
     ).then((s) => {
       section = s;
       generateJSONFromFigmaContent(section, context.settings).then((data) => {
-        context.stopSendingUpdates = false;
+        context.stopUpdates = false;
         context.lastFetchDoc = data;
         figma.ui.postMessage({
           type: 'new-node-data',
@@ -88,7 +90,7 @@ figma.ui.onmessage = (msg) => {
 
   //Push updates from figma
   if (msg.type === 'node-update') {
-    if (!context.stopSendingUpdates) {
+    if (!context.stopUpdates) {
       pushFigmaUpdates(context).then((res) => {
         if (res.type === 'new-node-data') {
           console.log('push figma updates');
@@ -107,46 +109,39 @@ figma.ui.onmessage = (msg) => {
 
   //Get updates from editor
   if (msg.type == 'update-selected-doc') {
-    context.stopSendingUpdates = true;
-    let data: DocData = msg.data;
-    console.log(msg);
-
     let section: BaseNode;
-    figma.getNodeByIdAsync(data.sectionId).then((node) => {
-      if (data.sectionId) {
+    if (!context.stopUpdates) {
+      figma.getNodeByIdAsync(msg.data.sectionId).then((node) => {
+        context.stopUpdates = true;
+        let data: DocData = msg.data;
+        console.log('start-figma-update');
+        console.log(msg);
         section = node;
         context.lastFetchDoc = data;
         if (section && section.type === 'SECTION') {
           //console.log('generate');
-
+          section.locked = true;
           generateFigmaContentFromJSON(
             data,
             section,
             context.settings,
             context.componentData.lastGenerated,
             msg.editedFrames
-          ).then((m) => {
-            let selectedFrame: BaseNode;
-            figma.getNodeByIdAsync(msg.editedFrame).then((node) => {
-              selectedFrame = node;
-              if (selectedFrame && selectedFrame.type === 'FRAME') {
-                figma.currentPage.selection = [selectedFrame];
-              }
-
-              context.stopSendingUpdates = false;
-              figma.ui.postMessage({ type: 'finished-figma-update' });
-            });
+          ).then((section) => {
+            context.stopUpdates = false;
+            section.locked = false;
+            figma.ui.postMessage({ type: 'finished-figma-update' });
           });
         }
-      }
-    });
+      });
+    }
   }
 
   if (msg.type === 'update-outdated-components') {
-    context.stopSendingUpdates = true;
+    context.stopUpdates = true;
     slowUpdateOutdatedComponentBlocks(context.componentData).then(() => {
       figma.ui.postMessage({ type: 'close-outdated-overlay' });
-      context.stopSendingUpdates = false;
+      context.stopUpdates = false;
     });
   }
 

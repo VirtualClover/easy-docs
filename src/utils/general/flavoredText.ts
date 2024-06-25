@@ -47,7 +47,7 @@ export let setFlavoredTextOnFigmaNode = async (
   textAlign: TextAlignment | false = false
 ) => {
   let flavoredMatches = matchFlavoredText(string);
-  console.log(flavoredMatches);
+  //console.log(flavoredMatches);
 
   if (flavoredMatches.length) {
     await Promise.all([

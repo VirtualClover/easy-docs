@@ -264,6 +264,8 @@ export const DEFAULT_PLUGIN_DATA = {
   setSheetOpen: (state: boolean) => {},
   sheetContent: null,
   setSheetContent: (content: () => JSX.Element) => {},
+  sheetZIndex: 0,
+  setSheetZIndex: (state: number) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

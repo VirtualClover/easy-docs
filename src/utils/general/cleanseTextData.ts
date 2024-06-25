@@ -43,10 +43,7 @@ export function decodeStringForFigma(
 ): string {
   if (string && typeof string === 'string') {
     let formattedString = string;
-    formattedString = formattedString.replace(/&lt;/g, '<');
-    formattedString = formattedString.replace(/&gt;/g, '>');
-    formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
-    formattedString = formattedString.replace(/&nbsp;/g, ' ');
+    formattedString = formattedString.replace('<br>', '\n');
     if (encodeFlavoredText) {
       formattedString = formattedString.replace(
         /</g,
@@ -57,6 +54,10 @@ export function decodeStringForFigma(
         ENCODED_CHARS.brackets.close
       );
     }
+    formattedString = formattedString.replace(/&lt;/g, '<');
+    formattedString = formattedString.replace(/&gt;/g, '>');
+    formattedString = formattedString.replace(/&amp;/g, '&'); //&&amp;
+    formattedString = formattedString.replace(/&nbsp;/g, ' ');
     return formattedString;
   } else return '';
 }
@@ -71,6 +72,10 @@ export function encodeStringForHTML(string: string): string {
       '&amp;'
     );
     formattedString = formattedString.replace(/ +$/gm, '&nbsp;');
+    formattedString = formattedString.replace(/(\s)\1{1,}/g, function (x) {
+      var i = 0;
+      return x.replace(/\s/g, (c) => (i++ % 2 ? c : '&nbsp;'));
+    });
     formattedString = formattedString.replace(/\[\[\[/g, '<');
     formattedString = formattedString.replace(/\]\]\]/g, '>');
     return formattedString;

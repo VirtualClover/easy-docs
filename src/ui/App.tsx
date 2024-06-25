@@ -14,6 +14,7 @@ import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { SettingsView } from './SettingsView';
 import { ThemeProvider } from '@mui/material/styles';
+import zIndex from '@mui/material/styles/zIndex';
 
 interface ComponentProps {
   themeMode: string;
@@ -62,6 +63,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   );
 
   const [sheetOpen, setSheetOpen] = React.useState(initialPluginData.sheetOpen);
+  const [sheetZIndex, setSheetZIndex] = React.useState(0);
 
   const [sheetContent, setSheetContent] = React.useState(
     initialPluginData.sheetContent
@@ -146,6 +148,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
               case 'outdated-components':
                 setSheetOpen(true);
+                setSheetZIndex(1400);
                 setSheetContent(<OutDatedComponentsView />);
                 //console.log('Theres some components that are outdated reload?');
                 break;
@@ -194,6 +197,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         setSheetOpen,
         sheetContent,
         setSheetContent,
+        sheetZIndex,
+        setSheetZIndex,
       }}
     >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
@@ -222,7 +227,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
               </Typography>
             </Box>
           )}
-          <BottomSheet />
+          <BottomSheet zIndex={sheetZIndex} />
         </PluginContainer>
       </ThemeProvider>
     </PluginDataContext.Provider>
