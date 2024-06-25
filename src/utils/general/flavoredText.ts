@@ -29,11 +29,11 @@ export let getURLFromAnchor = (
     let matches = string.match(
       /\[\[\[a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\]\]\]/
     );
-    return { href: matches[2], tag: matches[0] };
+    return { href: matches[2].replace(` target="_blank`, ''), tag: matches[0] };
   }
   if (type == 'html') {
     let matches = string.match(/\<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\>/);
-    return { href: matches[2], tag: matches[0] };
+    return { href: matches[2].replace(` target="_blank"`, ''), tag: matches[0] };
   }
 };
 

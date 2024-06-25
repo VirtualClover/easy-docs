@@ -21,7 +21,7 @@ export async function pushFigmaUpdates(context): Promise<{
       if (res.frame && res.section) {
         parentSection = res.section;
         parentFrame = res.frame;
-        selectedFrame;
+        selectedFrame = res.selectedFrame;
       }
     })
     .catch((e) => console.error(e));
@@ -45,6 +45,7 @@ export async function pushFigmaUpdates(context): Promise<{
           selectedFrame,
         };
       } else {
+
         return { type: 'same-node-data', data: '', selectedFrame };
       }
     }

@@ -47,6 +47,7 @@ export let scanCurrentSelectionForDocs = async (
         break;
     }
   }
+  
   return {
     section: parentSection,
     frame: parentFrame,
