@@ -109,6 +109,8 @@ figma.ui.onmessage = (msg) => {
   if (msg.type == 'update-selected-doc') {
     context.stopSendingUpdates = true;
     let data: DocData = msg.data;
+    console.log(msg);
+
     let section: BaseNode;
     figma.getNodeByIdAsync(data.sectionId).then((node) => {
       if (data.sectionId) {
@@ -121,7 +123,8 @@ figma.ui.onmessage = (msg) => {
             data,
             section,
             context.settings,
-            context.componentData.lastGenerated
+            context.componentData.lastGenerated,
+            msg.editedFrames
           ).then((m) => {
             let selectedFrame: BaseNode;
             figma.getNodeByIdAsync(msg.editedFrame).then((node) => {

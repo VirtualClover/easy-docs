@@ -27,7 +27,7 @@ export const pushNewDataToFigma = (
         pluginMessage: {
           type: 'update-selected-doc',
           data: newData,
-          editedFrame: editedFrame ?? '',
+          editedFrames: [editedFrame] ?? [],
         },
       },
       '*'

@@ -29,37 +29,51 @@ export async function generateFigmaContentFromJSON(
   data: DocData,
   parentSection: SectionNode,
   settings: PluginSettings,
-  componentVersion: number
+  componentVersion: number,
+  editedFrames: string[] = []
 ) {
   let pages = data.pages;
   let docTitle = decodeStringForFigma(data.title);
   parentSection.name = docTitle;
   console.log('editor data');
-  
+
   console.log(data);
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     let frame: FrameNode;
     //console.log(page);
-    if (page.frameId && parentSection.findOne((n) => n.id === page.frameId)) {
-      await figma
-        .getNodeByIdAsync(page.frameId)
-        .then(async (node) => {
-          if (node.type === 'FRAME') {
-            frame = node;
-            await generateFrameDataFromJSON(page, frame, componentVersion).then(
-              () => resizeSection(parentSection)
-            );
-          }
-        })
-        .catch((e) => console.error(e));
-    } else {
-      frame = createPageFrame(parentSection, page.title, settings);
-      selectNode(frame);
-      await generateFrameDataFromJSON(page, frame, componentVersion).then(() =>
-        resizeSection(parentSection)
-      );
+
+    if (
+      (editedFrames && editedFrames.includes(page.frameId)) ||
+      !editedFrames.length
+    ) {
+      if (
+        page.frameId &&
+        parentSection.findChild(
+          (n) => n.id === page.frameId && n.type === 'FRAME'
+        )
+      ) {
+        await figma
+          .getNodeByIdAsync(page.frameId)
+          .then(async (node) => {
+            if (node.type === 'FRAME') {
+              frame = node;
+              await generateFrameDataFromJSON(
+                page,
+                frame,
+                componentVersion
+              ).then(() => resizeSection(parentSection));
+            }
+          })
+          .catch((e) => console.error(e));
+      } else {
+        frame = createPageFrame(parentSection, page.title, settings);
+        selectNode(frame);
+        await generateFrameDataFromJSON(page, frame, componentVersion).then(
+          () => resizeSection(parentSection)
+        );
+      }
     }
   }
 
