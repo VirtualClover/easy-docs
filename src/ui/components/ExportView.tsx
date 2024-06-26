@@ -76,7 +76,10 @@ export const ExportView = (): JSX.Element => {
         Preview
       </Typography>
       <Typography variant="caption">
-        {_.snakeCase(mountedData.pages[mountedActiveTab].title)}.{format}
+        {_.snakeCase(
+          mountedData.pages[mountedActiveTab].title.replace(/[\W_]+/g, '')
+        )}
+        .{format}
       </Typography>
       <CodeBlock code={previewData} language={format} loading={loading} />
       <Stack

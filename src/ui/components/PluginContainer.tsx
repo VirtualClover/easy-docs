@@ -51,9 +51,11 @@ export const PluginContainer = styled(Container, {
 
     //      color: theme.palette.text.primary
   },
-  '.codex-editor ::selection': {
-      background: theme.palette.info.main,
-      color: theme.palette.info.contrastText,
+  '& ::selection, .ce-block--selected .cdx-block, .ce-block--selected .ce-block__content, .ce-block--selected .ce-block__content hr, .ce-block--selected .ce-block__content .tc-cell':
+    {
+      background: '#0338A2',
+      color: 'white',
+      borderColor: `white`,
     },
   '.ce-inline-toolbar': {
     background: theme.palette.background.default,
@@ -133,8 +135,7 @@ export const PluginContainer = styled(Container, {
     minHeight: '160px',
   },
 
-'.ce-conversion-toolbar__label': {
-  color: theme.palette.text.secondary,
-}
-
+  '.ce-conversion-toolbar__label': {
+    color: theme.palette.text.secondary,
+  },
 }));
