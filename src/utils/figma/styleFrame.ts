@@ -16,7 +16,8 @@ export let styleFrame = (
   frame.horizontalPadding = settings.customization.frame.padding;
   frame.minWidth = settings.customization.frame.minWidth;
   frame.minHeight = settings.customization.frame.minHeight;
-  frame.verticalPadding = settings.customization.frame.padding;
+  frame.paddingTop = 82;
+  frame.paddingBottom = settings.customization.frame.padding;
   setNodeFills(frame, settings.customization.palette.background.default);
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';

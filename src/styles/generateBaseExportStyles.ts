@@ -8,7 +8,13 @@ export let generateBaseExportStyles = (
 ): string => {
   let styles: string[] = [];
   styles.push(
-    `${addIndentation(identation)}<link rel="preconnect" href="https://fonts.googleapis.com">\n${addIndentation(identation)}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n${addIndentation(identation)}<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">\n`
+    `${addIndentation(
+      identation
+    )}<link rel="preconnect" href="https://fonts.googleapis.com">\n${addIndentation(
+      identation
+    )}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n${addIndentation(
+      identation
+    )}<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">\n`
   );
   styles.push(`${addIndentation(identation)}<style>`);
   styles.push(
@@ -47,6 +53,7 @@ export let generateBaseExportStyles = (
   styles.push(
     `.ed-alert {padding: 16px 8px 16px 16px; border-radius: 8px; border-left:12px solid;}`
   );
+  styles.push(`.ed-alert-icon{margin-right:8px;}`);
   styles.push(
     `.ed-alert-warning {background: ${basePalette.status.warning.muted}; color: ${basePalette.status.warning.content}; border-color: ${basePalette.status.warning.default};}`
   );
