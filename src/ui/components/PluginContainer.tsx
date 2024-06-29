@@ -8,6 +8,11 @@ export const PluginContainer = styled(Container, {
 })(({ theme }) => ({
   background: theme.palette.background.default,
   color: theme.palette.text.primary,
+
+  '.MuiButtonBase-root': {
+    textTransform: 'none',
+  },
+
   '#editorjs': {
     background: theme.palette.background.default,
   },

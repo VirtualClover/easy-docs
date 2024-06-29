@@ -18,10 +18,6 @@ const baseTheme = {
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
-    primary: {
-      main: '#70B4FF',
-      contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
-    },
     background: {
       default: '#2C2C2C',
     },
