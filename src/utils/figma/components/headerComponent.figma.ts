@@ -7,6 +7,7 @@ import {
 import {
   BlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   HeaderBlockData,
 } from '../../constants';
@@ -72,7 +73,8 @@ export async function createHeaderComponent(
 }
 
 export async function generateHeaderInstance(
-  data: HeaderBlockData
+  data: HeaderBlockData,
+  componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -96,6 +98,11 @@ export async function generateHeaderInstance(
       ),
       [componentData.components.header.levelProp.key]: `${data.level}`,
     });
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
     return instance;
     //instance.set
   }

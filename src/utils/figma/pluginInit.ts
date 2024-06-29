@@ -1,9 +1,7 @@
 import {
   AuthorUser,
   BASE_COMPONENT_DATA,
-  BASE_FILE_DATA,
   BaseComponentData,
-  BaseFileData,
   DEFAULT_SETTINGS,
 } from '../constants/constants';
 import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../constants';

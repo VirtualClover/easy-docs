@@ -2,6 +2,7 @@ import {
   AlertBlockData,
   BlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   TextAlignment,
   UpperCaseTextAligment,
@@ -141,7 +142,8 @@ export async function createAlertComponent(
 }
 
 export async function generateAlertInstance(
-  data: AlertBlockData
+  data: AlertBlockData,
+  componentVersion: number
 ): Promise<InstanceNode | null> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -175,6 +177,11 @@ export async function generateAlertInstance(
             data.align.toLocaleUpperCase() as UpperCaseTextAligment)
       );
 
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
     return instance;
   }
 

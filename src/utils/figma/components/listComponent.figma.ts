@@ -6,6 +6,7 @@ import {
 import {
   BlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   ListBlockData,
   ListOrder,
@@ -57,7 +58,8 @@ export async function createListComponent(parent: FrameNode) {
 }
 
 export async function generateListInstance(
-  data: ListBlockData
+  data: ListBlockData,
+  componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -88,6 +90,13 @@ export async function generateListInstance(
     instance.setProperties({
       [componentData.components.list.contentProp]: jointDataDecoded,
     });
+
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
+
     //console.log('here');
     await figma
       .loadFontAsync({ family: 'Inter', style: 'Regular' })

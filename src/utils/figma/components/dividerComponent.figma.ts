@@ -4,7 +4,11 @@ import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
-import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
+import {
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
+  FIGMA_NAMESPACE,
+} from '../../constants';
 
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -32,7 +36,9 @@ export async function createDividerComponent(parent: FrameNode) {
   return { id: component.id };
 }
 
-export async function generateDividerInstance(): Promise<InstanceNode> {
+export async function generateDividerInstance(
+  componentVersion: number
+): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
@@ -47,6 +53,12 @@ export async function generateDividerInstance(): Promise<InstanceNode> {
 
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
+
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
 
     return instance;
     //instance.set

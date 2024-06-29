@@ -7,6 +7,7 @@ import {
   BlockData,
   CodeBlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
 } from '../../constants';
 
@@ -70,7 +71,8 @@ export async function createCodeComponent(parent: FrameNode) {
 }
 
 export async function generateCodeInstance(
-  data: CodeBlockData
+  data: CodeBlockData,
+  componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -88,6 +90,13 @@ export async function generateCodeInstance(
         data.code
       ),
     });
+
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
+
     return instance;
     //instance.set
   }

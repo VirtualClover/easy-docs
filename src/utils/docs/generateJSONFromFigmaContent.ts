@@ -118,161 +118,179 @@ async function generatePageDataFromFrame(
         figmaNodeId: childNode.id,
       };
 
-      let version = parseInt(
-        childNode.getSharedPluginData(
-          FIGMA_NAMESPACE,
-          FIGMA_COMPONENT_VERSION_KEY
-        )
-      );
-      if (version == componentData.lastGenerated) {
+      let version: number;
+
+      if (true /*version == componentData.lastGenerated*/) {
         if (childNode.type == 'INSTANCE') {
-          let mainCompId: string;
-          await childNode.getMainComponentAsync().then((component) => {
-            // TODO Add check for component parent
-            mainCompId =
-              component.parent.type == 'COMPONENT_SET'
-                ? component.parent.id
-                : component.id;
-          });
+          version = parseInt(
+            childNode.getSharedPluginData(
+              FIGMA_NAMESPACE,
+              FIGMA_COMPONENT_VERSION_KEY
+            )
+          );
 
-          switch (mainCompId) {
-            case componentData.components.header.id:
-              generateBlockDataFromHeader(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => pageData.blocks.push(data));
-              break;
-            case componentData.components.paragraph.id:
-              generateBlockDataFromParagraph(
-                childNode,
-                editedDate,
-                childNode.id
-              ).then((data) => pageData.blocks.push(data));
-              break;
-            case componentData.components.quote.id:
-              generateBlockDataFromQuote(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => pageData.blocks.push(data));
-
-              break;
-            case componentData.components.list.id:
-              generateBlockDataFromList(
-                childNode,
-                editedDate,
-                childNode.id
-              ).then((data) => pageData.blocks.push(data));
-              break;
-            case componentData.components.alert.id:
-              generateBlockDataFromAlert(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => pageData.blocks.push(data));
-              break;
-            case componentData.components.code.id:
-              generateBlockDataFromCode(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => pageData.blocks.push(data));
-              break;
-            case componentData.components.divider.id:
-              generateBlockDataFromDivider(editedDate, childNode.id).then(
-                (data) => pageData.blocks.push(data)
-              );
-              break;
-            case componentData.components.dosAndDonts.id:
-              //Probably a dehydrated frame
-              await hydrateDosAndDontsFrame(
-                childNode,
-                frame,
-                i,
-                componentData
-              ).then((data) => pageData.blocks.push(data));
-              break;
-            case componentData.components.displayFrame.id:
-              //Probably a dehydrated frame
-              await hydrateDisplayFrame(
-                childNode,
-                frame,
-                i,
-                componentData
-              ).then((data) => pageData.blocks.push(data));
-              break;
-
-            default:
-              break;
-          }
-        } // If a component is inside a frame like frame display
-        else if (childNode.type == 'FRAME') {
-          let instInsideAFrame: InstanceNode = scanInsideAFrame(childNode);
-          let mainCompId: string;
-
-          if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
-            await getMainCompIdFromInstance(instInsideAFrame).then(
-              (id) => (mainCompId = id)
-            );
-
-            if (mainCompId == componentData.components.brokenLink.id) {
-              instInsideAFrame = scanInsideAFrame(
-                childNode,
-                instInsideAFrame.id
-              );
-              await getMainCompIdFromInstance(instInsideAFrame).then(
-                (id) => (mainCompId = id)
-              );
-            }
+          if (version == componentData.lastGenerated) {
+            let mainCompId: string;
+            await childNode.getMainComponentAsync().then((component) => {
+              // TODO Add check for component parent
+              mainCompId =
+                component.parent.type == 'COMPONENT_SET'
+                  ? component.parent.id
+                  : component.id;
+            });
 
             switch (mainCompId) {
-              case componentData.components.displayFrame.id:
-                await generateBlockDataFromDisplayFrame(
-                  instInsideAFrame,
+              case componentData.components.header.id:
+                generateBlockDataFromHeader(
+                  childNode,
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => {
-                  pageData.blocks.push(data);
-                });
+                ).then((data) => pageData.blocks.push(data));
                 break;
-              case componentData.components.dosAndDonts.id:
-                await generateBlockDataFromDosAndDonts(
-                  instInsideAFrame,
+              case componentData.components.paragraph.id:
+                generateBlockDataFromParagraph(
+                  childNode,
+                  editedDate,
+                  childNode.id
+                ).then((data) => pageData.blocks.push(data));
+                break;
+              case componentData.components.quote.id:
+                generateBlockDataFromQuote(
+                  childNode,
                   componentData,
                   editedDate,
                   childNode.id
                 ).then((data) => pageData.blocks.push(data));
 
                 break;
-              case componentData.components.tableCell.id:
-                await generateBlockDataFromTable(
-                  instInsideAFrame,
-                  mainCompId,
+              case componentData.components.list.id:
+                generateBlockDataFromList(
+                  childNode,
+                  editedDate,
+                  childNode.id
+                ).then((data) => pageData.blocks.push(data));
+                break;
+              case componentData.components.alert.id:
+                generateBlockDataFromAlert(
+                  childNode,
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => {
-                  pageData.blocks.push(data);
-                });
-
+                ).then((data) => pageData.blocks.push(data));
                 break;
+              case componentData.components.code.id:
+                generateBlockDataFromCode(
+                  childNode,
+                  componentData,
+                  editedDate,
+                  childNode.id
+                ).then((data) => pageData.blocks.push(data));
+                break;
+              case componentData.components.divider.id:
+                generateBlockDataFromDivider(editedDate, childNode.id).then(
+                  (data) => pageData.blocks.push(data)
+                );
+                break;
+              case componentData.components.dosAndDonts.id:
+                //Probably a dehydrated frame
+                await hydrateDosAndDontsFrame(
+                  childNode,
+                  frame,
+                  i,
+                  componentData
+                ).then((data) => pageData.blocks.push(data));
+                break;
+              case componentData.components.displayFrame.id:
+                //Probably a dehydrated frame
+                await hydrateDisplayFrame(
+                  childNode,
+                  frame,
+                  i,
+                  componentData
+                ).then((data) => pageData.blocks.push(data));
+                break;
+
               default:
-                //console.log(instInsideAFrame);
-                //console.log(mainCompId);
                 break;
             }
+          } else {
+            figma.ui.postMessage({
+              type: 'outdated-components',
+            });
+          }
+        } // If a component is inside a frame like frame display
+        else if (childNode.type == 'FRAME') {
+          let instInsideAFrame: InstanceNode = scanInsideAFrame(childNode);
+          let mainCompId: string;
+
+          version = parseInt(
+            instInsideAFrame.getSharedPluginData(
+              FIGMA_NAMESPACE,
+              FIGMA_COMPONENT_VERSION_KEY
+            )
+          );
+
+          if (version == componentData.lastGenerated) {
+            if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
+              await getMainCompIdFromInstance(instInsideAFrame).then(
+                (id) => (mainCompId = id)
+              );
+
+              if (mainCompId == componentData.components.brokenLink.id) {
+                instInsideAFrame = scanInsideAFrame(
+                  childNode,
+                  instInsideAFrame.id
+                );
+                await getMainCompIdFromInstance(instInsideAFrame).then(
+                  (id) => (mainCompId = id)
+                );
+              }
+
+              switch (mainCompId) {
+                case componentData.components.displayFrame.id:
+                  await generateBlockDataFromDisplayFrame(
+                    instInsideAFrame,
+                    componentData,
+                    editedDate,
+                    childNode.id
+                  ).then((data) => {
+                    pageData.blocks.push(data);
+                  });
+                  break;
+                case componentData.components.dosAndDonts.id:
+                  await generateBlockDataFromDosAndDonts(
+                    instInsideAFrame,
+                    componentData,
+                    editedDate,
+                    childNode.id
+                  ).then((data) => pageData.blocks.push(data));
+
+                  break;
+                case componentData.components.tableCell.id:
+                  await generateBlockDataFromTable(
+                    instInsideAFrame,
+                    mainCompId,
+                    componentData,
+                    editedDate,
+                    childNode.id
+                  ).then((data) => {
+                    pageData.blocks.push(data);
+                  });
+
+                  break;
+                default:
+                  //console.log(instInsideAFrame);
+                  //console.log(mainCompId);
+                  break;
+              }
+            }
+          } else {
+            figma.ui.postMessage({
+              type: 'outdated-components',
+            });
           }
         }
-      } else {
-        figma.ui.postMessage({
-          type: 'outdated-components',
-        });
       }
     }
   }

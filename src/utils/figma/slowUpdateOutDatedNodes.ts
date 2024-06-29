@@ -9,12 +9,12 @@ import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
 export let slowUpdateOutdatedComponentBlocks = async (
   componentData: BaseComponentData
 ) => {
-  let frame: FrameNode;
+  let section: SectionNode;
 
   scanCurrentSelectionForDocs().then((res) => {
-    frame = res.frame;
+    section = res.section;
 
-    const nodes = frame.findAllWithCriteria({
+    const nodes = section.findAllWithCriteria({
       types: ['INSTANCE'],
     });
 

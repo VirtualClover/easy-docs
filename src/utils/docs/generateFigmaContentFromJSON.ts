@@ -86,7 +86,7 @@ async function generateFrameDataFromJSON(
   componentVersion: number
 ) {
   selectNode(frame);
-  frame.opacity = .5;
+  frame.opacity = 0.5;
   if (frame.layoutMode != 'VERTICAL') {
     frame.layoutMode = 'VERTICAL';
   }
@@ -148,21 +148,23 @@ async function generateBlockInstanceFromJSON(
   let node: InstanceNode | FrameNode;
   switch (block.type) {
     case 'header':
-      await generateHeaderInstance(block.data).then((n) => {
+      await generateHeaderInstance(block.data, componentVersion).then((n) => {
         if (n) {
           node = n;
         }
       });
       break;
     case 'paragraph':
-      await generateParagraphInstance(block.data).then((n) => {
-        if (n) {
-          node = n;
+      await generateParagraphInstance(block.data, componentVersion).then(
+        (n) => {
+          if (n) {
+            node = n;
+          }
         }
-      });
+      );
       break;
     case 'quote':
-      await generateQuoteInstance(block.data).then((n) => {
+      await generateQuoteInstance(block.data, componentVersion).then((n) => {
         if (n) {
           node = n;
         }
@@ -170,49 +172,53 @@ async function generateBlockInstanceFromJSON(
       //node = generateParagraphInstance(block.data);
       break;
     case 'displayFrame':
-      await generateDisplayFrameInstance(block.data).then((n) => {
-        if (n) {
-          node = n;
+      await generateDisplayFrameInstance(block.data, componentVersion).then(
+        (n) => {
+          if (n) {
+            node = n;
+          }
         }
-      });
+      );
       break;
     case 'dosAndDonts':
-      await generateDosAndDontsInstance(block.data).then((n) => {
-        if (n) {
-          node = n;
+      await generateDosAndDontsInstance(block.data, componentVersion).then(
+        (n) => {
+          if (n) {
+            node = n;
+          }
         }
-      });
+      );
       break;
     case 'list':
-      await generateListInstance(block.data).then((n) => {
+      await generateListInstance(block.data, componentVersion).then((n) => {
         if (n) {
           node = n;
         }
       });
       break;
     case 'table':
-      await generateTableInstance(block.data).then((n) => {
+      await generateTableInstance(block.data, componentVersion).then((n) => {
         if (n) {
           node = n;
         }
       });
       break;
     case 'alert':
-      await generateAlertInstance(block.data).then((n) => {
+      await generateAlertInstance(block.data, componentVersion).then((n) => {
         if (n) {
           node = n;
         }
       });
       break;
     case 'code':
-      await generateCodeInstance(block.data).then((n) => {
+      await generateCodeInstance(block.data, componentVersion).then((n) => {
         if (n) {
           node = n;
         }
       });
       break;
     case 'divider':
-      await generateDividerInstance().then((n) => {
+      await generateDividerInstance(componentVersion).then((n) => {
         if (n) {
           node = n;
         }
@@ -226,12 +232,6 @@ async function generateBlockInstanceFromJSON(
   if (node) {
     frame.insertChild(indexInFrame, node);
     node.layoutSizingHorizontal = 'FILL';
-    node.setSharedPluginData(
-      FIGMA_NAMESPACE,
-      FIGMA_COMPONENT_VERSION_KEY,
-      componentVersion.toString()
-    );
   }
   console.log('done generating block!');
-  
 }

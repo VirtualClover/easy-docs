@@ -22,6 +22,7 @@ import {
   BlockData,
   DosAndDontsBlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
 } from '../../constants';
 
@@ -167,7 +168,8 @@ async function generateOuterWrapper(
   component: InstanceNode,
   type: GuidelineType,
   nodeToDisplay?: FrameNode,
-  brokenLinkCaption?: string
+  brokenLinkCaption?: string,
+  brokenLinkComponentVersion?: number
 ) {
   //Outer wrapper
   let assets = decideAssetsToDisplay(type);
@@ -229,9 +231,10 @@ async function generateOuterWrapper(
     ];
     displayFrame.appendChild(frame);
   } else {
-    await generateBrokenLinkInstance(brokenLinkCaption).then((n) =>
-      displayFrame.appendChild(n)
-    );
+    await generateBrokenLinkInstance(
+      brokenLinkCaption,
+      brokenLinkComponentVersion
+    ).then((n) => displayFrame.appendChild(n));
   }
 
   outerWrapper.appendChild(component);
@@ -241,7 +244,8 @@ async function generateOuterWrapper(
 }
 
 export async function generateDosAndDontsInstance(
-  data: DosAndDontsBlockData
+  data: DosAndDontsBlockData,
+  componentVersion: number
 ): Promise<FrameNode | null> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -283,6 +287,12 @@ export async function generateDosAndDontsInstance(
       [componentData.components.dosAndDonts.typeProp.key]: `${data.type}`,
     });
 
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
+
     let nodeToDisplay: FrameNode;
 
     if (data.frameId) {
@@ -295,7 +305,8 @@ export async function generateDosAndDontsInstance(
       instance,
       data.type,
       nodeToDisplay,
-      'Frame not found'
+      'Frame not found',
+      componentVersion
     );
 
     return outerWrapper;
@@ -378,14 +389,16 @@ export async function hydrateDosAndDontsFrame(
     instance.id
   ).then((d: any) => {
     block = d;
-    generateDosAndDontsInstance(block.data).then((n) => {
-      parentFrame.insertChild(indexInFrame, n);
-      n.layoutSizingHorizontal = 'FILL';
-      let dehydratedNode = parentFrame.children[indexInFrame + 1];
-      dehydratedNode.remove();
-      block.data.figmaNodeId = n.id;
-      block.data.frameExistsInFile = true;
-    });
+    generateDosAndDontsInstance(block.data, componentData.lastGenerated).then(
+      (n) => {
+        parentFrame.insertChild(indexInFrame, n);
+        n.layoutSizingHorizontal = 'FILL';
+        let dehydratedNode = parentFrame.children[indexInFrame + 1];
+        dehydratedNode.remove();
+        block.data.figmaNodeId = n.id;
+        block.data.frameExistsInFile = true;
+      }
+    );
   });
   return block;
 }

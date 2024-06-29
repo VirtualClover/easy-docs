@@ -20,6 +20,7 @@ import {
   BlockData,
   DisplayFrameBlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
 } from '../../constants';
 
@@ -99,7 +100,8 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 async function generateOuterWrapper(
   component: InstanceNode,
   nodeToDisplay?: FrameNode,
-  brokenLinkCaption?: string
+  brokenLinkCaption?: string,
+  brokenLinkComponentVersion?: number
 ) {
   //Outer wrapper
   let outerWrapper = figma.createFrame();
@@ -163,9 +165,10 @@ async function generateOuterWrapper(
     ];
     displayFrame.appendChild(frame);
   } else {
-    await generateBrokenLinkInstance(brokenLinkCaption).then((n) =>
-      displayFrame.appendChild(n)
-    );
+    await generateBrokenLinkInstance(
+      brokenLinkCaption,
+      brokenLinkComponentVersion
+    ).then((n) => displayFrame.appendChild(n));
   }
 
   outerWrapper.appendChild(component);
@@ -175,7 +178,8 @@ async function generateOuterWrapper(
 }
 
 export async function generateDisplayFrameInstance(
-  data: DisplayFrameBlockData
+  data: DisplayFrameBlockData,
+  componentVersion: number
 ): Promise<FrameNode | null> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -214,6 +218,12 @@ export async function generateDisplayFrameInstance(
       [componentData.components.displayFrame.sourceProp]: sourceURL,
     });
 
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
+
     let nodeToDisplay: FrameNode;
 
     if (data.frameId) {
@@ -225,7 +235,8 @@ export async function generateDisplayFrameInstance(
     let outerWrapper = await generateOuterWrapper(
       instance,
       nodeToDisplay,
-      'Frame not found'
+      'Frame not found',
+      componentVersion
     );
 
     return outerWrapper;
@@ -304,14 +315,16 @@ export async function hydrateDisplayFrame(
     instance.id
   ).then((d: any) => {
     block = d;
-    generateDisplayFrameInstance(block.data).then((n) => {
-      parentFrame.insertChild(indexInFrame, n);
-      n.layoutSizingHorizontal = 'FILL';
-      let dehydratedNode = parentFrame.children[indexInFrame + 1];
-      dehydratedNode.remove();
-      block.data.figmaNodeId = n.id;
-      block.data.frameExistsInFile = true;
-    });
+    generateDisplayFrameInstance(block.data, componentData.lastGenerated).then(
+      (n) => {
+        parentFrame.insertChild(indexInFrame, n);
+        n.layoutSizingHorizontal = 'FILL';
+        let dehydratedNode = parentFrame.children[indexInFrame + 1];
+        dehydratedNode.remove();
+        block.data.figmaNodeId = n.id;
+        block.data.frameExistsInFile = true;
+      }
+    );
   });
   return block;
 }

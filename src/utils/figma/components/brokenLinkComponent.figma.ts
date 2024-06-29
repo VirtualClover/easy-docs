@@ -3,7 +3,11 @@ import {
   DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
-import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
+import {
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
+  FIGMA_NAMESPACE,
+} from '../../constants';
 
 import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
@@ -69,7 +73,8 @@ export async function createBrokenLinkComponent(parent: FrameNode) {
 }
 
 export async function generateBrokenLinkInstance(
-  caption: string
+  caption: string,
+  componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -86,6 +91,13 @@ export async function generateBrokenLinkInstance(
       [componentData.components.brokenLink.captionProp]:
         decodeStringForFigma(caption),
     });
+
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
+
     return instance;
     //instance.set
   }

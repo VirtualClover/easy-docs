@@ -8,6 +8,7 @@ import {
 import {
   BlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   TableBlockData,
 } from '../../constants';
@@ -142,7 +143,8 @@ async function generateTableRow(index: number, hasHeader: boolean = false) {
 }
 
 export async function generateTableInstance(
-  data: TableBlockData
+  data: TableBlockData,
+  componentVersion: number
 ): Promise<FrameNode | null> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -204,6 +206,12 @@ export async function generateTableInstance(
           ? 'header'
           : 'body',
       });
+
+      cellInstance.setSharedPluginData(
+        FIGMA_NAMESPACE,
+        FIGMA_COMPONENT_VERSION_KEY,
+        componentVersion.toString()
+      );
 
       rowWrapper.appendChild(cellInstance);
       tableInnerWrapper.appendChild(rowWrapper);

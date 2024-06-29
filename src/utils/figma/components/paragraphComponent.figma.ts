@@ -6,6 +6,7 @@ import {
 import {
   BlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   ParagraphBlockData,
 } from '../../constants';
@@ -54,7 +55,8 @@ export async function createParagraphComponent(parent: FrameNode) {
 }
 
 export async function generateParagraphInstance(
-  data: ParagraphBlockData
+  data: ParagraphBlockData,
+  componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -76,6 +78,12 @@ export async function generateParagraphInstance(
     });
 
     await setFlavoredTextOnFigmaNode(content, instance);
+
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
 
     return instance;
     //instance.set

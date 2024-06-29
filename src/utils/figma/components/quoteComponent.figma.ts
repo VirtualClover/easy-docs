@@ -6,6 +6,7 @@ import {
 import {
   BlockData,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   QuoteBlockData,
   TextAlignment,
@@ -99,7 +100,8 @@ export async function createQuoteComponent(parent: FrameNode) {
 }
 
 export async function generateQuoteInstance(
-  data: QuoteBlockData
+  data: QuoteBlockData,
+  componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
@@ -125,6 +127,12 @@ export async function generateQuoteInstance(
     });
 
     await setFlavoredTextOnFigmaNode(quoteText, instance, data.alignment);
+
+    instance.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_VERSION_KEY,
+      componentVersion.toString()
+    );
 
     return instance;
     //instance.set

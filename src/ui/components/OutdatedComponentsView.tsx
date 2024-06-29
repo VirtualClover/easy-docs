@@ -19,7 +19,7 @@ export const OutDatedComponentsView = () => {
       >
         <OutdatedComponentsAnim />
         <Typography variant="h4" align="center">
-          There seems to be outdated components in this frame!
+          There seems to be outdated components in this documentation!
         </Typography>
         <Typography align="center">
           Components get outdated when the plugin creates new main components
