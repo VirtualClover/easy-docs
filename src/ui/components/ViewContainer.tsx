@@ -1,4 +1,4 @@
-import { Divider, Stack, Toolbar } from '@mui/material';
+import { Stack, Toolbar } from '@mui/material';
 
 export const ViewContainer = ({ children }) => {
   return (

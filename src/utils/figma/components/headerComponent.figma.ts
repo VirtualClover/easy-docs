@@ -16,6 +16,7 @@ import {
   encodeStringForHTML,
 } from '../../general/cleanseTextData';
 
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
@@ -26,7 +27,7 @@ export async function createHeaderComponent(
   let componentSet: ComponentSetNode;
   let contentProperty: string;
   let levelPropKey: string = 'level';
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }).then(() => {
     for (let i = 0; i < headingSizes.length; i++) {
       const currentSize = headingSizes[i];
       let header = figma.createComponent();
@@ -37,7 +38,7 @@ export async function createHeaderComponent(
       header.paddingBottom = 32;
       header.name = `${levelPropKey}=${i + 1}`;
       let textNode = figma.createText();
-      textNode.fontName = { family: 'Inter', style: 'Bold' };
+      textNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' };
       textNode.fontSize = currentSize;
       textNode.characters = 'Heading';
       setNodeFills(

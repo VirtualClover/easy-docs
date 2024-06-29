@@ -25,6 +25,7 @@ import {
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
 } from '../../constants';
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 
 function decideAssetsToDisplay(type: GuidelineType) {
   switch (type) {
@@ -65,7 +66,7 @@ export async function createDosAndDontsComponent(
   let sourceProperty: string;
   let guidelinePropKey: string = 'type';
   await figma
-    .loadFontAsync({ family: 'Inter', style: 'Medium Italic' })
+    .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Medium Italic' })
     .then(() => {
       for (let i = 0; i < guidelineTypes.length; i++) {
         const currentGuideline = guidelineTypes[i];
@@ -91,7 +92,7 @@ export async function createDosAndDontsComponent(
         component.appendChild(sourceWrapper);
         sourceWrapper.layoutSizingHorizontal = 'FILL';
         let sourceNode = figma.createText();
-        sourceNode.fontName = { family: 'Inter', style: 'Medium Italic' };
+        sourceNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Medium Italic' };
         sourceNode.fontSize = 12;
         sourceNode.textDecoration = 'UNDERLINE';
         sourceNode.characters = 'Source here';
@@ -124,7 +125,7 @@ export async function createDosAndDontsComponent(
 
         //caption
         let captionNode = figma.createText();
-        captionNode.fontName = { family: 'Inter', style: 'Regular' };
+        captionNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
         captionNode.fontSize = 16;
         captionNode.characters = 'Frame caption';
         setNodeFills(

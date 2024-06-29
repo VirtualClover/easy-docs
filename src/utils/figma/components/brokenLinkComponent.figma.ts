@@ -9,13 +9,14 @@ import {
   FIGMA_NAMESPACE,
 } from '../../constants';
 
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { decodeStringForFigma } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createBrokenLinkComponent(parent: FrameNode) {
   let component: ComponentNode;
   let captionProperty: string;
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }).then(() => {
     //Component
     component = figma.createComponent();
     component.resizeWithoutConstraints(300, 1);
@@ -35,7 +36,7 @@ export async function createBrokenLinkComponent(parent: FrameNode) {
 
     //Broken link message
     let messageNode = figma.createText();
-    messageNode.fontName = { family: 'Inter', style: 'Bold' };
+    messageNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' };
     messageNode.fontSize = 24;
     messageNode.characters = 'Preview not available.';
     messageNode.textAlignHorizontal = 'CENTER';
@@ -48,7 +49,7 @@ export async function createBrokenLinkComponent(parent: FrameNode) {
 
     //caption
     let captionNode = figma.createText();
-    captionNode.fontName = { family: 'Inter', style: 'Regular' };
+    captionNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
     captionNode.fontSize = 16;
     captionNode.characters = 'Frame caption';
     captionNode.textAlignHorizontal = 'CENTER';

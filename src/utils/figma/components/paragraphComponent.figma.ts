@@ -20,12 +20,13 @@ import {
 } from '../../general/flavoredText';
 
 import { BaseFileData } from '../../constants/constants';
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
   let component: ComponentNode;
   let contentProperty: string;
-  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
     component = figma.createComponent();
     component.resizeWithoutConstraints(400, 20);
     component.layoutMode = 'HORIZONTAL';
@@ -34,7 +35,7 @@ export async function createParagraphComponent(parent: FrameNode) {
     component.paddingBottom = 32;
     component.name = `${FIGMA_COMPONENT_PREFIX}Paragraph`;
     let textNode = figma.createText();
-    textNode.fontName = { family: 'Inter', style: 'Regular' };
+    textNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
     textNode.fontSize = 24;
     textNode.characters = 'Paragraph';
     setNodeFills(

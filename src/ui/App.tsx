@@ -8,7 +8,6 @@ import { darkTheme, lightTheme } from '../styles/themes';
 import { BottomSheet } from './components/BottomSheet';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
-import { OutDatedComponentsView } from './components/OutdatedComponentsView';
 import { PluginContainer } from './components/PluginContainer';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';

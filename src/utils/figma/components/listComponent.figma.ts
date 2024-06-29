@@ -21,6 +21,7 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { clone } from '../../clone';
 import { setNodeFills } from '../setNodeFills';
 
@@ -28,7 +29,7 @@ export async function createListComponent(parent: FrameNode) {
   let component: ComponentNode;
   let contentProperty: string;
   let defaultStyle: TextListOptions = { type: 'UNORDERED' };
-  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
     component = figma.createComponent();
     component.resizeWithoutConstraints(400, 20);
     component.layoutMode = 'HORIZONTAL';
@@ -37,7 +38,7 @@ export async function createListComponent(parent: FrameNode) {
     component.paddingBottom = 32;
     component.name = `${FIGMA_COMPONENT_PREFIX}List`;
     let textNode = figma.createText();
-    textNode.fontName = { family: 'Inter', style: 'Regular' };
+    textNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
     textNode.fontSize = 24;
     textNode.characters = 'List';
     textNode.setRangeListOptions(0, textNode.characters.length, defaultStyle);
@@ -99,7 +100,7 @@ export async function generateListInstance(
 
     //console.log('here');
     await figma
-      .loadFontAsync({ family: 'Inter', style: 'Regular' })
+      .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' })
       .then(() => {
         if (textNode.type == 'TEXT' && jointDataDecoded.length) {
           textNode.setRangeListOptions(0, jointDataDecoded.length, {
@@ -146,7 +147,7 @@ export async function generateBlockDataFromList(
       listStyle = unformattedStyle.type.toLowerCase() as ListOrder;
     } else {
       await figma
-        .loadFontAsync({ family: 'Inter', style: 'Regular' })
+        .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' })
         .then(() => {
           textNode.setRangeListOptions(0, textNode.characters.length, {
             type: listStyle.toUpperCase() as UpperCaseListOrder,

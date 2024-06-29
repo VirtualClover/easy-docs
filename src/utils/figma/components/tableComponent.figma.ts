@@ -21,6 +21,7 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { clone } from '../../clone';
 import { isOdd } from '../../general/isOdd';
 import { setNodeFills } from '../setNodeFills';
@@ -34,7 +35,7 @@ export async function createTableCellComponent(
   let componentSet: ComponentSetNode;
   let contentProperty: string;
   let cellTypePropKey: string = 'type';
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }).then(() => {
     for (let i = 0; i < cellTypes.length; i++) {
       const currentType = cellTypes[i];
       let isHeader = currentType == 'header';
@@ -60,7 +61,7 @@ export async function createTableCellComponent(
       cell.strokes = fills;
       let textNode = figma.createText();
       textNode.fontName = {
-        family: 'Inter',
+        family: DEFAULT_FONT_FAMILIES[0],
         style: isHeader ? 'Bold' : 'Regular',
       };
       textNode.fontSize = isHeader ? 18 : 16;

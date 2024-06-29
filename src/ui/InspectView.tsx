@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import { Button } from '@mui/material';
 import { InspectAnim } from '../assets/animations/Animations';
-import React from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 

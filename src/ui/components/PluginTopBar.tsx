@@ -86,11 +86,7 @@ const EditorBar = () => {
       }}
     >
       <Tooltip
-        title={
-          !pluginContext.outdatedComponents
-            ? 'Double click to edit!'
-            : ''
-        }
+        title={!pluginContext.outdatedComponents ? 'Double click to edit!' : ''}
       >
         <Typography
           variant="h4"
@@ -100,7 +96,7 @@ const EditorBar = () => {
             opacity: disableActions ? 0.5 : 1,
             ml: 16,
             '&:hover': {
-              cursor: 'pointer',
+              cursor: !pluginContext.outdatedComponents ? 'pointer' : 'default',
             },
             maxWidth: '80%',
           }}

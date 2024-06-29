@@ -20,6 +20,7 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -27,7 +28,7 @@ export async function createQuoteComponent(parent: FrameNode) {
   let component: ComponentNode;
   let contentProperty: string;
   let authorProperty: string;
-  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
     component = figma.createComponent();
     component.resizeWithoutConstraints(400, 20);
     component.layoutMode = 'HORIZONTAL';
@@ -57,7 +58,7 @@ export async function createQuoteComponent(parent: FrameNode) {
     innerWrapper.layoutSizingHorizontal = 'FILL';
     //Quote
     let quoteNode = figma.createText();
-    quoteNode.fontName = { family: 'Inter', style: 'Regular' };
+    quoteNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
     quoteNode.fontSize = 36;
     quoteNode.characters = 'Quote';
     innerWrapper.name = 'innerWrapper';
@@ -75,7 +76,7 @@ export async function createQuoteComponent(parent: FrameNode) {
     quoteNode.componentPropertyReferences = { characters: contentProperty };
     //Author
     let authorNode = figma.createText();
-    authorNode.fontName = { family: 'Inter', style: 'Regular' };
+    authorNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
     authorNode.fontSize = 16;
     authorNode.characters = '- Author';
     setNodeFills(

@@ -21,6 +21,7 @@ import {
   warningIcon,
 } from '../../../assets/svgs';
 
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { encodeStringForHTML } from '../../general/cleanseTextData';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
@@ -68,7 +69,7 @@ export async function createAlertComponent(
   let componentSet: ComponentSetNode;
   let contentProperty: string;
   let statusPropKey: string = 'type';
-  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }).then(() => {
+  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
     for (let i = 0; i < statusTypes.length; i++) {
       const currentStatus = statusTypes[i];
       let assets = decideAssetsToDisplay(currentStatus);
@@ -107,7 +108,7 @@ export async function createAlertComponent(
       innerWrapper.appendChild(captionIcon);
       //Content
       let contentNode = figma.createText();
-      contentNode.fontName = { family: 'Inter', style: 'Regular' };
+      contentNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
       contentNode.fontSize = 18;
       contentNode.characters = 'Alert';
       setNodeFills(contentNode, assets.palette.content);
@@ -170,7 +171,7 @@ export async function generateAlertInstance(
 
     let textNode = instance.findOne((n) => n.type == 'TEXT') as TextNode;
     await figma
-      .loadFontAsync({ family: 'Inter', style: 'Regular' })
+      .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' })
       .then(
         () =>
           (textNode.textAlignHorizontal =
