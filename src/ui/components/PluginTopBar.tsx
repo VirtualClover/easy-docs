@@ -85,7 +85,13 @@ const EditorBar = () => {
         alignItems: 'center',
       }}
     >
-      <Tooltip title="Double click to edit!">
+      <Tooltip
+        title={
+          !pluginContext.outdatedComponents
+            ? 'Double click to edit!'
+            : ''
+        }
+      >
         <Typography
           variant="h4"
           component="div"

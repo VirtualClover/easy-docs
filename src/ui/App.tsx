@@ -14,7 +14,6 @@ import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { SettingsView } from './SettingsView';
 import { ThemeProvider } from '@mui/material/styles';
-import zIndex from '@mui/material/styles/zIndex';
 
 interface ComponentProps {
   themeMode: string;
@@ -65,6 +64,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   const [sheetOpen, setSheetOpen] = React.useState(initialPluginData.sheetOpen);
   const [sheetZIndex, setSheetZIndex] = React.useState(0);
 
+  const [outdatedComponents, setOutdatedComponents] = React.useState(false);
+
   const [sheetContent, setSheetContent] = React.useState(
     initialPluginData.sheetContent
   );
@@ -90,6 +91,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           if (event.data.pluginMessage) {
             switch (event.data.pluginMessage.type) {
               case 'new-node-data':
+                setOutdatedComponents(false);
                 //console.log('new doc data');
                 //console.log(incomingEditorChanges);
                 let data: DocData = event.data.pluginMessage.data;
@@ -136,25 +138,25 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                     currentView: 'INSPECT',
                     prevView: navigation.currentView,
                   });
+                  setOutdatedComponents(false);
                   setSheetOpen(false);
                 }
                 break;
 
               case 'finished-figma-update':
-                console.log('set editor changes false');
-
+                //console.log('set editor changes false');
                 setIncomingEditorChanges(false);
                 break;
 
               case 'outdated-components':
-                setSheetOpen(true);
-                setSheetZIndex(1400);
-                setSheetContent(<OutDatedComponentsView />);
+                if (!outdatedComponents) {
+                  setOutdatedComponents(true);
+                }
                 //console.log('Theres some components that are outdated reload?');
                 break;
 
               case 'close-outdated-overlay':
-                setSheetOpen(false);
+                setOutdatedComponents(false);
                 break;
 
               default:
@@ -199,6 +201,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         setSheetContent,
         sheetZIndex,
         setSheetZIndex,
+        outdatedComponents,
+        setOutdatedComponents,
       }}
     >
       <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>

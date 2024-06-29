@@ -15,6 +15,7 @@ import {
 import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { Editor } from './components/Editor';
+import { OutDatedComponentsView } from './components/OutdatedComponentsView';
 import { PluginDataContext } from '../utils/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -48,6 +49,7 @@ export const EditorView = () => {
   };
 
   const handlePageCreation = () => {
+    pluginContext.setLoadingState('MINOR');
     let tempDoc = pluginContext.currentDocData;
     let newPage = createNewPageJSON(tempDoc.pages.length + 1);
     tempDoc.pages.push(newPage);
@@ -101,36 +103,45 @@ export const EditorView = () => {
             {tabs}
           </Tabs>
           <Tooltip title={'Add a new page'}>
-            <IconButton
-              sx={{ margin: 'auto 0' }}
-              onClick={() => handlePageCreation()}
-            >
-              <Add />
-            </IconButton>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton
+                sx={{ margin: 'auto 0' }}
+                onClick={() => handlePageCreation()}
+                disabled={pluginContext.loadingState != 'NONE' || pluginContext.outdatedComponents}
+              >
+                <Add />
+              </IconButton>
+            </span>
           </Tooltip>
         </Stack>
         <Divider />
       </AppBar>
-      <Stack>
-        <Toolbar variant="dense" />
-      </Stack>
-      <Box
-        sx={{
-          overflow: 'auto',
-          flex: 1,
-          alignSelf: 'stretch',
-          padding: '16px 16px 0 16px',
-        }}
-      >
-        <Editor />
-      </Box>
-      <Snackbar
-        open={pluginContext.incomingFigmaChanges}
-        autoHideDuration={1000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        message={'Loading the latest Figma changes'}
-        action={circularLoader}
-      />
+      {!pluginContext.outdatedComponents ? (
+        <>
+          <Stack>
+            <Toolbar variant="dense" />
+          </Stack>
+          <Box
+            sx={{
+              overflow: 'auto',
+              flex: 1,
+              alignSelf: 'stretch',
+              padding: '16px 16px 0 16px',
+            }}
+          >
+            <Editor />
+          </Box>
+          <Snackbar
+            open={pluginContext.incomingFigmaChanges}
+            autoHideDuration={1000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            message={'Loading the latest Figma changes'}
+            action={circularLoader}
+          />{' '}
+        </>
+      ) : (
+        <OutDatedComponentsView />
+      )}
     </ViewContainer>
   );
 };
