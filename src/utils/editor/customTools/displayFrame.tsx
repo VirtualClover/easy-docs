@@ -69,8 +69,8 @@ const InputUI = (blockData: ComponentProps) => {
           {blockData &&
             typeof frameExistsInFile !== 'undefined' &&
             !frameExistsInFile && (
-              <Alert severity="error">
-                The frame referenced in this block was possibly deleted.
+              <Alert severity="warning">
+                The frame referenced in this block was possibly deleted or the frame is located on another file.
               </Alert>
             )}
           <IFrame

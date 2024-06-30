@@ -1,12 +1,7 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import {
-  BASE_COMPONENT_DATA,
-  DEFAULT_SETTINGS,
-  DocData,
-  EMPTY_DOC_OBJECT,
-} from './utils/constants/constants';
+import { DocData } from './utils/constants/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
@@ -16,7 +11,7 @@ import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
-import { setNodeFills } from './utils/figma/setNodeFills';
+import { INITIAL_PLUGIN_CONTEXT } from './utils/constants/pluginConstants';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -26,16 +21,7 @@ import { setNodeFills } from './utils/figma/setNodeFills';
 figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 figma.skipInvisibleInstanceChildren = true;
 
-let context = {
-  //parentSection: null,
-  settings: DEFAULT_SETTINGS,
-  stopSendingUpdates: false,
-  stopIncomingUpdates: false,
-  stopUpdates: false,
-  lastFetchDoc: EMPTY_DOC_OBJECT,
-  componentData: BASE_COMPONENT_DATA, // Latest data pulled from editor
-};
-
+let context = INITIAL_PLUGIN_CONTEXT;
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.

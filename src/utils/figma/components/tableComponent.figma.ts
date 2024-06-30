@@ -1,6 +1,5 @@
 import {
   BaseComponentData,
-  BaseFileData,
   DEFAULT_SETTINGS,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
@@ -162,7 +161,6 @@ export async function generateTableInstance(
 
   if (componentSet.type == 'COMPONENT_SET') {
     let component = componentSet.children[0] as ComponentNode;
-    let emptyData = [[], []];
     let tableInnerWrapper = await generateTableWrapper();
 
     //Outside table wrapper

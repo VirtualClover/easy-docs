@@ -100,6 +100,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 
 async function generateOuterWrapper(
   component: InstanceNode,
+  fileId: string,
   nodeToDisplay?: FrameNode,
   brokenLinkCaption?: string,
   brokenLinkComponentVersion?: number
@@ -148,6 +149,7 @@ async function generateOuterWrapper(
       format: 'PNG',
       constraint: { type: 'SCALE', value: scaleFactor },
     });
+    
     let image = figma.createImage(bytes);
     let frame = figma.createFrame();
     frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${nodeToDisplay.name}`;
@@ -235,8 +237,9 @@ export async function generateDisplayFrameInstance(
 
     let outerWrapper = await generateOuterWrapper(
       instance,
+      data.fileId,
       nodeToDisplay,
-      'Frame not found',
+      'Frame not found in file',
       componentVersion
     );
 
