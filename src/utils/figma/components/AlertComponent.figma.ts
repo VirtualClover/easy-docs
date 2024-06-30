@@ -9,7 +9,6 @@ import {
 } from '../../constants';
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   DEFAULT_STATUSES,
   FIGMA_COMPONENT_PREFIX,
   StatusType,
@@ -23,38 +22,41 @@ import {
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { encodeStringForHTML } from '../../general/cleanseTextData';
+import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
 function decideAssetsToDisplay(type: StatusType) {
+  let settings = getPluginSettings();
+
   switch (type) {
     case 'success':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.success,
+        palette: settings.customization.palette.status.success,
         icon: successIcon,
       };
       break;
     case 'warning':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.warning,
+        palette: settings.customization.palette.status.warning,
         icon: warningIcon,
       };
       break;
     case 'info':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.info,
+        palette: settings.customization.palette.status.info,
         icon: infoIcon,
       };
       break;
     case 'danger':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.error,
+        palette: settings.customization.palette.status.error,
         icon: errorIcon,
       };
       break;
     default:
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.info,
+        palette: settings.customization.palette.status.info,
         icon: infoIcon,
       };
       break;
@@ -69,68 +71,73 @@ export async function createAlertComponent(
   let componentSet: ComponentSetNode;
   let contentProperty: string;
   let statusPropKey: string = 'type';
-  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
-    for (let i = 0; i < statusTypes.length; i++) {
-      const currentStatus = statusTypes[i];
-      let assets = decideAssetsToDisplay(currentStatus);
-      let component = figma.createComponent();
-      component.resizeWithoutConstraints(400, 20);
-      component.layoutMode = 'HORIZONTAL';
-      component.counterAxisSizingMode = 'AUTO';
-      component.primaryAxisSizingMode = 'FIXED';
-      component.name = `${statusPropKey}=${currentStatus}`;
-      component.paddingTop = 8;
-      component.paddingBottom = 32;
-      //Inner wrapper
-      let innerWrapper = figma.createFrame();
-      innerWrapper.name = 'innerWrapper';
-      innerWrapper.resizeWithoutConstraints(400, 20);
-      innerWrapper.layoutMode = 'HORIZONTAL';
-      innerWrapper.counterAxisSizingMode = 'AUTO';
-      innerWrapper.primaryAxisSizingMode = 'FIXED';
-      innerWrapper.strokeLeftWeight = 16;
-      innerWrapper.paddingLeft = 32;
-      innerWrapper.paddingRight = 16;
-      innerWrapper.paddingTop = 16;
-      innerWrapper.paddingBottom = 16;
-      innerWrapper.itemSpacing = 8;
-      innerWrapper.cornerRadius = 8;
-      setNodeStrokeColor(innerWrapper, assets.palette.default);
-      setNodeFills(innerWrapper, assets.palette.muted);
-      component.appendChild(innerWrapper);
-      innerWrapper.layoutSizingHorizontal = 'FILL';
-      //Alert icon
-      let captionIcon = figma.createNodeFromSvg(assets.icon);
-      captionIcon.resize(24, 24);
-      captionIcon.name = 'alertIcon';
-      let shape = captionIcon.findOne((n) => n.type === 'VECTOR');
-      setNodeFills(shape, assets.palette.content);
-      innerWrapper.appendChild(captionIcon);
-      //Content
-      let contentNode = figma.createText();
-      contentNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
-      contentNode.fontSize = 18;
-      contentNode.characters = 'Alert';
-      setNodeFills(contentNode, assets.palette.content);
-      innerWrapper.appendChild(contentNode);
-      contentNode.layoutSizingHorizontal = 'FILL';
-      contentProperty = component.addComponentProperty(
-        'content',
-        'TEXT',
-        'Alert'
-      );
-      contentNode.componentPropertyReferences = {
-        characters: contentProperty,
-      };
-      parent.appendChild(component);
-      set.push(component);
-    }
+  await figma
+    .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' })
+    .then(() => {
+      for (let i = 0; i < statusTypes.length; i++) {
+        const currentStatus = statusTypes[i];
+        let assets = decideAssetsToDisplay(currentStatus);
+        let component = figma.createComponent();
+        component.resizeWithoutConstraints(400, 20);
+        component.layoutMode = 'HORIZONTAL';
+        component.counterAxisSizingMode = 'AUTO';
+        component.primaryAxisSizingMode = 'FIXED';
+        component.name = `${statusPropKey}=${currentStatus}`;
+        component.paddingTop = 8;
+        component.paddingBottom = 32;
+        //Inner wrapper
+        let innerWrapper = figma.createFrame();
+        innerWrapper.name = 'innerWrapper';
+        innerWrapper.resizeWithoutConstraints(400, 20);
+        innerWrapper.layoutMode = 'HORIZONTAL';
+        innerWrapper.counterAxisSizingMode = 'AUTO';
+        innerWrapper.primaryAxisSizingMode = 'FIXED';
+        innerWrapper.strokeLeftWeight = 16;
+        innerWrapper.paddingLeft = 32;
+        innerWrapper.paddingRight = 16;
+        innerWrapper.paddingTop = 16;
+        innerWrapper.paddingBottom = 16;
+        innerWrapper.itemSpacing = 8;
+        innerWrapper.cornerRadius = 8;
+        setNodeStrokeColor(innerWrapper, assets.palette.default);
+        setNodeFills(innerWrapper, assets.palette.muted);
+        component.appendChild(innerWrapper);
+        innerWrapper.layoutSizingHorizontal = 'FILL';
+        //Alert icon
+        let captionIcon = figma.createNodeFromSvg(assets.icon);
+        captionIcon.resize(24, 24);
+        captionIcon.name = 'alertIcon';
+        let shape = captionIcon.findOne((n) => n.type === 'VECTOR');
+        setNodeFills(shape, assets.palette.content);
+        innerWrapper.appendChild(captionIcon);
+        //Content
+        let contentNode = figma.createText();
+        contentNode.fontName = {
+          family: DEFAULT_FONT_FAMILIES[0],
+          style: 'Regular',
+        };
+        contentNode.fontSize = 18;
+        contentNode.characters = 'Alert';
+        setNodeFills(contentNode, assets.palette.content);
+        innerWrapper.appendChild(contentNode);
+        contentNode.layoutSizingHorizontal = 'FILL';
+        contentProperty = component.addComponentProperty(
+          'content',
+          'TEXT',
+          'Alert'
+        );
+        contentNode.componentPropertyReferences = {
+          characters: contentProperty,
+        };
+        parent.appendChild(component);
+        set.push(component);
+      }
 
-    componentSet = figma.combineAsVariants(set, parent);
-    componentSet.layoutMode = 'VERTICAL';
-    componentSet.itemSpacing = 90;
-    componentSet.name = `${FIGMA_COMPONENT_PREFIX}Alert`;
-  });
+      componentSet = figma.combineAsVariants(set, parent);
+      componentSet.layoutMode = 'VERTICAL';
+      componentSet.itemSpacing = 90;
+      componentSet.name = `${FIGMA_COMPONENT_PREFIX}Alert`;
+    });
   return {
     id: componentSet.id,
     contentProp: Object.keys(componentSet.componentPropertyDefinitions)[0],

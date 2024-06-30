@@ -1,6 +1,5 @@
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
@@ -23,35 +22,43 @@ import {
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { clone } from '../../clone';
+import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createListComponent(parent: FrameNode) {
+  let settings = getPluginSettings();
   let component: ComponentNode;
   let contentProperty: string;
   let defaultStyle: TextListOptions = { type: 'UNORDERED' };
-  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
-    component = figma.createComponent();
-    component.resizeWithoutConstraints(400, 20);
-    component.layoutMode = 'HORIZONTAL';
-    component.counterAxisSizingMode = 'AUTO';
-    component.primaryAxisSizingMode = 'FIXED';
-    component.paddingBottom = 32;
-    component.name = `${FIGMA_COMPONENT_PREFIX}List`;
-    let textNode = figma.createText();
-    textNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
-    textNode.fontSize = 24;
-    textNode.characters = 'List';
-    textNode.setRangeListOptions(0, textNode.characters.length, defaultStyle);
-    setNodeFills(
-      textNode,
-      DEFAULT_SETTINGS.customization.palette.onBackground.mid
-    );
-    component.appendChild(textNode);
-    textNode.layoutSizingHorizontal = 'FILL';
-    contentProperty = component.addComponentProperty('content', 'TEXT', 'List');
-    textNode.componentPropertyReferences = { characters: contentProperty };
-    parent.appendChild(component);
-  });
+  await figma
+    .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' })
+    .then(() => {
+      component = figma.createComponent();
+      component.resizeWithoutConstraints(400, 20);
+      component.layoutMode = 'HORIZONTAL';
+      component.counterAxisSizingMode = 'AUTO';
+      component.primaryAxisSizingMode = 'FIXED';
+      component.paddingBottom = 32;
+      component.name = `${FIGMA_COMPONENT_PREFIX}List`;
+      let textNode = figma.createText();
+      textNode.fontName = {
+        family: DEFAULT_FONT_FAMILIES[0],
+        style: 'Regular',
+      };
+      textNode.fontSize = 24;
+      textNode.characters = 'List';
+      textNode.setRangeListOptions(0, textNode.characters.length, defaultStyle);
+      setNodeFills(textNode, settings.customization.palette.onBackground.mid);
+      component.appendChild(textNode);
+      textNode.layoutSizingHorizontal = 'FILL';
+      contentProperty = component.addComponentProperty(
+        'content',
+        'TEXT',
+        'List'
+      );
+      textNode.componentPropertyReferences = { characters: contentProperty };
+      parent.appendChild(component);
+    });
   return {
     id: component.id,
     contentProp: contentProperty,

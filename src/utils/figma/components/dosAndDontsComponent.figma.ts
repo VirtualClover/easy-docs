@@ -1,7 +1,6 @@
 import {
   BaseComponentData,
   DEFAULT_GUIDELINES,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
   GuidelineType,
 } from '../../constants/constants';
@@ -25,31 +24,32 @@ import {
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
 } from '../../constants';
-import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
+import { ColorPalette, DEFAULT_FONT_FAMILIES } from '../../../styles/base';
+import { getPluginSettings } from '../getPluginSettings';
 
-function decideAssetsToDisplay(type: GuidelineType) {
+function decideAssetsToDisplay(type: GuidelineType, palette: ColorPalette) {
   switch (type) {
     case 'do':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.success,
+        palette: palette.status.success,
         icon: doIcon,
       };
       break;
     case 'dont':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.error,
+        palette: palette.status.error,
         icon: dontIcon,
       };
       break;
     case 'caution':
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.warning,
+        palette: palette.status.warning,
         icon: cautionIcon,
       };
       break;
     default:
       return {
-        palette: DEFAULT_SETTINGS.customization.palette.status.success,
+        palette: palette.status.success,
         icon: doIcon,
       };
       break;
@@ -68,9 +68,13 @@ export async function createDosAndDontsComponent(
   await figma
     .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Medium Italic' })
     .then(() => {
+      let settings = getPluginSettings();
       for (let i = 0; i < guidelineTypes.length; i++) {
         const currentGuideline = guidelineTypes[i];
-        let assets = decideAssetsToDisplay(currentGuideline);
+        let assets = decideAssetsToDisplay(
+          currentGuideline,
+          settings.customization.palette
+        );
         let component = figma.createComponent();
         //Component
         component.resizeWithoutConstraints(100, 1);
@@ -92,7 +96,10 @@ export async function createDosAndDontsComponent(
         component.appendChild(sourceWrapper);
         sourceWrapper.layoutSizingHorizontal = 'FILL';
         let sourceNode = figma.createText();
-        sourceNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Medium Italic' };
+        sourceNode.fontName = {
+          family: DEFAULT_FONT_FAMILIES[0],
+          style: 'Medium Italic',
+        };
         sourceNode.fontSize = 12;
         sourceNode.textDecoration = 'UNDERLINE';
         sourceNode.characters = 'Source here';
@@ -125,12 +132,15 @@ export async function createDosAndDontsComponent(
 
         //caption
         let captionNode = figma.createText();
-        captionNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
+        captionNode.fontName = {
+          family: DEFAULT_FONT_FAMILIES[0],
+          style: 'Regular',
+        };
         captionNode.fontSize = 16;
         captionNode.characters = 'Frame caption';
         setNodeFills(
           captionNode,
-          DEFAULT_SETTINGS.customization.palette.onBackground.mid
+          settings.customization.palette.onBackground.mid
         );
         captionWrapper.appendChild(captionNode);
         captionNode.layoutSizingHorizontal = 'FILL';
@@ -172,8 +182,9 @@ async function generateOuterWrapper(
   brokenLinkCaption?: string,
   brokenLinkComponentVersion?: number
 ) {
+  let settings = getPluginSettings();
   //Outer wrapper
-  let assets = decideAssetsToDisplay(type);
+  let assets = decideAssetsToDisplay(type, settings.customization.palette);
   let outerWrapper = figma.createFrame();
   outerWrapper.layoutMode = 'VERTICAL';
   outerWrapper.counterAxisSizingMode = 'AUTO';

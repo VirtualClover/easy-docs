@@ -266,8 +266,8 @@ export const DEFAULT_PLUGIN_DATA = {
   setSheetContent: (content: () => JSX.Element) => {},
   sheetZIndex: 0,
   setSheetZIndex: (state: number) => {},
-  outdatedComponents: false,
-  setOutdatedComponents: (state: boolean) => {},
+  outdatedComponents:false,
+  setOutdatedComponents:(state: boolean) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

@@ -1,6 +1,5 @@
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
@@ -19,12 +18,13 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { BaseFileData } from '../../constants/constants';
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
+import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createParagraphComponent(parent: FrameNode) {
   let component: ComponentNode;
+  let settings = getPluginSettings();
   let contentProperty: string;
   await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' }).then(() => {
     component = figma.createComponent();
@@ -40,7 +40,7 @@ export async function createParagraphComponent(parent: FrameNode) {
     textNode.characters = 'Paragraph';
     setNodeFills(
       textNode,
-      DEFAULT_SETTINGS.customization.palette.onBackground.mid
+      settings.customization.palette.onBackground.mid
     );
     component.appendChild(textNode);
     textNode.layoutSizingHorizontal = 'FILL';

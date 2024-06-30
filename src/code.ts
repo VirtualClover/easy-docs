@@ -11,7 +11,6 @@ import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
-import { INITIAL_PLUGIN_CONTEXT } from './utils/constants/pluginConstants';
 import {
   FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
   FIGMA_CONTEXT_STOP_UPDATES_KEY,
@@ -25,7 +24,7 @@ import {
 figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 figma.skipInvisibleInstanceChildren = true;
 
-let context = INITIAL_PLUGIN_CONTEXT;
+//let context = INITIAL_PLUGIN_CONTEXT;
 figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, false);
 figma.clientStorage.setAsync(
   FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
@@ -59,7 +58,7 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'load-data') {
     //Get keys
-    pluginInit(context);
+    pluginInit();
   }
 
   if (msg.type === 'create-new-doc') {
@@ -69,24 +68,22 @@ figma.ui.onmessage = (msg) => {
     //console.log(context);
     createNewDoc(createNewDocJSON()).then((s) => {
       section = s;
-      generateJSONFromFigmaContent(section).then(
-        async (data) => {
-          await figma.clientStorage.setAsync(
-            FIGMA_CONTEXT_STOP_UPDATES_KEY,
-            false
-          );
-          await figma.clientStorage.setAsync(
-            FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
-            data
-          );
-          //context.stopUpdates = false;
-          //context.lastFetchDoc = data;
-          figma.ui.postMessage({
-            type: 'new-node-data',
-            data: data,
-          });
-        }
-      );
+      generateJSONFromFigmaContent(section).then(async (data) => {
+        await figma.clientStorage.setAsync(
+          FIGMA_CONTEXT_STOP_UPDATES_KEY,
+          false
+        );
+        await figma.clientStorage.setAsync(
+          FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
+          data
+        );
+        //context.stopUpdates = false;
+        //context.lastFetchDoc = data;
+        figma.ui.postMessage({
+          type: 'new-node-data',
+          data: data,
+        });
+      });
     });
   }
 

@@ -1,14 +1,14 @@
-import { DEFAULT_SETTINGS, SectionSettings } from '../constants/constants';
+import { getPluginSettings } from './getPluginSettings';
 
 /**
  * Resizes a section
  * @param section
  * @param sectionSettings
  */
-export function resizeSection(
-  section: SectionNode,
-  sectionSettings: SectionSettings = DEFAULT_SETTINGS.customization.section
-) {
+export function resizeSection(section: SectionNode) {
+  let settings = getPluginSettings();
+  let sectionSettings = settings.customization.section;
+
   setTimeout(() => {
     if (section.children.length) {
       for (let i = 0; i < section.children.length; i++) {

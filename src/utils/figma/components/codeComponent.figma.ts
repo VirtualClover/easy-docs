@@ -1,6 +1,5 @@
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
@@ -12,6 +11,7 @@ import {
 } from '../../constants';
 
 import { decodeStringForFigma } from '../../general/cleanseTextData';
+import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createCodeComponent(parent: FrameNode) {
@@ -20,6 +20,8 @@ export async function createCodeComponent(parent: FrameNode) {
   await figma
     .loadFontAsync({ family: 'Roboto Mono', style: 'Regular' })
     .then(() => {
+      let settings = getPluginSettings();
+
       component = figma.createComponent();
       component.resizeWithoutConstraints(400, 20);
       component.layoutMode = 'HORIZONTAL';
@@ -38,10 +40,7 @@ export async function createCodeComponent(parent: FrameNode) {
       innerWrapper.horizontalPadding = 32;
       innerWrapper.itemSpacing = 8;
       innerWrapper.cornerRadius = 16;
-      setNodeFills(
-        innerWrapper,
-        DEFAULT_SETTINGS.customization.palette.surface
-      );
+      setNodeFills(innerWrapper, settings.customization.palette.surface);
       component.appendChild(innerWrapper);
       innerWrapper.layoutSizingHorizontal = 'FILL';
       //Code
@@ -49,10 +48,7 @@ export async function createCodeComponent(parent: FrameNode) {
       codeNode.fontName = { family: 'Roboto Mono', style: 'Regular' };
       codeNode.fontSize = 24;
       codeNode.characters = 'Code';
-      setNodeFills(
-        codeNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground.high
-      );
+      setNodeFills(codeNode, settings.customization.palette.onBackground.high);
       innerWrapper.appendChild(codeNode);
       codeNode.layoutSizingHorizontal = 'FILL';
       contentProperty = component.addComponentProperty(

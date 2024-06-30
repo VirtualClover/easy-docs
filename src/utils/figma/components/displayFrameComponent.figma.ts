@@ -1,6 +1,5 @@
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 
@@ -24,6 +23,8 @@ import {
   FIGMA_NAMESPACE,
 } from '../../constants';
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
+import { getPluginSettings } from '../getPluginSettings';
+import { getComponentData } from '../getComponentData';
 
 export async function createDisplayFrameComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -32,6 +33,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
   await figma
     .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Medium Italic' })
     .then(() => {
+      let settings = getPluginSettings();
       //Component
       component = figma.createComponent();
       component.resizeWithoutConstraints(100, 1);
@@ -48,20 +50,23 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
       sourceWrapper.paddingLeft = 16;
       setNodeFills(
         sourceWrapper,
-        DEFAULT_SETTINGS.customization.palette.status.neutral.muted
+        settings.customization.palette.status.neutral.muted
       );
       sourceWrapper.bottomLeftRadius = 16;
       sourceWrapper.bottomRightRadius = 16;
       component.appendChild(sourceWrapper);
       sourceWrapper.layoutSizingHorizontal = 'FILL';
       let sourceNode = figma.createText();
-      sourceNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Medium Italic' };
+      sourceNode.fontName = {
+        family: DEFAULT_FONT_FAMILIES[0],
+        style: 'Medium Italic',
+      };
       sourceNode.fontSize = 12;
       sourceNode.textDecoration = 'UNDERLINE';
       sourceNode.characters = 'Source here';
       setNodeFills(
         sourceNode,
-        DEFAULT_SETTINGS.customization.palette.status.neutral.content
+        settings.customization.palette.status.neutral.content
       );
       sourceWrapper.appendChild(sourceNode);
       sourceNode.layoutSizingHorizontal = 'FILL';
@@ -74,12 +79,15 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 
       //caption
       let captionNode = figma.createText();
-      captionNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' };
+      captionNode.fontName = {
+        family: DEFAULT_FONT_FAMILIES[0],
+        style: 'Regular',
+      };
       captionNode.fontSize = 16;
       captionNode.characters = 'Frame caption';
       setNodeFills(
         captionNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground.mid
+        settings.customization.palette.onBackground.mid
       );
       component.appendChild(captionNode);
       captionNode.layoutSizingHorizontal = 'FILL';
@@ -100,7 +108,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 
 async function generateOuterWrapper(
   component: InstanceNode,
-  fileId: string,
+  backgroundColor: string,
   nodeToDisplay?: FrameNode,
   brokenLinkCaption?: string,
   brokenLinkComponentVersion?: number
@@ -128,10 +136,7 @@ async function generateOuterWrapper(
   displayFrame.paddingRight = 16;
   displayFrame.topLeftRadius = 16;
   displayFrame.topRightRadius = 16;
-  setNodeFills(
-    displayFrame,
-    DEFAULT_SETTINGS.customization.palette.status.neutral.default
-  );
+  setNodeFills(displayFrame, backgroundColor);
   outerWrapper.appendChild(displayFrame);
   displayFrame.layoutSizingHorizontal = 'FILL';
 
@@ -149,7 +154,7 @@ async function generateOuterWrapper(
       format: 'PNG',
       constraint: { type: 'SCALE', value: scaleFactor },
     });
-    
+
     let image = figma.createImage(bytes);
     let frame = figma.createFrame();
     frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${nodeToDisplay.name}`;
@@ -184,9 +189,8 @@ export async function generateDisplayFrameInstance(
   data: DisplayFrameBlockData,
   componentVersion: number
 ): Promise<FrameNode | null> {
-  let componentData: BaseComponentData = JSON.parse(
-    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
-  );
+  let settings = getPluginSettings();
+  let componentData = getComponentData();
   let component: BaseNode;
 
   await figma
@@ -237,7 +241,7 @@ export async function generateDisplayFrameInstance(
 
     let outerWrapper = await generateOuterWrapper(
       instance,
-      data.fileId,
+      settings.customization.palette.status.neutral.default,
       nodeToDisplay,
       'Frame not found in file',
       componentVersion

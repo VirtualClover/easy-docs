@@ -1,7 +1,6 @@
 import {
   BaseComponentData,
   BlockData,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
@@ -10,9 +9,11 @@ import {
   FIGMA_NAMESPACE,
 } from '../../constants';
 
+import { getPluginSettings } from '../getPluginSettings';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
 export async function createDividerComponent(parent: FrameNode) {
+  let settings = getPluginSettings();
   let component: ComponentNode;
   component = figma.createComponent();
   component.resizeWithoutConstraints(400, 20);
@@ -30,7 +31,7 @@ export async function createDividerComponent(parent: FrameNode) {
   lineNode.strokeWeight = 2;
   setNodeStrokeColor(
     lineNode,
-    DEFAULT_SETTINGS.customization.palette.divider.simple
+    settings.customization.palette.divider.simple
   );
   parent.appendChild(component);
   return { id: component.id };

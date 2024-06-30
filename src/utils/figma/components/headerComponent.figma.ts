@@ -1,7 +1,6 @@
 import {
   BaseComponentData,
   DEFAULT_HEADING_SIZES,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
@@ -17,50 +16,54 @@ import {
 } from '../../general/cleanseTextData';
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
+import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 
 export async function createHeaderComponent(
   parent: FrameNode,
   headingSizes: number[] = DEFAULT_HEADING_SIZES
 ) {
+  let settings = getPluginSettings();
   let set: ComponentNode[] = [];
   let componentSet: ComponentSetNode;
   let contentProperty: string;
   let levelPropKey: string = 'level';
-  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }).then(() => {
-    for (let i = 0; i < headingSizes.length; i++) {
-      const currentSize = headingSizes[i];
-      let header = figma.createComponent();
-      header.resizeWithoutConstraints(400, 20);
-      header.layoutMode = 'HORIZONTAL';
-      header.counterAxisSizingMode = 'AUTO';
-      header.primaryAxisSizingMode = 'FIXED';
-      header.paddingBottom = 32;
-      header.name = `${levelPropKey}=${i + 1}`;
-      let textNode = figma.createText();
-      textNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' };
-      textNode.fontSize = currentSize;
-      textNode.characters = 'Heading';
-      setNodeFills(
-        textNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground.high
-      );
-      header.appendChild(textNode);
-      textNode.layoutSizingHorizontal = 'FILL';
-      contentProperty = header.addComponentProperty(
-        'content',
-        'TEXT',
-        'Heading'
-      );
-      textNode.componentPropertyReferences = { characters: contentProperty };
-      set.push(header);
-    }
+  await figma
+    .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' })
+    .then(() => {
+      for (let i = 0; i < headingSizes.length; i++) {
+        const currentSize = headingSizes[i];
+        let header = figma.createComponent();
+        header.resizeWithoutConstraints(400, 20);
+        header.layoutMode = 'HORIZONTAL';
+        header.counterAxisSizingMode = 'AUTO';
+        header.primaryAxisSizingMode = 'FIXED';
+        header.paddingBottom = 32;
+        header.name = `${levelPropKey}=${i + 1}`;
+        let textNode = figma.createText();
+        textNode.fontName = { family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' };
+        textNode.fontSize = currentSize;
+        textNode.characters = 'Heading';
+        setNodeFills(
+          textNode,
+          settings.customization.palette.onBackground.high
+        );
+        header.appendChild(textNode);
+        textNode.layoutSizingHorizontal = 'FILL';
+        contentProperty = header.addComponentProperty(
+          'content',
+          'TEXT',
+          'Heading'
+        );
+        textNode.componentPropertyReferences = { characters: contentProperty };
+        set.push(header);
+      }
 
-    componentSet = figma.combineAsVariants(set, parent);
-    componentSet.layoutMode = 'VERTICAL';
-    componentSet.itemSpacing = 90;
-    componentSet.name = `${FIGMA_COMPONENT_PREFIX}Heading`;
-  });
+      componentSet = figma.combineAsVariants(set, parent);
+      componentSet.layoutMode = 'VERTICAL';
+      componentSet.itemSpacing = 90;
+      componentSet.name = `${FIGMA_COMPONENT_PREFIX}Heading`;
+    });
   //console.log(componentSet.componentPropertyDefinitions);
   return {
     id: componentSet.id,

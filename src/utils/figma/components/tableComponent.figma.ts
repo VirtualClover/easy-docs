@@ -1,16 +1,15 @@
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
   BlockData,
-  FIGMA_COMPONENT_DATA_KEY,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   TableBlockData,
 } from '../../constants';
+import { ColorPalette, DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -20,8 +19,9 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { clone } from '../../clone';
+import { getComponentData } from '../getComponentData';
+import { getPluginSettings } from '../getPluginSettings';
 import { isOdd } from '../../general/isOdd';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
@@ -30,63 +30,63 @@ export async function createTableCellComponent(
   parent: FrameNode,
   cellTypes = DEFAULT_TABLE_CELL_TYPES
 ) {
+  let settings = getPluginSettings();
   let set: ComponentNode[] = [];
   let componentSet: ComponentSetNode;
   let contentProperty: string;
   let cellTypePropKey: string = 'type';
-  await figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }).then(() => {
-    for (let i = 0; i < cellTypes.length; i++) {
-      const currentType = cellTypes[i];
-      let isHeader = currentType == 'header';
-      let cell = figma.createComponent();
-      cell.resizeWithoutConstraints(220, 70);
-      cell.layoutMode = 'HORIZONTAL';
-      cell.counterAxisSizingMode = 'AUTO';
-      cell.primaryAxisSizingMode = 'FIXED';
-      cell.verticalPadding = 16;
-      cell.horizontalPadding = 16;
-      cell.name = `${cellTypePropKey}=${currentType}`;
-      if (currentType === 'header') {
-        let bgColor =
-          DEFAULT_SETTINGS.customization.palette.background.tonal_high;
-        setNodeFills(cell, bgColor);
+  await figma
+    .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' })
+    .then(() => {
+      for (let i = 0; i < cellTypes.length; i++) {
+        const currentType = cellTypes[i];
+        let isHeader = currentType == 'header';
+        let cell = figma.createComponent();
+        cell.resizeWithoutConstraints(220, 70);
+        cell.layoutMode = 'HORIZONTAL';
+        cell.counterAxisSizingMode = 'AUTO';
+        cell.primaryAxisSizingMode = 'FIXED';
+        cell.verticalPadding = 16;
+        cell.horizontalPadding = 16;
+        cell.name = `${cellTypePropKey}=${currentType}`;
+        if (currentType === 'header') {
+          let bgColor = settings.customization.palette.background.tonal_high;
+          setNodeFills(cell, bgColor);
+        }
+        cell.strokeRightWeight = 1;
+        const fills = clone(cell.strokes);
+        fills[0] = figma.util.solidPaint(
+          settings.customization.palette.divider.simple,
+          fills[0]
+        );
+        cell.strokes = fills;
+        let textNode = figma.createText();
+        textNode.fontName = {
+          family: DEFAULT_FONT_FAMILIES[0],
+          style: isHeader ? 'Bold' : 'Regular',
+        };
+        textNode.fontSize = isHeader ? 18 : 16;
+        textNode.characters = 'Cell content';
+        setNodeFills(
+          textNode,
+          settings.customization.palette.onBackground[isHeader ? 'high' : 'mid']
+        );
+        cell.appendChild(textNode);
+        textNode.layoutSizingHorizontal = 'FILL';
+        contentProperty = cell.addComponentProperty(
+          'content',
+          'TEXT',
+          'Cell content'
+        );
+        textNode.componentPropertyReferences = { characters: contentProperty };
+        set.push(cell);
       }
-      cell.strokeRightWeight = 1;
-      const fills = clone(cell.strokes);
-      fills[0] = figma.util.solidPaint(
-        DEFAULT_SETTINGS.customization.palette.divider.simple,
-        fills[0]
-      );
-      cell.strokes = fills;
-      let textNode = figma.createText();
-      textNode.fontName = {
-        family: DEFAULT_FONT_FAMILIES[0],
-        style: isHeader ? 'Bold' : 'Regular',
-      };
-      textNode.fontSize = isHeader ? 18 : 16;
-      textNode.characters = 'Cell content';
-      setNodeFills(
-        textNode,
-        DEFAULT_SETTINGS.customization.palette.onBackground[
-          isHeader ? 'high' : 'mid'
-        ]
-      );
-      cell.appendChild(textNode);
-      textNode.layoutSizingHorizontal = 'FILL';
-      contentProperty = cell.addComponentProperty(
-        'content',
-        'TEXT',
-        'Cell content'
-      );
-      textNode.componentPropertyReferences = { characters: contentProperty };
-      set.push(cell);
-    }
 
-    componentSet = figma.combineAsVariants(set, parent);
-    componentSet.layoutMode = 'VERTICAL';
-    componentSet.itemSpacing = 90;
-    componentSet.name = `${FIGMA_COMPONENT_PREFIX}TableCell`;
-  });
+      componentSet = figma.combineAsVariants(set, parent);
+      componentSet.layoutMode = 'VERTICAL';
+      componentSet.itemSpacing = 90;
+      componentSet.name = `${FIGMA_COMPONENT_PREFIX}TableCell`;
+    });
   //console.log(componentSet.componentPropertyDefinitions);
   return {
     id: componentSet.id,
@@ -100,7 +100,7 @@ export async function createTableCellComponent(
   };
 }
 
-async function generateTableWrapper() {
+async function generateTableWrapper(palette: ColorPalette) {
   //Outer wrapper
   let outerWrapper = figma.createFrame();
   outerWrapper.layoutMode = 'VERTICAL';
@@ -111,14 +111,15 @@ async function generateTableWrapper() {
   outerWrapper.strokeWeight = 1;
   outerWrapper.cornerRadius = 16;
   outerWrapper.clipsContent = true;
-  setNodeStrokeColor(
-    outerWrapper,
-    DEFAULT_SETTINGS.customization.palette.divider.simple
-  );
+  setNodeStrokeColor(outerWrapper, palette.divider.simple);
   return outerWrapper;
 }
 
-async function generateTableRow(index: number, hasHeader: boolean = false) {
+async function generateTableRow(
+  index: number,
+  palette: ColorPalette,
+  hasHeader: boolean = false
+) {
   //Outer wrapper
   let outerWrapper = figma.createFrame();
   outerWrapper.layoutMode = 'HORIZONTAL';
@@ -128,15 +129,9 @@ async function generateTableRow(index: number, hasHeader: boolean = false) {
   outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}TableRow`;
   outerWrapper.strokeWeight = 1;
   if ((isOdd(index) && !hasHeader) || (!isOdd(index) && hasHeader)) {
-    setNodeFills(
-      outerWrapper,
-      DEFAULT_SETTINGS.customization.palette.background.default
-    );
+    setNodeFills(outerWrapper, palette.background.default);
   } else {
-    setNodeFills(
-      outerWrapper,
-      DEFAULT_SETTINGS.customization.palette.background.tonal_low
-    );
+    setNodeFills(outerWrapper, palette.background.tonal_low);
   }
 
   return outerWrapper;
@@ -146,9 +141,8 @@ export async function generateTableInstance(
   data: TableBlockData,
   componentVersion: number
 ): Promise<FrameNode | null> {
-  let componentData: BaseComponentData = JSON.parse(
-    figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
-  );
+  let settings = getPluginSettings();
+  let componentData = getComponentData();
   let componentSet: BaseNode;
   await figma
     .getNodeByIdAsync(componentData.components.tableCell.id)
@@ -161,7 +155,9 @@ export async function generateTableInstance(
 
   if (componentSet.type == 'COMPONENT_SET') {
     let component = componentSet.children[0] as ComponentNode;
-    let tableInnerWrapper = await generateTableWrapper();
+    let tableInnerWrapper = await generateTableWrapper(
+      settings.customization.palette
+    );
 
     //Outside table wrapper
     let tableWrapper = figma.createFrame();
@@ -175,7 +171,10 @@ export async function generateTableInstance(
     if (data.content.length) {
       for (let i = 0; i < data.content.length; i++) {
         const row = data.content[i];
-        let rowWrapper = await generateTableRow(i);
+        let rowWrapper = await generateTableRow(
+          i,
+          settings.customization.palette
+        );
         for (let ci = 0; ci < row.length; ci++) {
           const cellContent = decodeStringForFigma(row[ci], true);
           let cellInstance = component.createInstance();
@@ -195,7 +194,10 @@ export async function generateTableInstance(
         rowWrapper.layoutSizingHorizontal = 'FILL';
       }
     } else {
-      let rowWrapper = await generateTableRow(0);
+      let rowWrapper = await generateTableRow(
+        0,
+        settings.customization.palette
+      );
       let cellContent = 'Item 1';
       let cellInstance = component.createInstance();
 
