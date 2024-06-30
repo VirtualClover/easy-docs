@@ -1,4 +1,5 @@
-import { DocData, PluginSettings } from '../constants/constants';
+import { DocData } from '../constants/constants';
+import { FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY } from '../constants';
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { reconcileDocData } from '../docs/reconcileData';
 import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
@@ -35,17 +36,25 @@ export async function pushFigmaUpdates(context): Promise<{
     //console.log(generatedDoc);
 
     if (generatedDoc.pages) {
-      let reconciliation = reconcileDocData(generatedDoc, context.lastFetchDoc);
+      let lastGeneratedDoc: DocData;
+      await figma.clientStorage
+        .getAsync(FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY)
+        .then((data: DocData) => (lastGeneratedDoc = data));
 
+      let reconciliation = reconcileDocData(generatedDoc, lastGeneratedDoc);
+      console.log(reconciliation);
       if (reconciliation.changesNumber) {
-        context.lastFetchDoc = <DocData>reconciliation.data;
+        await figma.clientStorage.setAsync(
+          FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
+          reconciliation.data
+        );
+
         return {
           type: 'new-node-data',
-          data: context.lastFetchDoc,
+          data: reconciliation.data,
           selectedFrame,
         };
       } else {
-
         return { type: 'same-node-data', data: '', selectedFrame };
       }
     }
