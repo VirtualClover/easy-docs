@@ -21,7 +21,6 @@ import { createTableCellComponent } from './tableComponent.figma';
 export async function initComponents(
   componentData: BaseComponentData,
   wholeObjectisMissing: Boolean = true,
-  context
 ) {
   figma.notify(
     wholeObjectisMissing
@@ -100,7 +99,6 @@ export async function initComponents(
       JSON.stringify(componentData)
     );
   });
-  context.componentData = componentData;
   await page.loadAsync();
   page.appendChild(frame);
 }

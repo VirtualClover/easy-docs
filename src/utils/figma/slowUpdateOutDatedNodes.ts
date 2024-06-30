@@ -4,12 +4,12 @@ import {
 } from '../constants/constants';
 import { FIGMA_COMPONENT_VERSION_KEY, FIGMA_NAMESPACE } from '../constants';
 
+import { getComponentData } from './getComponentData';
 import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
 
-export let slowUpdateOutdatedComponentBlocks = async (
-  componentData: BaseComponentData
-) => {
+export let slowUpdateOutdatedComponentBlocks = async () => {
   let section: SectionNode;
+  let componentData = getComponentData();
 
   scanCurrentSelectionForDocs().then((res) => {
     section = res.section;

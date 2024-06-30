@@ -30,12 +30,12 @@ import { generateBlockDataFromList } from '../figma/components/listComponent.fig
 import { generateBlockDataFromParagraph } from '../figma/components/paragraphComponent.figma';
 import { generateBlockDataFromQuote } from '../figma/components/quoteComponent.figma';
 import { generateBlockDataFromTable } from '../figma/components/tableComponent.figma';
+import { getPluginSettings } from '../figma/getPluginSettings';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 import { styleFrame } from '../figma/styleFrame';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode,
-  settings: PluginSettings
 ): Promise<DocData> {
   let JSONData: DocData = {
     title: encodeStringForHTML(section.name),
@@ -47,6 +47,8 @@ export async function generateJSONFromFigmaContent(
     },
     lastEdited: Date.now().toString(),
   };
+
+  let settings = getPluginSettings();
 
   let stringComponentData = figma.root.getSharedPluginData(
     FIGMA_NAMESPACE,

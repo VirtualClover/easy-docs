@@ -8,7 +8,7 @@ import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
  * Generates doc data from a section and then pushes it
  * @returns
  */
-export async function pushFigmaUpdates(context): Promise<{
+export async function pushFigmaUpdates(): Promise<{
   type: string;
   data: any;
   selectedFrame: number;
@@ -29,7 +29,7 @@ export async function pushFigmaUpdates(context): Promise<{
 
   if (parentSection && parentSection.children.length) {
     let generatedDoc: DocData;
-    await generateJSONFromFigmaContent(parentSection, context.settings).then(
+    await generateJSONFromFigmaContent(parentSection).then(
       (data) => (generatedDoc = data)
     );
     //console.log('Generated doc');

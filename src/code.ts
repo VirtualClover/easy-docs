@@ -66,14 +66,10 @@ figma.ui.onmessage = (msg) => {
     //context.stopUpdates = true;
     figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, true);
     let section: SectionNode;
-    console.log(context);
-    createNewDoc(
-      createNewDocJSON(),
-      context.settings,
-      context.componentData.lastGenerated
-    ).then((s) => {
+    //console.log(context);
+    createNewDoc(createNewDocJSON()).then((s) => {
       section = s;
-      generateJSONFromFigmaContent(section, context.settings).then(
+      generateJSONFromFigmaContent(section).then(
         async (data) => {
           await figma.clientStorage.setAsync(
             FIGMA_CONTEXT_STOP_UPDATES_KEY,
@@ -98,7 +94,7 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'node-update') {
     figma.clientStorage.getAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY).then((res) => {
       if (!res) {
-        pushFigmaUpdates(context).then((res) => {
+        pushFigmaUpdates().then((res) => {
           if (res.type === 'new-node-data') {
             console.log('push figma updates');
             console.log(res.type);
@@ -145,8 +141,6 @@ figma.ui.onmessage = (msg) => {
                 generateFigmaContentFromJSON(
                   data,
                   section,
-                  context.settings,
-                  context.componentData.lastGenerated,
                   msg.editedFrames
                 ).then(async (section) => {
                   await figma.clientStorage.setAsync(
@@ -166,7 +160,7 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'update-outdated-components') {
     //context.stopUpdates = true;
     figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, true);
-    slowUpdateOutdatedComponentBlocks(context.componentData).then(async () => {
+    slowUpdateOutdatedComponentBlocks().then(async () => {
       figma.ui.postMessage({ type: 'close-outdated-overlay' });
       await figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, false);
       //context.stopUpdates = false;

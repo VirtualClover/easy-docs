@@ -22,18 +22,21 @@ import { generateListInstance } from '../figma/components/listComponent.figma';
 import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
 import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
 import { generateTableInstance } from '../figma/components/tableComponent.figma';
+import { getComponentData } from '../figma/getComponentData';
+import { getPluginSettings } from '../figma/getPluginSettings';
 import { resizeSection } from '../figma/resizeSection';
 import { selectNode } from '../figma/selectNode';
 
 export async function generateFigmaContentFromJSON(
   data: DocData,
   parentSection: SectionNode,
-  settings: PluginSettings,
-  componentVersion: number,
   editedFrames: string[] = []
 ) {
   let pages = data.pages;
   let docTitle = decodeStringForFigma(data.title);
+  let componentData = getComponentData();
+  let settings = getPluginSettings();
+  let componentVersion = componentData.lastGenerated;
   parentSection.name = docTitle;
   console.log('editor data');
 
