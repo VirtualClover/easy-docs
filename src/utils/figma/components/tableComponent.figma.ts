@@ -184,6 +184,11 @@ export async function generateTableInstance(
             [componentData.components.tableCell.typeProp.key]:
               data.withHeadings && i == 0 ? 'header' : 'body',
           });
+          cellInstance.setSharedPluginData(
+            FIGMA_NAMESPACE,
+            FIGMA_COMPONENT_VERSION_KEY,
+            componentVersion.toString()
+          );
 
           await setFlavoredTextOnFigmaNode(cellContent, cellInstance);
 
@@ -200,6 +205,11 @@ export async function generateTableInstance(
       );
       let cellContent = 'Item 1';
       let cellInstance = component.createInstance();
+      cellInstance.setSharedPluginData(
+        FIGMA_NAMESPACE,
+        FIGMA_COMPONENT_VERSION_KEY,
+        componentVersion.toString()
+      );
 
       cellInstance.setProperties({
         [componentData.components.tableCell.contentProp]: cellContent,
@@ -207,12 +217,6 @@ export async function generateTableInstance(
           ? 'header'
           : 'body',
       });
-
-      cellInstance.setSharedPluginData(
-        FIGMA_NAMESPACE,
-        FIGMA_COMPONENT_VERSION_KEY,
-        componentVersion.toString()
-      );
 
       rowWrapper.appendChild(cellInstance);
       tableInnerWrapper.appendChild(rowWrapper);
