@@ -11,10 +11,7 @@ import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
-import {
-  FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
-  FIGMA_CONTEXT_STOP_UPDATES_KEY,
-} from './utils/constants';
+import { FIGMA_CONTEXT_STOP_UPDATES_KEY } from './utils/constants';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -25,13 +22,9 @@ figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 figma.skipInvisibleInstanceChildren = true;
 
 //let context = INITIAL_PLUGIN_CONTEXT;
-figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, false);
-figma.clientStorage.setAsync(
-  FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
-  EMPTY_DOC_OBJECT
-);
-let cachedData = false;
+let cachedMsg = null;
 let stopUpdates = false;
+let lastFetchDoc = EMPTY_DOC_OBJECT;
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
@@ -65,20 +58,14 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === 'create-new-doc') {
     //context.stopUpdates = true;
-    figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, true);
+    stopUpdates = true;
     let section: SectionNode;
     //console.log(context);
     createNewDoc(createNewDocJSON()).then((s) => {
       section = s;
       generateJSONFromFigmaContent(section).then(async (data) => {
-        await figma.clientStorage.setAsync(
-          FIGMA_CONTEXT_STOP_UPDATES_KEY,
-          false
-        );
-        await figma.clientStorage.setAsync(
-          FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
-          data
-        );
+        stopUpdates = false;
+        lastFetchDoc = data;
         //context.stopUpdates = false;
         //context.lastFetchDoc = data;
         figma.ui.postMessage({
@@ -91,78 +78,79 @@ figma.ui.onmessage = (msg) => {
 
   //Push updates from figma
   if (msg.type === 'node-update') {
-    figma.clientStorage.getAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY).then((res) => {
-      if (!res) {
-        pushFigmaUpdates().then((res) => {
-          if (res.type === 'new-node-data') {
-            console.log('push figma updates');
-            console.log(res.type);
-            console.log(res.data);
-          }
-          figma.ui.postMessage({
-            type: res.type,
-            data: res.data,
-            selectedFrame: res.selectedFrame,
-          });
+    if (!stopUpdates && cachedMsg == null) {
+      pushFigmaUpdates(lastFetchDoc).then((res) => {
+        if (res.type === 'new-node-data') {
+          lastFetchDoc = res.data;
+          console.log('push figma updates');
+          console.log(res.type);
+          console.log(res.data);
+        }
+        if (res.type === 'no-node') {
+          cachedMsg == null;
+        }
+        figma.ui.postMessage({
+          type: res.type,
+          data: res.data,
+          selectedFrame: res.selectedFrame,
         });
-      }
-    });
+      });
+    }
   }
 
   //Get updates from editor
-  if (msg.type == 'update-selected-doc') {
+  if (msg.type == 'update-selected-doc' || cachedMsg != null) {
     let section: BaseNode;
-
-    figma.clientStorage
-      .getAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY)
-      .then(async (res) => {
-        if (res == false) {
-          await figma
-            .getNodeByIdAsync(msg.data.sectionId)
-            .then(async (node) => {
-              figma.clientStorage.setAsync(
-                FIGMA_CONTEXT_STOP_UPDATES_KEY,
-                true
-              );
-              //context.stopUpdates = true;
-              let data: DocData = msg.data;
-              console.log('start-figma-update');
-              console.log(msg);
-              section = node;
-              await figma.clientStorage.setAsync(
-                FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
-                data
-              );
-              //context.lastFetchDoc = data;
-              if (section && section.type === 'SECTION') {
-                //console.log('generate');
-                section.locked = true;
-                generateFigmaContentFromJSON(
-                  data,
-                  section,
-                  msg.editedFrames
-                ).then(async (section) => {
-                  await figma.clientStorage.setAsync(
-                    FIGMA_CONTEXT_STOP_UPDATES_KEY,
-                    false
-                  );
-                  //context.stopUpdates = false;
-                  section.locked = false;
-                  figma.ui.postMessage({ type: 'finished-figma-update' });
-                });
+    let msgToGenerate;
+    let isCached = false;
+    if (msg.type == 'update-selected-doc') {
+      msgToGenerate = msg;
+    } else {
+      msgToGenerate = cachedMsg;
+      isCached = true;
+    }
+    if (stopUpdates == false) {
+      stopUpdates = true;
+      figma
+        .getNodeByIdAsync(msgToGenerate.data.sectionId)
+        .then(async (node) => {
+          //context.stopUpdates = true;
+          let data: DocData = msgToGenerate.data;
+          lastFetchDoc = data;
+          console.log('start-figma-update');
+          console.log(msgToGenerate);
+          section = node;
+          //context.lastFetchDoc = data;
+          if (section && section.type === 'SECTION') {
+            //console.log('generate');
+            section.locked = true;
+            generateFigmaContentFromJSON(
+              data,
+              section,
+              msgToGenerate.editedFrames
+            ).then(async (section) => {
+              //context.stopUpdates = false;
+              if (isCached && cachedMsg == msgToGenerate) {
+                cachedMsg = null;
               }
+              stopUpdates = false;
+              section.locked = false;
+              figma.ui.postMessage({ type: 'finished-figma-update' });
             });
-        }
-      });
+          }
+        });
+    } else {
+      if (!isCached) {
+        cachedMsg = msg;
+      }
+    }
   }
 
   if (msg.type === 'update-outdated-components') {
-    //context.stopUpdates = true;
-    figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, true);
+    stopUpdates = true;
     slowUpdateOutdatedComponentBlocks().then(async () => {
       figma.ui.postMessage({ type: 'close-outdated-overlay' });
-      await figma.clientStorage.setAsync(FIGMA_CONTEXT_STOP_UPDATES_KEY, false);
-      //context.stopUpdates = false;
+      stopUpdates = false;
     });
   }
 

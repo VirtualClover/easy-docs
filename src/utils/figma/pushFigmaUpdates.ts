@@ -1,5 +1,4 @@
 import { DocData } from '../constants/constants';
-import { FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY } from '../constants';
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { reconcileDocData } from '../docs/reconcileData';
 import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
@@ -8,7 +7,7 @@ import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
  * Generates doc data from a section and then pushes it
  * @returns
  */
-export async function pushFigmaUpdates(): Promise<{
+export async function pushFigmaUpdates(lastFetchDoc:DocData): Promise<{
   type: string;
   data: any;
   selectedFrame: number;
@@ -36,19 +35,10 @@ export async function pushFigmaUpdates(): Promise<{
     //console.log(generatedDoc);
 
     if (generatedDoc.pages) {
-      let lastGeneratedDoc: DocData;
-      await figma.clientStorage
-        .getAsync(FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY)
-        .then((data: DocData) => (lastGeneratedDoc = data));
 
-      let reconciliation = reconcileDocData(generatedDoc, lastGeneratedDoc);
+      let reconciliation = reconcileDocData(generatedDoc, lastFetchDoc);
       //console.log(reconciliation);
       if (reconciliation.changesNumber) {
-        await figma.clientStorage.setAsync(
-          FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
-          reconciliation.data
-        );
-
         return {
           type: 'new-node-data',
           data: reconciliation.data,
