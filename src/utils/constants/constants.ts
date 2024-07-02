@@ -22,6 +22,13 @@ export const EMPTY_USER_AUTHOR_DATA = {
   photoUrl: '',
 };
 
+export const EMPY_DOC_MAP_ITEM = {
+  title:'',
+  frameId: ''
+};
+
+export type DocMapItem = typeof EMPY_DOC_MAP_ITEM;
+
 export type AuthorUser = typeof EMPTY_USER_AUTHOR_DATA;
 
 export const EMPTY_AUTHOR_DATA = {

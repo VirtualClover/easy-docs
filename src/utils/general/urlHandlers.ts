@@ -67,11 +67,11 @@ export function getDetailsFromFigmaURL(
     let fileMatch = url.match(
       /(?<=file|design\/)(.*?)(?=\/)/ // (?<=file|design\/)(.*?)(?=\/)
     );
-    let frameMatch = url.match(/(?<=node-id=)(.*?)(?=&)/);
+    let frameMatch = url.match(/(?<=node-id=)(.*?)(?=(&|\?))/);
     let fileId = fileMatch ? fileMatch[0] : '';
     let frameId = frameMatch ? frameMatch[0] : '';
 
-    //console.log(fileId);
+    console.log(frameMatch);
     //console.log(frameId);
     if (fileId && frameId) {
       return {

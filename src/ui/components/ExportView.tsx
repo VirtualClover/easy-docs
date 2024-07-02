@@ -12,6 +12,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { generateDocMap, generatePageExport } from '../../utils/docs/exportUtils';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { CodeBlock } from './CodeBlock';
@@ -20,7 +21,7 @@ import { ExportButton } from './ExportButton';
 import { ExportFileFormat } from '../../utils/constants/constants';
 import { PluginDataContext } from '../../utils/PluginDataContext';
 import React from 'react';
-import { generatePageExport } from '../../utils/docs/exportUtils';
+import { formatStringToFileName } from '../../utils/general/formatStringToFileName';
 
 export const ExportView = (): JSX.Element => {
   const [format, setFormat] = React.useState('md' as ExportFileFormat);
@@ -35,10 +36,11 @@ export const ExportView = (): JSX.Element => {
     pluginContext.activeTab
   );
   const [previewData, setPreviewdata] = React.useState('');
+  const [docMap,setDocMap] = React.useState(generateDocMap(mountedData));
 
   React.useEffect(() => {
     setLoading(true);
-    generatePageExport(mountedData.pages[mountedActiveTab], format).then(
+    generatePageExport(mountedData.pages[mountedActiveTab], format,docMap).then(
       (data) => {
         setPreviewdata(data);
         setLoading(false);
@@ -76,10 +78,8 @@ export const ExportView = (): JSX.Element => {
         Preview
       </Typography>
       <Typography variant="caption">
-        {_.snakeCase(
-          mountedData.pages[mountedActiveTab].title.replace(/[\W_]+/g, '')
-        )}
-        .{format}
+        {formatStringToFileName(mountedData.pages[mountedActiveTab].title)}.
+        {format}
       </Typography>
       <CodeBlock code={previewData} language={format} loading={loading} />
       <Stack

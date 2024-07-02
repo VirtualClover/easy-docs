@@ -1,4 +1,10 @@
-import { DEFAULT_SETTINGS, ExportFileFormat, PageData } from '../constants/constants';
+import {
+  DEFAULT_SETTINGS,
+  DocData,
+  DocMapItem,
+  ExportFileFormat,
+  PageData,
+} from '../constants/constants';
 import {
   decideEmojiBasedOnDosAndDonts,
   decideEmojiBasedOnStatus,
@@ -8,11 +14,16 @@ import {
   decodeStringForFigma,
   encodeStringForHTML,
 } from '../general/cleanseTextData';
+import {
+  generateFigmaURL,
+  getDetailsFromFigmaURL,
+  validateFigmaURL,
+} from '../general/urlHandlers';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { addIndentation } from '../general/addIndentation';
+import { formatStringToFileName } from '../general/formatStringToFileName';
 import { generateBaseExportStyles } from '../../styles/generateBaseExportStyles';
-import { generateFigmaURL } from '../general/urlHandlers';
 import { getURLFromAnchor } from '../general/flavoredText';
 
 // TODO Add Nextra
@@ -46,17 +57,17 @@ let generateIFrame = (
   }${addIndentation(identation)}</figure>`;
 };
 
-let generateMDTableRow = (rowData: string[]): string => {
+let generateMDTableRow = (rowData: string[], docMap: DocMapItem[]): string => {
   let mdRow = [];
   for (let i = 0; i < rowData.length; i++) {
-    const cell = convertFlavoredText(rowData[i]);
+    const cell = convertFlavoredText(rowData[i], docMap);
     mdRow.push(`${i == 0 ? '|' : ' '}${cell}|`);
   }
 
   return mdRow.join('');
 };
 
-let convertFlavoredText = (text: string) => {
+let convertFlavoredText = (text: string, docMap: DocMapItem[] = []) => {
   let globalOffset = 0;
   let regularMatches = [
     ...text.matchAll(/(?<!<(b|i)>)<a[^>]*>([^<]+)<\/a>(?!<\/(b|i)>)/g),
@@ -79,6 +90,15 @@ let convertFlavoredText = (text: string) => {
   if (matches.length) {
     matches.forEach((item) => {
       let url = getURLFromAnchor(item.match[0], 'html');
+      if (docMap.length && url.href.match(/\?ed-ref=1/)) {
+        let urlDetails = getDetailsFromFigmaURL(url.href, 'decode');
+        let mapItem = docMap.find((item) => item.frameId == urlDetails.frameId);
+        console.log(url);
+        console.log(urlDetails);
+        if (urlDetails.frameId && mapItem) {
+          url.href = `/${mapItem.title}`;
+        }
+      }
 
       switch (item.type) {
         case 'r':
@@ -120,12 +140,12 @@ let convertFlavoredText = (text: string) => {
   return text;
 };
 
-let generateMDTable = (data): string => {
+let generateMDTable = (data, docMap: DocMapItem[]): string => {
   let md = [];
   let content: string[][] = data.content;
   for (let i = 0; i < content.length; i++) {
     let rowData = content[i];
-    md.push(generateMDTableRow(rowData));
+    md.push(generateMDTableRow(rowData, docMap));
     if (i == 0) {
       md.push('|' + '---|'.repeat(rowData.length));
     }
@@ -134,15 +154,15 @@ let generateMDTable = (data): string => {
   return md.join('\n');
 };
 
-let generateMDList = (data): string => {
+let generateMDList = (data, docMap: DocMapItem[]): string => {
   let items = [];
   if (data.items.length) {
     for (let i = 0; i < data.items.length; i++) {
       const listItem = data.items[i];
       if (data.style == 'unordered') {
-        items.push(`* ${convertFlavoredText(listItem)}`);
+        items.push(`* ${convertFlavoredText(listItem, docMap)}`);
       } else {
-        items.push(`${i + 1}. ${convertFlavoredText(listItem)}`);
+        items.push(`${i + 1}. ${convertFlavoredText(listItem, docMap)}`);
       }
     }
   }
@@ -155,7 +175,10 @@ let generateMDList = (data): string => {
  * @param data
  * @returns
  */
-export async function generateMarkdownPage(data: PageData): Promise<string> {
+export async function generateMarkdownPage(
+  data: PageData,
+  docMap: DocMapItem[] = []
+): Promise<string> {
   //console.log(data);
 
   let markdown = [];
@@ -168,11 +191,11 @@ export async function generateMarkdownPage(data: PageData): Promise<string> {
         markdown.push(`${'#'.repeat(block.data.level)} ${block.data.text}`);
         break;
       case 'paragraph':
-        markdown.push(`${convertFlavoredText(block.data.text)}`);
+        markdown.push(`${convertFlavoredText(block.data.text, docMap)}`);
         break;
       case 'quote':
         markdown.push(
-          `> ${convertFlavoredText(block.data.text)}${
+          `> ${convertFlavoredText(block.data.text, docMap)}${
             block.data.caption ? `  \n> ${block.data.caption}` : ``
           }  \n`
         );
@@ -224,11 +247,11 @@ export async function generateMarkdownPage(data: PageData): Promise<string> {
         }
         break;
       case 'list':
-        markdown.push(generateMDList(block.data));
+        markdown.push(generateMDList(block.data, docMap));
         break;
       case 'table':
         if (block.data.content.length) {
-          markdown.push(generateMDTable(block.data));
+          markdown.push(generateMDTable(block.data, docMap));
         }
         break;
       case 'alert':
@@ -252,7 +275,10 @@ export async function generateMarkdownPage(data: PageData): Promise<string> {
   return decodeStringForFigma(markdown.join('  \n'));
 }
 
-export async function generateJSONPage(data: PageData): Promise<string> {
+export async function generateJSONPage(
+  data: PageData,
+  docMap: DocMapItem[] = []
+): Promise<string> {
   return JSON.stringify(data, null, 2);
 }
 
@@ -313,7 +339,10 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
   return formattedString.join('\n');
 };
 
-export async function generateHTMLPage(data: PageData): Promise<string> {
+export async function generateHTMLPage(
+  data: PageData,
+  docMap: DocMapItem[] = []
+): Promise<string> {
   //console.log(data);
 
   let html = [];
@@ -467,9 +496,10 @@ export async function generateHTMLPage(data: PageData): Promise<string> {
 
 export async function generatePageExport(
   data: PageData,
-  format: ExportFileFormat
+  format: ExportFileFormat,
+  docMap: DocMapItem[] = []
 ): Promise<string> {
-  let exportFunc: (data: PageData) => Promise<string>;
+  let exportFunc: (data: PageData, docMap: DocMapItem[]) => Promise<string>;
   let exportData = '';
   switch (format) {
     case 'md':
@@ -483,11 +513,23 @@ export async function generatePageExport(
   }
 
   if (data && data.blocks) {
-    await exportFunc(data).then((string) => (exportData = string));
+    await exportFunc(data, docMap).then((string) => (exportData = string));
   } else {
     console.error(`The data provided didn't have any content`);
   }
   return exportData;
+}
+
+export function generateDocMap(data: DocData): DocMapItem[] {
+  let pagesArr = [];
+  for (let i = 0; i < data.pages.length; i++) {
+    const page = data.pages[i];
+    pagesArr.push({
+      title: formatStringToFileName(page.title),
+      frameId: page.frameId,
+    });
+  }
+  return pagesArr;
 }
 
 /*
