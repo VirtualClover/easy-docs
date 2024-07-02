@@ -30,6 +30,8 @@ figma.clientStorage.setAsync(
   FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
   EMPTY_DOC_OBJECT
 );
+let cachedData = false;
+let stopUpdates = false;
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.

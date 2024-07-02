@@ -42,7 +42,7 @@ export async function pushFigmaUpdates(): Promise<{
         .then((data: DocData) => (lastGeneratedDoc = data));
 
       let reconciliation = reconcileDocData(generatedDoc, lastGeneratedDoc);
-      console.log(reconciliation);
+      //console.log(reconciliation);
       if (reconciliation.changesNumber) {
         await figma.clientStorage.setAsync(
           FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY,
