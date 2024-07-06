@@ -19,8 +19,8 @@ export const pushNewDataToFigma = (
     console.log('set editor changes true');
 
     pluginContext.setIncomingEditorChanges(true);
-    //console.log('pushed to figma');
-    //console.log(newData);
+    console.log('pushed to figma');
+    console.log(newData);
 
     parent.postMessage(
       {

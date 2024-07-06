@@ -20,7 +20,7 @@ export const selectNewPageFromEditor = (
       '*'
     );
   } else {
-    console.error('The selected pages does not exists.');
+    console.error('The selected pages does not exist.');
     
   }
 };

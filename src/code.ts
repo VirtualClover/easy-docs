@@ -65,6 +65,7 @@ figma.ui.onmessage = (msg) => {
       generateJSONFromFigmaContent(section).then(async (data) => {
         stopUpdates = false;
         lastFetchDoc = data;
+        figma.viewport.scrollAndZoomIntoView([section]);
         //context.stopUpdates = false;
         //context.lastFetchDoc = data;
         figma.ui.postMessage({

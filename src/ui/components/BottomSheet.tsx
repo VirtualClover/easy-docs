@@ -19,6 +19,7 @@ export const BottomSheet = ({ zIndex = 0 }) => {
       sx={zIndex ? { zIndex: zIndex } : {}}
       PaperProps={{
         sx: {
+          backgroundImage: 'none',
           p: 16,
           width: `calc(95vw - 12px)`,
           margin: '0 auto',

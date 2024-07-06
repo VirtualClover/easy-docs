@@ -13,6 +13,7 @@ import { PluginDataContext } from '../utils/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { SettingsView } from './SettingsView';
 import { ThemeProvider } from '@mui/material/styles';
+import { VersionBanner } from './VersionBanner';
 
 interface ComponentProps {
   themeMode: string;
@@ -164,7 +165,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           }
         };
       }
-    }, 400);
+    }, 300);
 
     return () => clearInterval(interval);
   }, [
@@ -215,21 +216,7 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
         >
           <PluginTopBar />
           {view}
-          {process.env.NODE_ENV == 'development' && (
-            <Box
-              sx={{
-                borderWidth: '1 0 1 0',
-                p: 8,
-                borderColor: `divider`,
-                borderStyle: 'solid',
-                bgcolor: 'background.paper',
-              }}
-            >
-              <Typography variant="caption">
-                🚧⚠ Development Build - V{process.env.npm_package_version}
-              </Typography>
-            </Box>
-          )}
+          <VersionBanner />
           <BottomSheet zIndex={sheetZIndex} />
         </PluginContainer>
       </ThemeProvider>

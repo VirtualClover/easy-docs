@@ -1,6 +1,6 @@
 {
   "name": "easy-docs",
-  "version": "1.0.0",
+  "version": "0.0.9-beta.1",
   "description": "Create documentation on Figma efficiently",
   "main": "code.js",
   "author": "Memo Lopez <memo@virtualclover.ltd>",

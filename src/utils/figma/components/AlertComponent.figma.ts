@@ -14,6 +14,10 @@ import {
   StatusType,
 } from '../../constants/constants';
 import {
+  decodeStringForFigma,
+  encodeStringForHTML,
+} from '../../general/cleanseTextData';
+import {
   errorIcon,
   infoIcon,
   successIcon,
@@ -21,8 +25,8 @@ import {
 } from '../../../assets/svgs';
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
-import { encodeStringForHTML } from '../../general/cleanseTextData';
 import { getPluginSettings } from '../getPluginSettings';
+import { setFlavoredTextOnFigmaNode } from '../../general/flavoredText';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 
@@ -170,9 +174,10 @@ export async function generateAlertInstance(
     let component = componentSet.children[0] as ComponentNode;
 
     let instance = component.createInstance();
+    let content = decodeStringForFigma(data.message, true);
 
     instance.setProperties({
-      [componentData.components.alert.contentProp]: data.message,
+      [componentData.components.alert.contentProp]: content,
       [componentData.components.alert.typeProp.key]: `${data.type}`,
     });
 

@@ -23,8 +23,8 @@ export const EMPTY_USER_AUTHOR_DATA = {
 };
 
 export const EMPY_DOC_MAP_ITEM = {
-  title:'',
-  frameId: ''
+  title: '',
+  frameId: '',
 };
 
 export type DocMapItem = typeof EMPY_DOC_MAP_ITEM;
@@ -220,9 +220,9 @@ const exportSettings = {
 export type ExportSettings = typeof exportSettings;
 
 export const SETTINGS_GROUPS = [
-  'Customization',
+  /*'Customization',*/
   'Exports',
-  'Sync',
+  /*'Sync',*/
   'About',
 ] as const;
 export type SettingsGroups = (typeof SETTINGS_GROUPS)[number];
@@ -273,8 +273,8 @@ export const DEFAULT_PLUGIN_DATA = {
   setSheetContent: (content: () => JSX.Element) => {},
   sheetZIndex: 0,
   setSheetZIndex: (state: number) => {},
-  outdatedComponents:false,
-  setOutdatedComponents:(state: boolean) => {},
+  outdatedComponents: false,
+  setOutdatedComponents: (state: boolean) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

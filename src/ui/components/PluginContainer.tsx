@@ -1,16 +1,54 @@
 import { Container, styled } from '@mui/material';
 
+import { CustomTheme } from '../../styles/themes';
 import zIndex from '@mui/material/styles/zIndex';
+
+interface ContainerProps {
+  theme: CustomTheme;
+}
 
 export const PluginContainer = styled(Container, {
   name: 'PluginContainer',
   slot: 'root',
-})(({ theme }) => ({
+})(({ theme }: ContainerProps) => ({
   background: theme.palette.background.default,
   color: theme.palette.text.primary,
 
   '.MuiButtonBase-root': {
     textTransform: 'none',
+  },
+  '.MuiButton-outlined': {
+    color: theme.palette.text.primary,
+    borderColor: theme.palette.text.primary,
+  },
+  '.MuiIconButton-root': {
+    borderRadius: 4,
+  },
+
+  '.MuiTabs-flexContainer .MuiTab-root:first-of-type': {
+    marginLeft: 16,
+  },
+
+  '.MuiTab-root': {
+    border: 'none',
+    borderRadius: 8,
+    margin: '8px 4px',
+    padding: '0 8px',
+    minHeight: 32,
+    minWidth: 32,
+  },
+
+  '.MuiTab-root.Mui-selected': {
+    color: theme.palette.text.primary,
+    background: theme.palette.background.paper,
+  },
+
+  '.MuiTabs-indicator': {
+    display: 'none',
+  },
+
+  'a[href]': {
+    color: theme.palette.link,
   },
 
   '#editorjs': {
@@ -137,6 +175,7 @@ export const PluginContainer = styled(Container, {
   '.ce-code__textarea': {
     color: theme.palette.text.primary,
     background: theme.palette.background.paper,
+    border: 'none',
     minHeight: '160px',
   },
 

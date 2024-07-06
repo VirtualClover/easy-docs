@@ -1,5 +1,18 @@
+import { Palette, PaletteOptions, Theme, createTheme } from '@mui/material';
+
 import { BASE_STYLE_TOKENS } from './base';
-import { createTheme } from '@mui/material';
+
+interface CustomPaletteOptions extends PaletteOptions {
+  link: string;
+}
+
+export interface CustomPalette extends Palette {
+  link: string;
+}
+
+export interface CustomTheme extends Theme {
+  palette: CustomPalette;
+}
 
 const baseTheme = {
   typography: {
@@ -18,10 +31,16 @@ const baseTheme = {
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: BASE_STYLE_TOKENS.palette.primary,
+      contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
+    },
+    link: '#7EB4E1',
     background: {
       default: '#2C2C2C',
+      paper: '#383838',
     },
-  },
+  } as CustomPaletteOptions,
   ...baseTheme,
 });
 
@@ -32,6 +51,7 @@ export const lightTheme = createTheme({
       main: BASE_STYLE_TOKENS.palette.primary,
       contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
     },
+    link: BASE_STYLE_TOKENS.palette.primary,
     text: {
       primary: BASE_STYLE_TOKENS.palette.onBackground.high,
       secondary: BASE_STYLE_TOKENS.palette.onBackground.mid,
@@ -61,6 +81,6 @@ export const lightTheme = createTheme({
       main: BASE_STYLE_TOKENS.palette.status.error.default,
       contrastText: BASE_STYLE_TOKENS.palette.status.error.content,
     },
-  },
+  } as CustomPaletteOptions,
   ...baseTheme,
 });
