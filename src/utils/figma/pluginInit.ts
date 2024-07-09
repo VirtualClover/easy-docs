@@ -1,6 +1,5 @@
 import {
   AuthorUser,
-  BASE_COMPONENT_DATA,
   BaseComponentData,
   DEFAULT_SETTINGS,
   PluginSettings,
@@ -14,7 +13,7 @@ import { getComponentData } from './getComponentData';
 import { getPluginSettings } from './getPluginSettings';
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { initComponents } from './components/initComponents';
-import { objectIsNull } from '../objectisNull';
+import { objectIsNull } from '../general/objectisNull';
 
 /**
  * The initialization func of the plugin

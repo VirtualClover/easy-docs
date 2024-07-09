@@ -19,7 +19,7 @@ import {
   setFlavoredTextOnFigmaNode,
 } from '../../general/flavoredText';
 
-import { clone } from '../../clone';
+import { clone } from '../../general/clone';
 import { getComponentData } from '../getComponentData';
 import { getPluginSettings } from '../getPluginSettings';
 import { isOdd } from '../../general/isOdd';

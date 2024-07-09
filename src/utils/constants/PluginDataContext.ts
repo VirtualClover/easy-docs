@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DEFAULT_PLUGIN_DATA } from './constants/constants';
+import { DEFAULT_PLUGIN_DATA } from './constants';
 
 /**
  * The initial plugin data context

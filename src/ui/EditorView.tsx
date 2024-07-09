@@ -16,7 +16,7 @@ import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { Editor } from './components/Editor';
 import { OutDatedComponentsView } from './components/OutdatedComponentsView';
-import { PluginDataContext } from '../utils/PluginDataContext';
+import { PluginDataContext } from '../utils/constants/PluginDataContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { ViewContainer } from './components/ViewContainer';

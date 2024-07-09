@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { ArrowBack, Close, SettingsOutlined } from '@mui/icons-material';
+import { ArrowBack, SettingsOutlined } from '@mui/icons-material';
 import { DocData, PluginData } from '../../utils/constants/constants';
 import {
   decodeStringForFigma,
@@ -18,9 +18,9 @@ import {
 } from '../../utils/general/cleanseTextData';
 
 import { ExportView } from './ExportView';
-import { PluginDataContext } from '../../utils/PluginDataContext';
+import { PluginDataContext } from '../../utils/constants/PluginDataContext';
 import React from 'react';
-import { navigate } from '../../utils/navigate';
+import { navigate } from '../../utils/editor/navigate';
 import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 
 interface BarProps {

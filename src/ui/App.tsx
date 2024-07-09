@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import { Box, Typography } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants/constants';
 import { darkTheme, lightTheme } from '../styles/themes';
 
@@ -9,11 +8,11 @@ import { BottomSheet } from './components/BottomSheet';
 import { EditorView } from './EditorView';
 import { InspectView } from './InspectView';
 import { PluginContainer } from './components/PluginContainer';
-import { PluginDataContext } from '../utils/PluginDataContext';
+import { PluginDataContext } from '../utils/constants/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { SettingsView } from './SettingsView';
 import { ThemeProvider } from '@mui/material/styles';
-import { VersionBanner } from './VersionBanner';
+import { VersionBanner } from './components/VersionBanner';
 
 interface ComponentProps {
   themeMode: string;

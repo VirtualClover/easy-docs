@@ -1,5 +1,5 @@
 import { Drawer } from '@mui/material';
-import { PluginDataContext } from '../../utils/PluginDataContext';
+import { PluginDataContext } from '../../utils/constants/PluginDataContext';
 import React from 'react';
 
 export const BottomSheet = ({ zIndex = 0 }) => {

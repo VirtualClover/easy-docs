@@ -1,4 +1,4 @@
-import { clone } from '../clone';
+import { clone } from '../general/clone';
 
 /**
  * Sets the stroke color of a specific node

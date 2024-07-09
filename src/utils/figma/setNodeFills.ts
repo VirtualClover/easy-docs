@@ -1,4 +1,4 @@
-import { clone } from '../clone';
+import { clone } from '../general/clone';
 
 /**
  * Sets the fills of a specific node

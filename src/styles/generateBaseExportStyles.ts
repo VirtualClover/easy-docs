@@ -27,7 +27,7 @@ export let generateBaseExportStyles = (
   styles.push(`a{color: ${basePalette.onBackground.link};}`);
   styles.push(`hr{border: 1px solid ${basePalette.divider.simple};}`);
   styles.push(
-    `pre{background-color: ${basePalette.surface}; color:${basePalette.onSurface.high}; border-radius:16px;}`
+    `pre{background-color: ${basePalette.surface}; color:${basePalette.onSurface.high}; border-radius:16px; overflow:auto;}`
   );
   styles.push(`.ed-figma-frame{margin: 16px 0 48px 0;}`);
   styles.push(`.ed-figma-frame figcaption{margin-top: 16px;}`);

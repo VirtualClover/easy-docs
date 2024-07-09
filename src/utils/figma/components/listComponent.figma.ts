@@ -21,7 +21,7 @@ import {
 } from '../../general/flavoredText';
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
-import { clone } from '../../clone';
+import { clone } from '../../general/clone';
 import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 

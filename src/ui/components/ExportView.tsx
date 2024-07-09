@@ -19,7 +19,7 @@ import { CodeBlock } from './CodeBlock';
 import { CopyToClipboard } from 'react-copy-to-clipboard'; // Using a library because for the life of me I cannot find a native workaround
 import { ExportButton } from './ExportButton';
 import { ExportFileFormat } from '../../utils/constants/constants';
-import { PluginDataContext } from '../../utils/PluginDataContext';
+import { PluginDataContext } from '../../utils/constants/PluginDataContext';
 import React from 'react';
 import { formatStringToFileName } from '../../utils/general/formatStringToFileName';
 

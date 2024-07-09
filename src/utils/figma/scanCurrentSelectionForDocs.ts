@@ -1,3 +1,4 @@
+import { generateSpecs } from './getSpecsFromInstance';
 import { getCurrentSectionFromChildNode } from './getCurrentSectionFromChildNode';
 
 export let scanCurrentSelectionForDocs = async (
@@ -30,7 +31,10 @@ export let scanCurrentSelectionForDocs = async (
         });
         break;
       case 'INSTANCE':
-        await getCurrentSectionFromChildNode(selection).then((res) => {
+        await getCurrentSectionFromChildNode(selection).then(async (res) => {
+          await generateSpecs(selection as InstanceNode).then((res) =>
+            console.log(res)
+          );
           parentSection = res.section;
           parentFrame = res.frame as FrameNode;
           selectedFrame = res.frameIndex;
@@ -47,7 +51,7 @@ export let scanCurrentSelectionForDocs = async (
         break;
     }
   }
-  
+
   return {
     section: parentSection,
     frame: parentFrame,

@@ -7,7 +7,7 @@ import {
   Reconciliation,
 } from '../constants/constants';
 
-import { clone } from '../clone';
+import { clone } from '../general/clone';
 import { formatPageData } from './formatPageData';
 
 /**
