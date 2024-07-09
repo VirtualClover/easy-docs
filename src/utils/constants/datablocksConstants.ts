@@ -1,5 +1,5 @@
 import { GuidelineType, StatusType } from './guidelines';
-import { TextAlignment, UpperCaseTextAligment } from './porperties';
+import { TextAlignment, UpperCaseTextAligment } from './properties';
 
 import { OutputBlockData } from '@editorjs/editorjs';
 

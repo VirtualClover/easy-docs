@@ -1,4 +1,4 @@
 export * from './datablocksConstants';
-export * from './porperties';
+export * from './properties';
 export * from './guidelines';
 export * from './figmaConstants';
