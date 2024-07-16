@@ -3,50 +3,58 @@ export type UpperCaseTextAligment = 'LEFT' | 'RIGHT' | 'CENTER';
 export type ListOrder = 'unordered' | 'ordered';
 export type UpperCaseListOrder = 'UNORDERED' | 'ORDERED';
 
-export const PROPERTY_SOURCES = [
+export const SPEC_VALUE_SOURCES = [
   'raw',
   'figmaStyle',
   'figmaVariable',
   'designToken',
 ] as const;
-export type PropertySource = (typeof PROPERTY_SOURCES)[number];
+export type SpecValueSource = (typeof SPEC_VALUE_SOURCES)[number];
 
-export interface AnatomyProperty {
+export interface AnatomySpecValue {
   value: number | string | null;
-  source: PropertySource;
+  source: SpecValueSource;
 }
 
 export interface PropertyDependant {
   mainComponent: 'string';
-} 
+}
 
-export interface AnatomyProperties {
-  width: AnatomyProperty;
-  height: AnatomyProperty;
-  typography: AnatomyProperty;
-  fontName: AnatomyProperty;
-  fontSize: AnatomyProperty;
-  fontWeight: AnatomyProperty;
-  lineHeight: AnatomyProperty;
-  textDecoration: AnatomyProperty;
-  letterSpacing: AnatomyProperty;
-  fills: AnatomyProperty;
-  minHeight: AnatomyProperty;
-  minWidth: AnatomyProperty;
-  itemSpacing: AnatomyProperty;
-  cornerRadius: AnatomyProperty;
-  topLeftRadius: AnatomyProperty;
-  topRightRadius: AnatomyProperty;
-  bottomLeftRadius: AnatomyProperty;
-  bottomRightRadius: AnatomyProperty;
-  strokeWeight: AnatomyProperty;
-  strokeTopWeight: AnatomyProperty;
-  strokeRightWeight: AnatomyProperty;
-  strokeBottomWeight: AnatomyProperty;
-  strokeLeftWeight: AnatomyProperty;
-  strokes: AnatomyProperty;
-  paddingTop: AnatomyProperty;
-  paddingRight: AnatomyProperty;
-  paddingLeft: AnatomyProperty;
-  paddingBottom: AnatomyProperty;
+export interface AnatomySpecs {
+  width: AnatomySpecValue;
+  height: AnatomySpecValue;
+  typography: AnatomySpecValue;
+  fontName: AnatomySpecValue;
+  fontSize: AnatomySpecValue;
+  fontWeight: AnatomySpecValue;
+  lineHeight: AnatomySpecValue;
+  textDecoration: AnatomySpecValue;
+  letterSpacing: AnatomySpecValue;
+  fills: AnatomySpecValue;
+  minHeight: AnatomySpecValue;
+  minWidth: AnatomySpecValue;
+  itemSpacing: AnatomySpecValue;
+  cornerRadius: AnatomySpecValue;
+  topLeftRadius: AnatomySpecValue;
+  topRightRadius: AnatomySpecValue;
+  bottomLeftRadius: AnatomySpecValue;
+  bottomRightRadius: AnatomySpecValue;
+  strokeWeight: AnatomySpecValue;
+  strokeTopWeight: AnatomySpecValue;
+  strokeRightWeight: AnatomySpecValue;
+  strokeBottomWeight: AnatomySpecValue;
+  strokeLeftWeight: AnatomySpecValue;
+  strokes: AnatomySpecValue;
+  paddingTop: AnatomySpecValue;
+  paddingRight: AnatomySpecValue;
+  paddingLeft: AnatomySpecValue;
+  paddingBottom: AnatomySpecValue;
+}
+
+export interface LayerSpecs {
+  name: string;
+  type: string;
+  specs?: AnatomySpecs;
+  mainComponent?: string;
+  nodeId: string;
 }

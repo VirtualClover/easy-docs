@@ -1,5 +1,6 @@
 import {
   BaseComponentData,
+  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 
@@ -120,7 +121,7 @@ async function generateOuterWrapper(
   outerWrapper.primaryAxisSizingMode = 'AUTO';
   outerWrapper.paddingBottom = 32;
   outerWrapper.itemSpacing = 0;
-  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}DosAndDonts`;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Frame`;
 
   //Display
   let displayFrame = figma.createFrame();
@@ -157,7 +158,7 @@ async function generateOuterWrapper(
 
     let image = figma.createImage(bytes);
     let frame = figma.createFrame();
-    frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${nodeToDisplay.name}`;
+    frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${nodeToDisplay.name ?? 'No frame'}`;
     frame.x = maxWidth;
     frame.resize(
       nodeToDisplay.width * scaleFactor,
@@ -187,7 +188,9 @@ async function generateOuterWrapper(
 
 export async function generateDisplayFrameInstance(
   data: DisplayFrameBlockData,
-  componentVersion: number
+  componentVersion: number,
+  backgroundColor: string = DEFAULT_SETTINGS.customization.palette.status
+    .neutral.default
 ): Promise<FrameNode | null> {
   let settings = getPluginSettings();
   let componentData = getComponentData();
@@ -201,8 +204,8 @@ export async function generateDisplayFrameInstance(
     .catch((e) => {
       console.error(e);
     });
-
-  let sourceURL = generateFigmaURL(data.fileId, data.frameId, 'share');
+  let sourceURL: string;
+  sourceURL = generateFigmaURL(data.fileId, data.frameId, 'share');
   let referenceNode: BaseNode;
   await figma.getNodeByIdAsync(data.frameId).then((node) => {
     referenceNode = node;
@@ -241,7 +244,7 @@ export async function generateDisplayFrameInstance(
 
     let outerWrapper = await generateOuterWrapper(
       instance,
-      settings.customization.palette.status.neutral.default,
+      backgroundColor,
       nodeToDisplay,
       'Frame not found in file',
       componentVersion

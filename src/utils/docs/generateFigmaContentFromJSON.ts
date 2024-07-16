@@ -14,6 +14,7 @@ import { createPageFrame } from '../figma/createPageFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
 import { generateAlertInstance } from '../figma/components/AlertComponent.figma';
 import { generateCodeInstance } from '../figma/components/codeComponent.figma';
+import { generateComponentDocInstance } from '../figma/components/componentDocComponent.figma';
 import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent.figma';
 import { generateDividerInstance } from '../figma/components/dividerComponent.figma';
 import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
@@ -226,6 +227,15 @@ async function generateBlockInstanceFromJSON(
           node = n;
         }
       });
+      break;
+    case 'componentDoc':
+      await generateComponentDocInstance(block.data, componentVersion).then(
+        (n) => {
+          if (n) {
+            node = n;
+          }
+        }
+      );
       break;
     //node = generateParagraphInstance(block.data);
     default:

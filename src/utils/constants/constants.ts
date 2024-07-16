@@ -104,6 +104,10 @@ export const BASE_COMPONENT_DATA = {
     divider: {
       id: '',
     },
+    componentDoc: {
+      id: '',
+      componentSourceProp: '',
+    },
   },
   lastGenerated: 0,
 };

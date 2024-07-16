@@ -1,4 +1,4 @@
-import { AnatomyProperties, PropertySource } from '../constants';
+import { AnatomySpecValue, AnatomySpecs, SpecValueSource } from '../constants';
 
 import { nodeCanHaveSpecs } from './nodeCanHaveSpecs';
 import { nodeSupportsChildren } from './nodeSupportsChildren';
@@ -22,7 +22,7 @@ export let generateSpecs = async (
   node: SceneNode,
   specsArr: {
     nodeName: string;
-    properties?: AnatomyProperties;
+    properties?: AnatomySpecs;
     mainComponent?: string;
   }[] = [],
   treeLevel = 0
@@ -48,7 +48,7 @@ export let generateSpecs = async (
 
 export let generateSpecsFromNode = async (
   node: SceneNode,
-  priorization: PropertySource[] = [
+  priorization: SpecValueSource[] = [
     'designToken',
     'figmaVariable',
     'figmaStyle',
@@ -56,7 +56,7 @@ export let generateSpecsFromNode = async (
   ]
 ) => {
   if (nodeCanHaveSpecs(node)) {
-    let anatomy: AnatomyProperties = {
+    let anatomy: AnatomySpecs = {
       width: { value: null, source: 'raw' },
       height: { value: null, source: 'raw' },
       fills: { value: null, source: 'raw' },
@@ -86,6 +86,8 @@ export let generateSpecsFromNode = async (
       paddingLeft: { value: null, source: 'raw' },
       paddingBottom: { value: null, source: 'raw' },
     };
+
+    // TODO Effects
 
     // Fill
     if (node.fills && node.fills != figma.mixed && node.fills.length) {
@@ -260,7 +262,7 @@ let convertUnitString = (unit: 'PIXELS' | 'PERCENT' | 'AUTO') => {
 };
 
 let generateRawTextStyleSpecs = (
-  anatomy: AnatomyProperties,
+  anatomy: AnatomySpecs,
   node: TextNode
 ) => {
   anatomy.fontName.value =

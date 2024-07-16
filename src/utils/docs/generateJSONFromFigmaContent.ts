@@ -24,6 +24,7 @@ import { encodeStringForHTML } from '../general/cleanseTextData';
 import { formatPageData } from './formatPageData';
 import { generateBlockDataFromAlert } from '../figma/components/AlertComponent.figma';
 import { generateBlockDataFromCode } from '../figma/components/codeComponent.figma';
+import { generateBlockDataFromComponentDoc } from '../figma/components/componentDocComponent.figma';
 import { generateBlockDataFromDivider } from '../figma/components/dividerComponent.figma';
 import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
 import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
@@ -35,7 +36,7 @@ import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 import { styleFrame } from '../figma/styleFrame';
 
 export async function generateJSONFromFigmaContent(
-  section: SectionNode,
+  section: SectionNode
 ): Promise<DocData> {
   let JSONData: DocData = {
     title: encodeStringForHTML(section.name),
@@ -281,6 +282,19 @@ async function generatePageDataFromFrame(
                   });
 
                   break;
+
+                case componentData.components.componentDoc.id:
+                  await generateBlockDataFromComponentDoc(
+                    instInsideAFrame,
+                    componentData,
+                    editedDate,
+                    childNode.id
+                  ).then((data) => {
+                    pageData.blocks.push(data);
+                  });
+
+                  break;
+
                 default:
                   //console.log(instInsideAFrame);
                   //console.log(mainCompId);

@@ -12,6 +12,7 @@ import { createListComponent } from './listComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
 import { createTableCellComponent } from './tableComponent.figma';
+import { createcomponentDocComponent } from './componentDocComponent.figma';
 
 /**
  * Generates the main components in a Figma file
@@ -20,7 +21,7 @@ import { createTableCellComponent } from './tableComponent.figma';
  */
 export async function initComponents(
   componentData: BaseComponentData,
-  wholeObjectisMissing: Boolean = true,
+  wholeObjectisMissing: Boolean = true
 ) {
   figma.notify(
     wholeObjectisMissing
@@ -68,6 +69,7 @@ export async function initComponents(
     createAlertComponent(frame),
     createCodeComponent(frame),
     createDividerComponent(frame),
+    createcomponentDocComponent(frame),
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
@@ -80,6 +82,7 @@ export async function initComponents(
     let alert = values[8];
     let code = values[9];
     let divider = values[10];
+    let componentDoc = values[11];
     componentData.components.header = header;
     componentData.components.paragraph = paragraph;
     componentData.components.quote = quote;
@@ -91,6 +94,7 @@ export async function initComponents(
     componentData.components.alert = alert;
     componentData.components.code = code;
     componentData.components.divider = divider;
+    componentData.components.componentDoc = componentDoc;
     componentData.components.componentsPage.id = page.id;
     componentData.lastGenerated = Date.now();
     figma.root.setSharedPluginData(

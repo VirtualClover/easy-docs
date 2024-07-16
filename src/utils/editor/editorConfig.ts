@@ -8,6 +8,7 @@ import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Alert from 'editorjs-alert';
 import Code from '@editorjs/code';
+import { ComponentDoc } from './customTools/componentDoc';
 
 /**
  * The base editor config
@@ -68,5 +69,8 @@ export const EDITOR_TOOLS = {
   },
   divider: {
     class: <any>Divider,
+  },
+  componentDoc: {
+    class: <any>ComponentDoc,
   },
 };

@@ -1,5 +1,5 @@
 import { GuidelineType, StatusType } from './guidelines';
-import { TextAlignment, UpperCaseTextAligment } from './properties';
+import { LayerSpecs, TextAlignment, UpperCaseTextAligment } from './properties';
 
 import { OutputBlockData } from '@editorjs/editorjs';
 
@@ -25,7 +25,7 @@ export interface AlertBlockData {
 }
 
 export interface DisplayFrameBlockData {
-  fileId: string;
+  fileId?: string;
   frameId: string;
   frameExistsInFile: boolean | undefined;
   caption: string;
@@ -53,6 +53,29 @@ export interface CodeBlockData {
   code: string;
 }
 
+export interface ComponentDocumentation {
+  componentToDocument:
+    | {
+        id: string;
+        name: string;
+      }
+    | undefined;
+  fileId: string;
+  frameExistsInFile: boolean | undefined;
+  frameId: string;
+  specs: LayerSpecs[];
+}
+
+export interface ComponentDocBlockData {
+  componentName: string;
+  frameToDisplay: {
+    frameId: string;
+    fileId: string;
+    frameExistsInFile: boolean | undefined;
+  };
+  documentation: ComponentDocumentation[];
+}
+
 export interface BlockData extends OutputBlockData {
   figmaNodeId: string;
   lastEdited: number;
@@ -65,5 +88,6 @@ export interface BlockData extends OutputBlockData {
     | DosAndDontsBlockData
     | ListBlockData
     | TableBlockData
-    | CodeBlockData;
+    | CodeBlockData
+    | ComponentDocBlockData;
 }
