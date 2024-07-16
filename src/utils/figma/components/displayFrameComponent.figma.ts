@@ -110,6 +110,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 async function generateOuterWrapper(
   component: InstanceNode,
   backgroundColor: string,
+  maxHeight: number,
   nodeToDisplay?: FrameNode,
   brokenLinkCaption?: string,
   brokenLinkComponentVersion?: number
@@ -144,12 +145,14 @@ async function generateOuterWrapper(
   //Node to display
   if (nodeToDisplay) {
     let maxWidth: number = 1288 - 32;
-    let maxHeight: number = 900;
+    let finalMaxHeight: number = maxHeight ?? 300;
+    console.log('MH',maxHeight ?? 390);
+
     let scaleFactor = maxWidth / nodeToDisplay.width;
     // if frame is too long, then we resize so height doesnt surpass 900 so Figma can actually generate the preview
     let proposedHeight = nodeToDisplay.height * scaleFactor;
-    if (proposedHeight > maxHeight) {
-      scaleFactor = maxHeight / nodeToDisplay.height;
+    if (proposedHeight > finalMaxHeight) {
+      scaleFactor = finalMaxHeight / nodeToDisplay.height;
     }
     let bytes = await nodeToDisplay.exportAsync({
       format: 'PNG',
@@ -158,7 +161,9 @@ async function generateOuterWrapper(
 
     let image = figma.createImage(bytes);
     let frame = figma.createFrame();
-    frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${nodeToDisplay.name ?? 'No frame'}`;
+    frame.name = `${FIGMA_COMPONENT_PREFIX}displaying: ${
+      nodeToDisplay.name ?? 'No frame'
+    }`;
     frame.x = maxWidth;
     frame.resize(
       nodeToDisplay.width * scaleFactor,
@@ -245,6 +250,7 @@ export async function generateDisplayFrameInstance(
     let outerWrapper = await generateOuterWrapper(
       instance,
       backgroundColor,
+      data.maxHeight ?? 0,
       nodeToDisplay,
       'Frame not found in file',
       componentVersion

@@ -115,6 +115,9 @@ async function generateOuterWrapper(
   }`;
   outerWrapper.appendChild(specsComponent);
   if (componentsToSpec.length) {
+    let specsFrameWrapper = figma.createFrame();
+    specsFrameWrapper.layoutMode = 'VERTICAL';
+    specsFrameWrapper.name = `${FIGMA_COMPONENT_PREFIX}Display frames for ${componentName}`;
     for (let i = 0; i < componentsToSpec.length; i++) {
       const component = componentsToSpec[i];
       //Generate specs frame
@@ -123,8 +126,12 @@ async function generateOuterWrapper(
       specsFrame.appendChild(component.createInstance());
       specsFrame.verticalPadding = 32;
       specsFrame.horizontalPadding = 32;
+      specsFrame.layoutMode = 'VERTICAL';
+      specsFrame.primaryAxisAlignItems = 'CENTER';
+      specsFrame.counterAxisAlignItems = 'CENTER';
+      specsFrameWrapper.appendChild(specsFrame);
 
-      specsFrame.setSharedPluginData(
+      specsFrameWrapper.setSharedPluginData(
         FIGMA_NAMESPACE,
         FIGMA_COMPONENT_VERSION_KEY,
         componentVersion.toString()
@@ -137,6 +144,7 @@ async function generateOuterWrapper(
           fileId: fileId,
           frameExistsInFile: true,
           caption: `${component.name}`,
+          maxHeight: 300,
         },
         componentVersion,
         '#E6D7FA'
@@ -163,6 +171,7 @@ async function generateOuterWrapper(
         fileId: '',
         frameExistsInFile: false,
         caption: ``,
+        maxHeight: 300,
       },
       componentVersion,
       '#E6D7FA'
@@ -179,20 +188,20 @@ async function generateOuterWrapper(
 
 export async function getComponentsToDoc(
   node: ComponentNode | ComponentSetNode,
-  componentName: string,
   componentsToSpec: ComponentNode[]
 ) {
+  let componentName: string;
   let specChildParent = node.parent;
   if (specChildParent.type == 'COMPONENT_SET') {
-    componentName = specChildParent.name;
     for (const variant of specChildParent.children) {
       if (variant.type == 'COMPONENT') {
         componentsToSpec.push(variant);
       }
     }
+    return specChildParent.name;
   } else {
-    componentName = node.name;
     componentsToSpec.push(node as ComponentNode);
+    return node.name;
   }
 }
 
@@ -219,18 +228,20 @@ export async function generateComponentDocInstance(
         switch (specChild.type) {
           case 'INSTANCE':
             await specChild.getMainComponentAsync().then((componentNode) => {
-              getComponentsToDoc(
-                componentNode,
-                componentName,
-                componentsToSpec
+              getComponentsToDoc(componentNode, componentsToSpec).then(
+                (name) => (componentName = name)
               );
             });
             break;
           case 'COMPONENT':
-            getComponentsToDoc(specChild, componentName, componentsToSpec);
+            getComponentsToDoc(specChild, componentsToSpec).then(
+              (name) => (componentName = name)
+            );
             break;
           case 'COMPONENT_SET':
-            getComponentsToDoc(specChild, componentName, componentsToSpec);
+            getComponentsToDoc(specChild, componentsToSpec).then(
+              (name) => (componentName = name)
+            );
             break;
           default:
             break;
@@ -273,6 +284,8 @@ export async function generateBlockDataFromComponentDoc(
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
+  // TODO JUST CHECK IF THE FRAME ID CHANGED, DON'T REGENERATE THE WHOLE DOC!!!!!! maybe?
+
   let blockType = 'componentDoc';
   let url =
     instNode.componentProperties[
@@ -305,7 +318,9 @@ export async function generateBlockDataFromComponentDoc(
           (n) => n.type === 'INSTANCE'
         ) as InstanceNode;
         await specChild.getMainComponentAsync().then((componentNode) => {
-          getComponentsToDoc(componentNode, componentName, componentsToSpec);
+          getComponentsToDoc(componentNode, componentsToSpec).then(
+            (name) => (componentName = name)
+          );
         });
       }
     });

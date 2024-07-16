@@ -29,6 +29,7 @@ export interface DisplayFrameBlockData {
   frameId: string;
   frameExistsInFile: boolean | undefined;
   caption: string;
+  maxHeight?: number;
 }
 
 export interface DosAndDontsBlockData {
