@@ -4,15 +4,16 @@ import { BaseComponentData } from '../../constants/constants';
 import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
 import { createCodeComponent } from './codeComponent.figma';
+import { createComponentDocComponent } from './componentDocComponent.figma';
 import { createDisplayFrameComponent } from './displayFrameComponent.figma';
 import { createDividerComponent } from './dividerComponent.figma';
 import { createDosAndDontsComponent } from './dosAndDontsComponent.figma';
 import { createHeaderComponent } from './headerComponent.figma';
 import { createListComponent } from './listComponent.figma';
 import { createParagraphComponent } from './paragraphComponent.figma';
+import { createPointerComponent } from './pointerComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
 import { createTableCellComponent } from './tableComponent.figma';
-import { createcomponentDocComponent } from './componentDocComponent.figma';
 
 /**
  * Generates the main components in a Figma file
@@ -69,7 +70,8 @@ export async function initComponents(
     createAlertComponent(frame),
     createCodeComponent(frame),
     createDividerComponent(frame),
-    createcomponentDocComponent(frame),
+    createComponentDocComponent(frame),
+    createPointerComponent(frame)
   ]).then((values) => {
     let header = values[0];
     let paragraph = values[1];
@@ -83,6 +85,7 @@ export async function initComponents(
     let code = values[9];
     let divider = values[10];
     let componentDoc = values[11];
+    let pointer = values[12];
     componentData.components.header = header;
     componentData.components.paragraph = paragraph;
     componentData.components.quote = quote;
@@ -95,6 +98,7 @@ export async function initComponents(
     componentData.components.code = code;
     componentData.components.divider = divider;
     componentData.components.componentDoc = componentDoc;
+    componentData.components.pointer = pointer;
     componentData.components.componentsPage.id = page.id;
     componentData.lastGenerated = Date.now();
     figma.root.setSharedPluginData(

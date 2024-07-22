@@ -110,7 +110,7 @@ export async function createDisplayFrameComponent(parent: FrameNode) {
 async function generateOuterWrapper(
   component: InstanceNode,
   backgroundColor: string,
-  maxHeight: number,
+  maxHeight: number = 900,
   nodeToDisplay?: FrameNode,
   brokenLinkCaption?: string,
   brokenLinkComponentVersion?: number
@@ -145,8 +145,8 @@ async function generateOuterWrapper(
   //Node to display
   if (nodeToDisplay) {
     let maxWidth: number = 1288 - 32;
-    let finalMaxHeight: number = maxHeight ?? 300;
-    console.log('MH',maxHeight ?? 390);
+    let finalMaxHeight: number = maxHeight;
+    console.log('MH', maxHeight);
 
     let scaleFactor = maxWidth / nodeToDisplay.width;
     // if frame is too long, then we resize so height doesnt surpass 900 so Figma can actually generate the preview
@@ -195,7 +195,8 @@ export async function generateDisplayFrameInstance(
   data: DisplayFrameBlockData,
   componentVersion: number,
   backgroundColor: string = DEFAULT_SETTINGS.customization.palette.status
-    .neutral.default
+    .neutral.default,
+  maxHeight: number = 900
 ): Promise<FrameNode | null> {
   let settings = getPluginSettings();
   let componentData = getComponentData();
@@ -250,7 +251,7 @@ export async function generateDisplayFrameInstance(
     let outerWrapper = await generateOuterWrapper(
       instance,
       backgroundColor,
-      data.maxHeight ?? 0,
+      maxHeight,
       nodeToDisplay,
       'Frame not found in file',
       componentVersion

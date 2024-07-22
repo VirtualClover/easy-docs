@@ -108,6 +108,11 @@ export const BASE_COMPONENT_DATA = {
       id: '',
       componentSourceProp: '',
     },
+    pointer: {
+      id: '',
+      pointerPosProp: { key: '', variables: [] },
+      contentProp: '',
+    },
   },
   lastGenerated: 0,
 };
