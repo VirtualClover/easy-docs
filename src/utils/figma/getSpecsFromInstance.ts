@@ -22,7 +22,7 @@ export let generateSpecs = async (
   node: SceneNode,
   specsArr: {
     nodeName: string;
-    properties?: AnatomySpecs;
+    properties?: any;
     mainComponent?: string;
   }[] = [],
   treeLevel = 0
@@ -90,6 +90,8 @@ export let generateSpecsFromNode = async (
     // TODO Effects
 
     // Fill
+    console.log('node fills', node.fills);
+
     if (node.fills && node.fills != figma.mixed && node.fills.length) {
       if (node.fillStyleId && node.fillStyleId != figma.mixed) {
         await figma.getStyleByIdAsync(node.fillStyleId).then((res) => {
@@ -244,7 +246,18 @@ export let generateSpecsFromNode = async (
 
     */
 
-    return { nodeName: node.name, nodeType: node.type, properties: anatomy };
+    let propArr = [];
+    for (const [key, value] of Object.entries(anatomy)) {
+      if (value.value) {
+        propArr.push([
+          key,
+          JSON.stringify(value.value).replace('"', ''),
+          value.source,
+        ]);
+      }
+    }
+
+    return { nodeName: node.name, nodeType: node.type, properties: propArr };
   }
 
   return null;
@@ -261,10 +274,7 @@ let convertUnitString = (unit: 'PIXELS' | 'PERCENT' | 'AUTO') => {
   }
 };
 
-let generateRawTextStyleSpecs = (
-  anatomy: AnatomySpecs,
-  node: TextNode
-) => {
+let generateRawTextStyleSpecs = (anatomy: AnatomySpecs, node: TextNode) => {
   anatomy.fontName.value =
     node.fontName != figma.mixed
       ? `${node.fontName.family} ${node.fontName.style}`
