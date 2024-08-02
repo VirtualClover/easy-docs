@@ -5,3 +5,4 @@ export const FIGMA_LAST_EDITED_KEY = 'lastEdited';
 export const FIGMA_COMPONENT_VERSION_KEY = 'componentData';
 export const FIGMA_CONTEXT_STOP_UPDATES_KEY = 'easyDocsStopUpdates';
 export const FIGMA_CONTEXT_LAST_GENERATED_DOC_KEY = 'easyDocsLastGeneratedDoc';
+export const FIGMA_COMPONENT_DOCS_KEY = 'componentDocs';

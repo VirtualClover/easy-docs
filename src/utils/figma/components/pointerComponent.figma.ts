@@ -162,7 +162,7 @@ export async function generatePointerInstance(
     figma.root.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_COMPONENT_DATA_KEY)
   );
   let componentSet: BaseNode;
-  console.log(componentData);
+  //console.log(componentData);
 
   await figma
     .getNodeByIdAsync(componentData.components.pointer.id)

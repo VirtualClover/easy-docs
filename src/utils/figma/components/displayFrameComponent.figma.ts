@@ -146,7 +146,7 @@ async function generateOuterWrapper(
   if (nodeToDisplay) {
     let maxWidth: number = 1288 - 32;
     let finalMaxHeight: number = maxHeight;
-    console.log('MH', maxHeight);
+    //console.log('MH', maxHeight);
 
     let scaleFactor = maxWidth / nodeToDisplay.width;
     // if frame is too long, then we resize so height doesnt surpass 900 so Figma can actually generate the preview

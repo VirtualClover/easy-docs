@@ -3,11 +3,14 @@ import {
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 import {
-  AnatomySpecs,
   BlockData,
   ComponentDocBlockData,
+  EMPTY_COMPONENT_SHARED_DATA,
+  EMPTY_VARIANT_SHARED_DATA,
+  FIGMA_COMPONENT_DOCS_KEY,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
+  VariantSharedData,
 } from '../../constants';
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
@@ -24,8 +27,13 @@ import { getPluginSettings } from '../getPluginSettings';
 import { setNodeFills } from '../setNodeFills';
 import { generatePointerInstance } from './pointerComponent.figma';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
-import { generateSpecsFromNode } from '../getSpecsFromInstance';
+import {
+  convertPropObjToArr,
+  generateSpecsFromNode,
+} from '../getSpecsFromInstance';
 import { generateHeaderInstance } from './headerComponent.figma';
+import _ from 'lodash';
+import { clone } from '../../general/clone';
 
 export async function createComponentDocComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -99,134 +107,171 @@ export async function createComponentDocComponent(parent: FrameNode) {
   };
 }
 
-async function processLayer(
-  layersProcessed: {
-    nodeName: string;
-    nodeType: string;
-    properties: any[];
-  }[],
+interface PointerCoordsObj {
+  top: number[];
+  left: number[];
+  right: number[];
+  bottom: number[];
+}
+
+type ParentComponentData = { name: string; id: string } | null;
+
+async function processComponentChildLayer(
+  variantSharedData: VariantSharedData,
   layer: any,
   componentVersion: number,
   specsFrame: FrameNode,
   instance: InstanceNode | ComponentNode,
-  pointerCoords: {
-    top: number[];
-    left: number[];
-    right: number[];
-    bottom: number[];
-  }
+  pointerCoords: PointerCoordsObj,
+  avoidInstances: boolean = true
 ) {
   if (
     layer.absoluteRenderBounds &&
     layer.type != 'MASK' &&
     layer.type != 'GROUP'
   ) {
-    await generateSpecsFromNode(layer as FrameNode).then((res) =>
-      layersProcessed.push({
-        nodeName: res.nodeName,
-        nodeType: res.nodeType,
-        properties: res.properties,
-      })
-    );
-    let orientation = 'left';
-    let instanceRenderBounds = {
-      left: instance.absoluteRenderBounds.x,
-      right:
-        instance.absoluteRenderBounds.x + instance.absoluteRenderBounds.width,
-    };
-    let layerAbsoluteRenderBounds = {
-      left: layer.absoluteRenderBounds.x,
-      right: layer.absoluteRenderBounds.x + layer.absoluteRenderBounds.width,
-    };
+    await generateSpecsFromNode(layer as FrameNode, avoidInstances).then(
+      async (res) => {
+        if (res) {
+          variantSharedData.layers.push({
+            layerName: res.nodeName,
+            layerType: res.nodeType,
+            properties: res.propertiesObj,
+          });
 
-    if (
-      Math.abs(instanceRenderBounds.left - layerAbsoluteRenderBounds.left) >
-        Math.abs(instanceRenderBounds.right - layerAbsoluteRenderBounds.left) &&
-      pointerCoords.right.indexOf(instance.y + layer.y + layer.height / 2) == -1
-    ) {
-      orientation = 'right';
-    } else {
-      if (
-        pointerCoords.left.indexOf(instance.y + layer.y + layer.height / 2) !=
-        -1
-      ) {
-        if (
-          pointerCoords.top.indexOf(instance.x + layer.x + layer.width / 2) ==
-          -1
-        ) {
-          orientation = 'top';
-        } else {
+          let instanceRenderBounds = {
+            left: instance.absoluteRenderBounds.x,
+            right:
+              instance.absoluteRenderBounds.x +
+              instance.absoluteRenderBounds.width,
+          };
+          let layerAbsoluteRenderBounds = {
+            left: layer.absoluteRenderBounds.x,
+            right:
+              layer.absoluteRenderBounds.x + layer.absoluteRenderBounds.width,
+          };
+
+          let orientation =
+            Math.abs(
+              instanceRenderBounds.left - layerAbsoluteRenderBounds.left
+            ) >
+            Math.abs(
+              instanceRenderBounds.right - layerAbsoluteRenderBounds.left
+            )
+              ? 'right'
+              : 'left';
+
+          let layerCenter = {
+            vertical: instance.y + layer.y + layer.height / 2,
+            horiozntal: instance.x + layer.x + layer.width / 2,
+          };
+
           if (
-            pointerCoords.bottom.indexOf(
-              instance.x + layer.x + layer.width / 2
-            ) == -1
+            orientation == 'right' &&
+            !pointerCoords.right.some(
+              (value) =>
+                value > layerCenter.vertical - 10 &&
+                value < layerCenter.vertical + 10
+            )
           ) {
-            orientation = 'bottom';
           } else {
-            orientation = 'right';
+            if (
+              pointerCoords.left.some(
+                (value) =>
+                  value > layerCenter.vertical - 10 &&
+                  value < layerCenter.vertical + 10
+              )
+            ) {
+              if (
+                !pointerCoords.top.some(
+                  (value) =>
+                    value > layerCenter.horiozntal - 10 &&
+                    value < layerCenter.horiozntal + 10
+                )
+              ) {
+                orientation = 'top';
+              } else {
+                if (
+                  !pointerCoords.bottom.some(
+                    (value) =>
+                      value > layerCenter.horiozntal - 10 &&
+                      value < layerCenter.horiozntal + 10
+                  )
+                ) {
+                  orientation = 'bottom';
+                }
+              }
+            }
           }
+
+          await generatePointerInstance(
+            variantSharedData.layers.length,
+            orientation,
+            componentVersion
+          ).then((node) => {
+            specsFrame.appendChild(node);
+            node.layoutPositioning = 'ABSOLUTE';
+            node.constraints = { vertical: 'CENTER', horizontal: 'CENTER' };
+
+            switch (orientation) {
+              case 'left':
+                node.x = instance.x + layer.x - node.width;
+                if (node.x + node.width > instance.x) {
+                  let offset = layer.x;
+                  node.resize(node.width + offset, node.height);
+                  node.x -= offset;
+                }
+                node.y =
+                  instance.y + layer.y + layer.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
+                pointerCoords[orientation].push(
+                  instance.y + layer.y + layer.height / 2
+                );
+
+                break;
+              case 'top':
+                node.x =
+                  instance.x + layer.x + layer.width / 2 - node.width / 2;
+                node.y = instance.y + layer.y - node.height; //+(layer.height/2)-(node.height/2);
+                if (node.y > layer.y - node.height) {
+                  let offset = layer.y;
+                  node.resize(node.width, node.height + offset);
+                  node.y -= offset;
+                }
+                pointerCoords[orientation].push(
+                  instance.x + layer.x + layer.width / 2
+                );
+                break;
+
+              case 'right':
+                node.x = instance.x + layer.x + layer.width;
+                if (instance.x + instance.width > node.x) {
+                  let offset =
+                    instance.x + instance.width - node.x + node.width;
+                  node.resize(offset, node.height);
+                }
+                node.y =
+                  instance.y + layer.y + layer.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
+                pointerCoords[orientation].push(
+                  instance.y + layer.y + layer.height / 2
+                );
+                break;
+
+              case 'bottom':
+                node.x =
+                  instance.x + layer.x + layer.width / 2 - node.width / 2;
+                node.y = instance.y + layer.y + layer.height; //+(layer.height/2)-(node.height/2);
+                pointerCoords.bottom.push(
+                  instance.x + layer.x + layer.width / 2
+                );
+                break;
+
+              default:
+                break;
+            }
+          });
         }
       }
-    }
-
-    await generatePointerInstance(
-      layersProcessed.length,
-      orientation,
-      componentVersion
-    ).then((node) => {
-      specsFrame.appendChild(node);
-      node.layoutPositioning = 'ABSOLUTE';
-      node.constraints = { vertical: 'CENTER', horizontal: 'CENTER' };
-
-      switch (orientation) {
-        case 'left':
-          node.x = instance.x + layer.x - node.width;
-          if (node.x + node.width > instance.x) {
-            let offset = layer.x;
-            node.resize(node.width + offset, node.height);
-            node.x -= offset;
-          }
-          node.y = instance.y + layer.y + layer.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
-          pointerCoords[orientation].push(
-            instance.y + layer.y + layer.height / 2
-          );
-
-          break;
-        case 'top':
-          node.x = instance.x + layer.x + layer.width / 2 - node.width / 2;
-          node.y = instance.y + layer.y - node.height; //+(layer.height/2)-(node.height/2);
-          if (node.y > layer.y - node.height) {
-            let offset = layer.y;
-            node.resize(node.width, node.height + offset);
-            node.y -= offset;
-          }
-          pointerCoords[orientation].push(
-            instance.x + layer.x + layer.width / 2
-          );
-          break;
-
-        case 'right':
-          node.x = instance.x + layer.x + layer.width;
-          if (instance.x + instance.width > node.x) {
-            let offset = instance.x + instance.width - node.x + node.width;
-            node.resize(offset, node.height);
-          }
-          node.y = instance.y + layer.y + layer.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
-          pointerCoords[orientation].push(
-            instance.y + layer.y + layer.height / 2
-          );
-          break;
-
-        case 'bottom':
-          node.x = instance.x + layer.x + layer.width / 2 - node.width / 2;
-          node.y = instance.y + layer.y + layer.height; //+(layer.height/2)-(node.height/2);
-          pointerCoords.bottom.push(instance.x + layer.x + layer.width / 2);
-          break;
-
-        default:
-          break;
-      }
-    });
+    );
   }
 
   if (
@@ -235,9 +280,8 @@ async function processLayer(
     layer.children.length
   ) {
     for (const child of layer.children) {
-      console.log('child', child.name);
-      await processLayer(
-        layersProcessed,
+      await processComponentChildLayer(
+        variantSharedData,
         child,
         componentVersion,
         specsFrame,
@@ -248,45 +292,95 @@ async function processLayer(
   }
 }
 
+let processComponentLayer = async (
+  variantSharedData: VariantSharedData,
+  componentVersion: number,
+  specsFrame: FrameNode,
+  instance: InstanceNode,
+  pointerCoords: PointerCoordsObj
+) => {
+  await generateSpecsFromNode(instance).then((res) => {
+    variantSharedData.layers.push({
+      layerName: `❖ ${res.nodeName}`,
+      layerType: 'Main Component',
+      properties: res.propertiesObj,
+    });
+  });
+
+  await generatePointerInstance(
+    variantSharedData.layers.length,
+    'left',
+    componentVersion
+  ).then((node) => {
+    specsFrame.appendChild(node);
+    node.layoutPositioning = 'ABSOLUTE';
+    node.constraints = { vertical: 'CENTER', horizontal: 'CENTER' };
+    node.x = instance.x - node.width;
+    node.y = instance.y + instance.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
+    pointerCoords.left.push(instance.y + instance.height / 2);
+  });
+};
+
 async function generateOuterWrapper(
   specsComponent: InstanceNode,
-  componentName: string,
+  parentComponent: ParentComponentData,
   componentsToSpec: ComponentNode[],
   componentData: BaseComponentData,
   fileId: string,
   brokenLinkCaption?: string,
   componentVersion?: number
 ) {
-  //Outer wrapper
+  //console.log(parentComponent);
   let outerWrapper = figma.createFrame();
   outerWrapper.layoutMode = 'VERTICAL';
   outerWrapper.counterAxisSizingMode = 'AUTO';
   outerWrapper.primaryAxisSizingMode = 'AUTO';
   outerWrapper.paddingBottom = 32;
   outerWrapper.itemSpacing = 0;
-  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs: ${
-    componentName ?? 'No component'
-  }`;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs:`;
   outerWrapper.appendChild(specsComponent);
-  if (componentsToSpec.length) {
+
+  if (parentComponent && parentComponent.id && componentsToSpec.length) {
+    outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs: ${
+      parentComponent.name ?? ''
+    }`;
+    //Outer wrapper
+    let componentSharedData = clone(EMPTY_COMPONENT_SHARED_DATA);
+    componentSharedData.mainComponentId = parentComponent.id;
+    componentSharedData.mainComponentName = parentComponent.name;
+
+    //Generate specs frame
     let specsFrameWrapper = figma.createFrame();
     specsFrameWrapper.layoutMode = 'VERTICAL';
     specsFrameWrapper.counterAxisSizingMode = 'AUTO';
     specsFrameWrapper.counterAxisSizingMode = 'AUTO';
-    specsFrameWrapper.name = `${FIGMA_COMPONENT_PREFIX}Display frames for ${componentName}`;
+    specsFrameWrapper.name = `${FIGMA_COMPONENT_PREFIX}Display frames for ${parentComponent.name}`;
+    componentSharedData.parentFrameId = specsFrameWrapper.id;
+
+    //Generate specs per component variant
     for (let i = 0; i < componentsToSpec.length; i++) {
       const component = componentsToSpec[i];
-      //Generate specs frame
 
+      let variantSharedData = clone(EMPTY_VARIANT_SHARED_DATA);
+      variantSharedData.variantId = component.id;
+      variantSharedData.variantName = component.name;
+
+      //Generate instance of component variant to display
       let componentInstance = component.createInstance();
-      let layersProcessed = [];
-      await generateSpecsFromNode(componentInstance).then((res) =>
-        layersProcessed.push({
-          nodeName: res.nodeName,
-          nodeType: res.nodeType,
-          properties: res.properties,
-        })
-      );
+      let properties = componentInstance.componentProperties;
+      for (const property in properties) {
+        if (properties[property].type == 'BOOLEAN') {
+          componentInstance.setProperties({
+            [property]: true,
+          });
+        }
+      }
+
+      let specsFrameName = `The anatomy of ${
+        parentComponent.name != component.name
+          ? `${parentComponent.name} with ${component.name}`
+          : parentComponent.name
+      }.`;
 
       let specsFrame = figma.createFrame();
       specsFrame.appendChild(componentInstance);
@@ -297,43 +391,38 @@ async function generateOuterWrapper(
       specsFrame.counterAxisSizingMode = 'AUTO';
       specsFrame.primaryAxisAlignItems = 'CENTER';
       specsFrame.counterAxisAlignItems = 'CENTER';
+      specsFrame.name = specsFrameName;
       specsFrameWrapper.appendChild(specsFrame);
+      variantSharedData.frameId = specsFrame.id;
 
-      let pointerCoords = {
+      let pointerCoords: PointerCoordsObj = {
         left: [],
         top: [],
         right: [],
         bottom: [],
       };
 
-      await generatePointerInstance(
-        layersProcessed.length,
-        'left',
-        componentVersion
-      ).then((node) => {
-        specsFrame.appendChild(node);
-        node.layoutPositioning = 'ABSOLUTE';
-        node.constraints = { vertical: 'CENTER', horizontal: 'CENTER' };
-        node.x = componentInstance.x - node.width;
-        node.y =
-          componentInstance.y + componentInstance.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
-        pointerCoords.left.push(
-          componentInstance.y + componentInstance.height / 2
-        );
-      });
+      //Generate specs for first layer, in this case, the component layer
+      await processComponentLayer(
+        variantSharedData,
+        componentVersion,
+        specsFrame,
+        componentInstance,
+        pointerCoords
+      );
 
+      //Generate specs for other layers
       for (const child of componentInstance.children) {
-        await processLayer(
-          layersProcessed,
+        await processComponentChildLayer(
+          variantSharedData,
           child,
           componentVersion,
           specsFrame,
           componentInstance,
-          pointerCoords
+          pointerCoords,
+          true
         );
       }
-
-      //console.log(layers);
 
       specsFrameWrapper.setSharedPluginData(
         FIGMA_NAMESPACE,
@@ -347,10 +436,7 @@ async function generateOuterWrapper(
           frameId: specsFrame.id,
           fileId: fileId,
           frameExistsInFile: true,
-          caption:
-            componentName != component.name
-              ? `${componentName} with ${component.name}`
-              : componentName,
+          caption: specsFrameName,
         },
         componentVersion,
         '#E6D7FA',
@@ -367,30 +453,53 @@ async function generateOuterWrapper(
         node.layoutSizingHorizontal = 'FILL';
 
         //generateHeaderInstance({level:5,text:`${}`})
-        console.log('layers proc');
-        console.log(layersProcessed);
+        //console.log('layers proc');
+        //console.log(variantSharedData);
 
         //Specs table
-        if (layersProcessed.length) {
-          for (let i = 0; i < layersProcessed.length; i++) {
-            const layer = layersProcessed[i];
+        if (variantSharedData.layers.length) {
+          for (let i = 0; i < variantSharedData.layers.length; i++) {
+            const layer = variantSharedData.layers[i];
             await generateHeaderInstance(
-              { level: 5, text: `${i + 1}. ${layer.nodeName}` },
-              componentVersion
-            ).then((node) => {
-              outerWrapper.appendChild(node);
-              node.layoutSizingHorizontal = 'FILL';
-            });
-            await generateTableInstance(
               {
-                withHeadings: true,
-                content: [['Property', 'Value', 'Source'], ...layer.properties],
+                level: 6,
+                text: `${i + 1}. ${layer.layerType == 'INSTANCE' ? '◇' : ''} ${
+                  layer.layerName
+                }`,
               },
               componentVersion
             ).then((node) => {
               outerWrapper.appendChild(node);
               node.layoutSizingHorizontal = 'FILL';
             });
+            await generateParagraphInstance(
+              {
+                text: `${_.startCase(_.lowerCase(layer.layerType))} ${
+                  layer.layerType == 'INSTANCE'
+                    ? `dependant on ${layer.layerName}`
+                    : ''
+                }`,
+              },
+              componentVersion
+            ).then((node) => {
+              outerWrapper.appendChild(node);
+              node.layoutSizingHorizontal = 'FILL';
+            });
+            if (layer.properties) {
+              await generateTableInstance(
+                {
+                  withHeadings: true,
+                  content: [
+                    ['Property', 'Value', 'Source'],
+                    ...convertPropObjToArr(layer.properties),
+                  ],
+                },
+                componentVersion
+              ).then((node) => {
+                outerWrapper.appendChild(node);
+                node.layoutSizingHorizontal = 'FILL';
+              });
+            }
           }
         }
       });
@@ -414,15 +523,19 @@ async function generateOuterWrapper(
   }
   specsComponent.layoutSizingHorizontal = 'FILL';
 
-  //component.layoutSizingHorizontal = 'FILL';
+  /*figma.root.setSharedPluginData(
+    FIGMA_NAMESPACE,
+    FIGMA_COMPONENT_DOCS_KEY,
+    JSON.stringify(componentSharedData)
+  );*/
+
   return outerWrapper;
 }
 
-export async function getComponentsToDoc(
+export function getComponentsToDoc(
   node: ComponentNode | ComponentSetNode,
   componentsToSpec: ComponentNode[]
 ) {
-  let componentName: string;
   let specChildParent = node.parent;
   if (specChildParent && specChildParent.type == 'COMPONENT_SET') {
     for (const variant of specChildParent.children) {
@@ -430,10 +543,11 @@ export async function getComponentsToDoc(
         componentsToSpec.push(variant);
       }
     }
-    return specChildParent.name;
+
+    return { name: specChildParent.name, id: specChildParent.id };
   } else {
     componentsToSpec.push(node as ComponentNode);
-    return node.name;
+    return { name: node.name, id: node.id };
   }
 }
 
@@ -442,7 +556,7 @@ export async function generateComponentDocInstance(
   componentVersion: number
 ): Promise<FrameNode> {
   let componentData: BaseComponentData = getComponentData();
-  let componentName: string;
+  let parentComponent: { name: string; id: string };
   let specsComponent: BaseNode;
   let componentsToSpec: ComponentNode[] = []; // We define an array because a component can have multiple variants
   let specsFrame: FrameNode;
@@ -459,21 +573,20 @@ export async function generateComponentDocInstance(
 
         switch (specChild.type) {
           case 'INSTANCE':
-            await specChild.getMainComponentAsync().then((componentNode) => {
-              getComponentsToDoc(componentNode, componentsToSpec).then(
-                (name) => (componentName = name)
-              );
-            });
+            await specChild
+              .getMainComponentAsync()
+              .then(async (componentNode) => {
+                parentComponent = getComponentsToDoc(
+                  componentNode,
+                  componentsToSpec
+                );
+              });
             break;
           case 'COMPONENT':
-            getComponentsToDoc(specChild, componentsToSpec).then(
-              (name) => (componentName = name)
-            );
+            parentComponent = getComponentsToDoc(specChild, componentsToSpec);
             break;
           case 'COMPONENT_SET':
-            getComponentsToDoc(specChild, componentsToSpec).then(
-              (name) => (componentName = name)
-            );
+            parentComponent = getComponentsToDoc(specChild, componentsToSpec);
             break;
           default:
             break;
@@ -490,7 +603,7 @@ export async function generateComponentDocInstance(
 
     await generateOuterWrapper(
       instance,
-      componentName,
+      parentComponent,
       componentsToSpec,
       componentData,
       data.frameToDisplay.fileId,
@@ -516,7 +629,7 @@ export async function generateBlockDataFromComponentDoc(
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
-  // TODO JUST CHECK IF THE FRAME ID CHANGED, DON'T REGENERATE THE WHOLE DOC!!!!!! maybe?
+  // TODO JUST CHECK IF THE PARENT FRAME ID CHANGED, DON'T REGENERATE THE WHOLE DOC!!!!!! maybe?
 
   let blockType = 'componentDoc';
   let url =
@@ -550,9 +663,11 @@ export async function generateBlockDataFromComponentDoc(
           (n) => n.type === 'INSTANCE'
         ) as InstanceNode;
         await specChild.getMainComponentAsync().then((componentNode) => {
-          getComponentsToDoc(componentNode, componentsToSpec).then(
-            (name) => (componentName = name)
+          let parentComponent = getComponentsToDoc(
+            componentNode,
+            componentsToSpec
           );
+          componentName = parentComponent.name;
         });
       }
     });

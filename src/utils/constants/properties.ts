@@ -4,7 +4,7 @@ export type ListOrder = 'unordered' | 'ordered';
 export type UpperCaseListOrder = 'UNORDERED' | 'ORDERED';
 
 export const SPEC_VALUE_SOURCES = [
-  'raw',
+  'rawValue',
   'figmaStyle',
   'figmaVariable',
   'designToken',
@@ -13,6 +13,11 @@ export type SpecValueSource = (typeof SPEC_VALUE_SOURCES)[number];
 
 export interface AnatomySpecValue {
   value: number | string | null;
+  source: SpecValueSource;
+}
+
+export interface AnatomySpecNumberValue {
+  value: number;
   source: SpecValueSource;
 }
 
@@ -33,8 +38,11 @@ export interface AnatomySpecs {
   fills: AnatomySpecValue;
   minHeight: AnatomySpecValue;
   minWidth: AnatomySpecValue;
+  maxHeight: AnatomySpecValue;
+  maxWidth: AnatomySpecValue;
   itemSpacing: AnatomySpecValue;
   cornerRadius: AnatomySpecValue;
+  borderRadius?: AnatomySpecValue;
   topLeftRadius: AnatomySpecValue;
   topRightRadius: AnatomySpecValue;
   bottomLeftRadius: AnatomySpecValue;
@@ -51,6 +59,15 @@ export interface AnatomySpecs {
   paddingBottom: AnatomySpecValue;
 }
 
+export interface NumberAnatomySpecs extends AnatomySpecs {
+  cornerRadius: AnatomySpecNumberValue;
+  borderRadius?: AnatomySpecNumberValue;
+  topLeftRadius: AnatomySpecNumberValue;
+  topRightRadius: AnatomySpecNumberValue;
+  bottomLeftRadius: AnatomySpecNumberValue;
+  bottomRightRadius: AnatomySpecNumberValue;
+}
+
 export interface LayerSpecs {
   name: string;
   type: string;
@@ -58,3 +75,5 @@ export interface LayerSpecs {
   mainComponent?: string;
   nodeId: string;
 }
+
+export type Position = 'left' | 'right' | 'top' | 'bottom';
