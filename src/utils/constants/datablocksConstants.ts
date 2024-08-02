@@ -113,6 +113,7 @@ export const EMPTY_LAYER_PROPERTIES: AnatomySpecs = {
   paddingRight: { value: null, source: 'rawValue' },
   paddingLeft: { value: null, source: 'rawValue' },
   paddingBottom: { value: null, source: 'rawValue' },
+  opacity: { value: null, source: 'rawValue' },
 };
 
 export const EMPTY_LAYER_SHARED_DATA = {

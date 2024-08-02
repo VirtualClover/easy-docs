@@ -27,11 +27,16 @@ export let generateSpecsFromNode = async (
     let anatomy: AnatomySpecs | null = null;
 
     if (!avoidInstances || (avoidInstances && node.type !== 'INSTANCE')) {
+
       // TODO Effects
       anatomy = clone(EMPTY_LAYER_PROPERTIES);
       anatomy.minWidth.value = node.minWidth;
       anatomy.maxWidth.value = node.maxWidth;
       anatomy.maxHeight.value = node.maxHeight;
+
+      if ( node.opacity < 1) {
+        anatomy.opacity.value = node.opacity;
+      }
 
       if (node.layoutSizingHorizontal === 'FIXED') {
         anatomy.width.value = node.width;
@@ -154,7 +159,7 @@ export let generateSpecsFromNode = async (
         }
       }
 
-      console.log(ogValues);
+      //console.log(ogValues);
 
       let nodeVars = node.boundVariables;
       if (nodeVars) {

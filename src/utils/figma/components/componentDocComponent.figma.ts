@@ -116,21 +116,20 @@ interface PointerCoordsObj {
 }
 
 type ParentComponentData = { name: string; id: string } | null;
+let difference = function (a, b) {
+  return Math.abs(a - b);
+};
 
 async function processComponentChildLayer(
   variantSharedData: VariantSharedData,
-  layer: any,
+  layer: FrameNode | GroupNode | InstanceNode,
   componentVersion: number,
   specsFrame: FrameNode,
   instance: InstanceNode | ComponentNode,
   pointerCoords: PointerCoordsObj,
   avoidInstances: boolean = true
 ) {
-  if (
-    layer.absoluteRenderBounds &&
-    layer.type != 'MASK' &&
-    layer.type != 'GROUP'
-  ) {
+  if (layer.absoluteRenderBounds && !layer.isMask && layer.type != 'GROUP') {
     await generateSpecsFromNode(layer as FrameNode, avoidInstances).then(
       async (res) => {
         if (res) {
@@ -140,69 +139,86 @@ async function processComponentChildLayer(
             properties: res.propertiesObj,
           });
 
-          let instanceRenderBounds = {
-            left: instance.absoluteRenderBounds.x,
-            right:
-              instance.absoluteRenderBounds.x +
-              instance.absoluteRenderBounds.width,
+          let orientation: Position;
+
+          let layerCenter = {
+            y:
+              layer.absoluteRenderBounds.y +
+              layer.absoluteRenderBounds.height / 2,
+            x:
+              layer.absoluteRenderBounds.x +
+              layer.absoluteRenderBounds.width / 2,
           };
-          let layerAbsoluteRenderBounds = {
+
+          let layerCoords = {
+            top: layer.absoluteRenderBounds.y,
             left: layer.absoluteRenderBounds.x,
+            bottom:
+              layer.absoluteRenderBounds.y + layer.absoluteRenderBounds.height,
             right:
               layer.absoluteRenderBounds.x + layer.absoluteRenderBounds.width,
           };
 
-          let orientation : Position =
-            Math.abs(
-              instanceRenderBounds.left - layerAbsoluteRenderBounds.left
-            ) >
-            Math.abs(
-              instanceRenderBounds.right - layerAbsoluteRenderBounds.left
-            )
-              ? 'right'
-              : 'left';
-
-          let layerCenter = {
-            vertical: instance.y + layer.y + layer.height / 2,
-            horiozntal: instance.x + layer.x + layer.width / 2,
+          let instanceCoords = {
+            top: instance.absoluteRenderBounds.y,
+            left: instance.absoluteRenderBounds.x,
+            bottom:
+              instance.absoluteRenderBounds.y +
+              instance.absoluteRenderBounds.height,
+            right:
+              instance.absoluteRenderBounds.x +
+              instance.absoluteRenderBounds.width,
           };
 
-          if (
-            orientation == 'right' &&
-            !pointerCoords.right.some(
-              (value) =>
-                value > layerCenter.vertical - 10 &&
-                value < layerCenter.vertical + 10
-            )
-          ) {
-          } else {
+          let positionOffset = 0.4;
+
+          let distances = [
+            {
+              distance: difference(instanceCoords.top, layerCoords.top),
+              keyCoordPoint: layerCenter.x,
+              orientation: 'top',
+            },
+            {
+              distance: difference(instanceCoords.bottom, layerCoords.bottom),
+              keyCoordPoint: layerCenter.x,
+              orientation: 'bottom',
+            },
+            {
+              distance: difference(instanceCoords.left, layerCoords.left),
+              keyCoordPoint: layerCenter.y,
+              orientation: 'left',
+            },
+            {
+              distance: difference(instanceCoords.right, layerCoords.right),
+              keyCoordPoint: layerCenter.y,
+              orientation: 'right',
+            },
+          ];
+
+          let currentAttemp = 0;
+          let needsOffset = false;
+          distances.sort((a, b) => a.distance - b.distance);
+
+          while (currentAttemp < 3) {
             if (
-              pointerCoords.left.some(
+              !pointerCoords[distances[currentAttemp].orientation].some(
                 (value) =>
-                  value > layerCenter.vertical - 10 &&
-                  value < layerCenter.vertical + 10
-              )
+                  value > distances[currentAttemp].keyCoordPoint - 10 &&
+                  value < distances[currentAttemp].keyCoordPoint + 10
+              ) &&
+              distances[currentAttemp].distance <=
+                instance.absoluteRenderBounds.width / 2
             ) {
-              if (
-                !pointerCoords.top.some(
-                  (value) =>
-                    value > layerCenter.horiozntal - 10 &&
-                    value < layerCenter.horiozntal + 10
-                )
-              ) {
-                orientation = 'top';
-              } else {
-                if (
-                  !pointerCoords.bottom.some(
-                    (value) =>
-                      value > layerCenter.horiozntal - 10 &&
-                      value < layerCenter.horiozntal + 10
-                  )
-                ) {
-                  orientation = 'bottom';
-                }
-              }
+              orientation = distances[currentAttemp].orientation as Position;
+              break;
+            } else {
+              currentAttemp++;
             }
+          }
+
+          if (currentAttemp >= 3) {
+            orientation = distances[0].orientation as Position;
+            needsOffset = true;
           }
 
           await generatePointerInstance(
@@ -210,65 +226,78 @@ async function processComponentChildLayer(
             orientation,
             componentVersion
           ).then((node) => {
-            specsFrame.appendChild(node);
-            node.layoutPositioning = 'ABSOLUTE';
             node.constraints = { vertical: 'CENTER', horizontal: 'CENTER' };
 
             switch (orientation) {
               case 'left':
-                node.x = instance.x + layer.x - node.width;
-                if (node.x + node.width > instance.x) {
-                  let offset = layer.x;
+                node.x = layer.absoluteRenderBounds.x - node.width;
+                if (
+                  layer.absoluteRenderBounds.x > instance.absoluteRenderBounds.x
+                ) {
+                  let offset = difference(
+                    layer.absoluteRenderBounds.x,
+                    instanceCoords.left
+                  );
                   node.resize(node.width + offset, node.height);
                   node.x -= offset;
                 }
                 node.y =
-                  instance.y + layer.y + layer.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
-                pointerCoords[orientation].push(
-                  instance.y + layer.y + layer.height / 2
-                );
+                  layerCenter.y -
+                  node.height / 2 +
+                  (needsOffset ? node.height * positionOffset : 0);
+                pointerCoords[orientation].push(layerCenter.y);
 
                 break;
               case 'top':
                 node.x =
-                  instance.x + layer.x + layer.width / 2 - node.width / 2;
-                node.y = instance.y + layer.y - node.height; //+(layer.height/2)-(node.height/2);
-                if (node.y > layer.y - node.height) {
-                  let offset = layer.y;
+                  layerCenter.x -
+                  node.width / 2 +
+                  (needsOffset ? node.width * positionOffset : 0);
+                node.y = layer.absoluteRenderBounds.y - node.height;
+                if (
+                  layer.absoluteRenderBounds.y > instance.absoluteRenderBounds.y
+                ) {
+                  let offset = difference(
+                    layer.absoluteRenderBounds.y,
+                    instanceCoords.top
+                  );
                   node.resize(node.width, node.height + offset);
                   node.y -= offset;
                 }
-                pointerCoords[orientation].push(
-                  instance.x + layer.x + layer.width / 2
-                );
+                pointerCoords[orientation].push(layerCenter.x);
                 break;
 
               case 'right':
-                node.x = instance.x + layer.x + layer.width;
-                if (instance.x + instance.width > node.x) {
-                  let offset =
-                    instance.x + instance.width - node.x + node.width;
-                  node.resize(offset, node.height);
+                node.x = layerCoords.right;
+                if (node.x < instanceCoords.right) {
+                  let offset = difference(node.x, instanceCoords.right);
+                  node.resize(offset + node.width, node.height);
                 }
                 node.y =
-                  instance.y + layer.y + layer.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
-                pointerCoords[orientation].push(
-                  instance.y + layer.y + layer.height / 2
-                );
+                  layerCenter.y -
+                  node.height / 2 +
+                  (needsOffset ? node.height * positionOffset : 0);
+                pointerCoords[orientation].push(layerCenter.y);
                 break;
 
               case 'bottom':
                 node.x =
-                  instance.x + layer.x + layer.width / 2 - node.width / 2;
-                node.y = instance.y + layer.y + layer.height; //+(layer.height/2)-(node.height/2);
-                pointerCoords.bottom.push(
-                  instance.x + layer.x + layer.width / 2
-                );
+                  layerCenter.x -
+                  node.width / 2 +
+                  (needsOffset ? node.width * positionOffset : 0);
+                node.y = layerCoords.bottom;
+                if (layerCoords.bottom < instanceCoords.bottom) {
+                  let offset = difference(node.y, instanceCoords.bottom);
+                  node.resize(node.width, node.height + offset);
+                }
+                pointerCoords.bottom.push(layerCenter.x);
                 break;
 
               default:
                 break;
             }
+
+            specsFrame.appendChild(node);
           });
         }
       }
@@ -283,7 +312,7 @@ async function processComponentChildLayer(
     for (const child of layer.children) {
       await processComponentChildLayer(
         variantSharedData,
-        child,
+        child as FrameNode,
         componentVersion,
         specsFrame,
         instance,
@@ -313,12 +342,14 @@ let processComponentLayer = async (
     'left',
     componentVersion
   ).then((node) => {
+    node.x = instance.absoluteRenderBounds.x - node.width;
+    node.y =
+      instance.absoluteRenderBounds.y +
+      instance.absoluteRenderBounds.height / 2 -
+      node.absoluteRenderBounds.height / 2; //+(layer.height/2)-(node.height/2);
     specsFrame.appendChild(node);
-    node.layoutPositioning = 'ABSOLUTE';
     node.constraints = { vertical: 'CENTER', horizontal: 'CENTER' };
-    node.x = instance.x - node.width;
-    node.y = instance.y + instance.height / 2 - node.height / 2; //+(layer.height/2)-(node.height/2);
-    pointerCoords.left.push(instance.y + instance.height / 2);
+    pointerCoords.left.push(node.y);
   });
 };
 
@@ -384,16 +415,19 @@ async function generateOuterWrapper(
       }.`;
 
       let specsFrame = figma.createFrame();
+      let padding = 64;
       specsFrame.appendChild(componentInstance);
-      specsFrame.verticalPadding = 64;
-      specsFrame.horizontalPadding = 64;
-      specsFrame.layoutMode = 'VERTICAL';
-      specsFrame.counterAxisSizingMode = 'AUTO';
-      specsFrame.counterAxisSizingMode = 'AUTO';
-      specsFrame.primaryAxisAlignItems = 'CENTER';
-      specsFrame.counterAxisAlignItems = 'CENTER';
+      specsFrame.resize(
+        componentInstance.absoluteRenderBounds.width + padding * 2,
+        componentInstance.absoluteRenderBounds.height + padding * 2
+      );
+      componentInstance.x += padding;
+      componentInstance.y += padding;
+      componentInstance.constraints = {
+        vertical: 'CENTER',
+        horizontal: 'CENTER',
+      };
       specsFrame.name = specsFrameName;
-      specsFrameWrapper.appendChild(specsFrame);
       variantSharedData.frameId = specsFrame.id;
 
       let pointerCoords: PointerCoordsObj = {
@@ -416,7 +450,7 @@ async function generateOuterWrapper(
       for (const child of componentInstance.children) {
         await processComponentChildLayer(
           variantSharedData,
-          child,
+          child as FrameNode,
           componentVersion,
           specsFrame,
           componentInstance,
@@ -425,6 +459,7 @@ async function generateOuterWrapper(
         );
       }
 
+      specsFrameWrapper.appendChild(specsFrame);
       specsFrameWrapper.setSharedPluginData(
         FIGMA_NAMESPACE,
         FIGMA_COMPONENT_VERSION_KEY,
@@ -692,3 +727,45 @@ export async function generateBlockDataFromComponentDoc(
   }
   return blockData;
 }
+
+/*
+
+          if (
+            orientation == 'right' &&
+            !pointerCoords.right.some(
+              (value) =>
+                value > layerCenter.vertical - 10 &&
+                value < layerCenter.vertical + 10
+            )
+          ) {
+          } else {
+            if (
+              pointerCoords.left.some(
+                (value) =>
+                  value > layerCenter.vertical - 10 &&
+                  value < layerCenter.vertical + 10
+              )
+            ) {
+              if (
+                !pointerCoords.top.some(
+                  (value) =>
+                    value > layerCenter.horiozntal - 10 &&
+                    value < layerCenter.horiozntal + 10
+                )
+              ) {
+                orientation = 'top';
+              } else {
+                if (
+                  !pointerCoords.bottom.some(
+                    (value) =>
+                      value > layerCenter.horiozntal - 10 &&
+                      value < layerCenter.horiozntal + 10
+                  )
+                ) {
+                  orientation = 'bottom';
+                }
+              }
+            }
+          }
+
+*/

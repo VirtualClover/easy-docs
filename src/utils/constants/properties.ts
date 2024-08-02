@@ -57,6 +57,7 @@ export interface AnatomySpecs {
   paddingRight: AnatomySpecValue;
   paddingLeft: AnatomySpecValue;
   paddingBottom: AnatomySpecValue;
+  opacity: AnatomySpecValue;
 }
 
 export interface NumberAnatomySpecs extends AnatomySpecs {
