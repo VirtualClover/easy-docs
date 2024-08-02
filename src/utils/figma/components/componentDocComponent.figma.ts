@@ -10,6 +10,7 @@ import {
   FIGMA_COMPONENT_DOCS_KEY,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
+  Position,
   VariantSharedData,
 } from '../../constants';
 
@@ -151,7 +152,7 @@ async function processComponentChildLayer(
               layer.absoluteRenderBounds.x + layer.absoluteRenderBounds.width,
           };
 
-          let orientation =
+          let orientation : Position =
             Math.abs(
               instanceRenderBounds.left - layerAbsoluteRenderBounds.left
             ) >

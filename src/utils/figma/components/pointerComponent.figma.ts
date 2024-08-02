@@ -6,6 +6,7 @@ import {
   FIGMA_COMPONENT_DATA_KEY,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
+  Position,
 } from '../../constants';
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
@@ -97,8 +98,6 @@ export async function createPointerComponent(parent: FrameNode) {
         tag.y = variantData.py;
         tag.constraints = variantData.pConstraints;
 
-        console.log('Gets here');
-
         //tag.layoutSizingHorizontal = 'HUG';
 
         //Tag caption
@@ -155,7 +154,7 @@ export async function createPointerComponent(parent: FrameNode) {
 
 export async function generatePointerInstance(
   index: number,
-  pointerPosition: string = 'left',
+  pointerPosition: Position = 'left',
   componentVersion: number
 ): Promise<InstanceNode> {
   let componentData: BaseComponentData = JSON.parse(
