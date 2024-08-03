@@ -1,4 +1,15 @@
+import * as _ from 'lodash';
+
 import { Alert, Typography, styled } from '@mui/material';
+import {
+  ComponentDocBlockData,
+  EMPTY_COMPONENT_SHARED_DATA,
+  EMPTY_VARIANT_SHARED_DATA,
+} from '../../constants';
+import {
+  DEFAULT_SETTINGS,
+  FrameDetailsFromURL,
+} from '../../constants/constants';
 import { componentIcon, figmaIcon } from '../../../assets/svgs';
 import {
   decodeStringForFigma,
@@ -9,9 +20,8 @@ import {
   getDetailsFromFigmaURL,
 } from '../../general/urlHandlers';
 
-import { ComponentDocBlockData } from '../../constants';
-import { DEFAULT_SETTINGS } from '../../constants/constants';
 import React from 'react';
+import { clone } from '../../general/clone';
 import { createRoot } from 'react-dom/client';
 
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
@@ -37,16 +47,16 @@ const InputUI = (blockData: ComponentDocBlockData) => {
   //https://www.figma.com/design/tt54zCyis2CgMo6wRIkvB0/Untitled?node-id=16%3A249&t=Bad05SFQnNtoGy4z-1
 
   let [frameExistsInFile, setFrameExistsInFile] = React.useState(
-    blockData.frameToDisplay
-      ? blockData.frameToDisplay.frameExistsInFile
+    blockData.variants && blockData.variants.length
+      ? blockData.variants[0].displayFrame.existsInFile
       : undefined
   );
 
   let [frameDetails, setFrameDetails] = React.useState(
-    blockData.frameToDisplay
+    blockData.variants && blockData.variants.length
       ? {
-          frameId: blockData.frameToDisplay.frameId,
-          fileId: blockData.frameToDisplay.fileId,
+          frameId: blockData.variants[0].displayFrame.id,
+          fileId: blockData.fileId,
         }
       : {
           frameId: '',
@@ -156,26 +166,38 @@ export class ComponentDoc {
 
   save(blockContent): ComponentDocBlockData {
     let frameUrl;
+    let frameDetails: FrameDetailsFromURL;
     if (blockContent.querySelector('#cdx-component-specs-frame-url')) {
       frameUrl = blockContent.querySelector(
         '#cdx-component-specs-frame-url'
       ).value;
+      frameDetails = getDetailsFromFigmaURL(frameUrl, 'decode');
     }
     //console.log('frame ei¿xists');
     //console.log(this.data.frameExistsInFile);
 
-    return {
-      frameToDisplay: {
-        ...getDetailsFromFigmaURL(frameUrl, 'decode'),
-        frameExistsInFile:
-          this.data.frameToDisplay &&
-          this.data.frameToDisplay.frameExistsInFile != undefined
-            ? this.data.frameToDisplay.frameExistsInFile
-            : undefined,
-      },
-      documentation: this.data.documentation ?? [],
-      componentName: this.data.componentName ?? '',
+    let initData = _.merge(EMPTY_COMPONENT_SHARED_DATA, this.data) as any;
+
+    console.log('Init data');
+    console.log(this.data);
+    console.log(initData);
+
+    initData.fileId = frameDetails.fileId;
+
+    if (!initData.variants.length) {
+      initData.variants.push(clone(EMPTY_VARIANT_SHARED_DATA));
+    }
+
+    initData.variants[0].displayFrame = {
+      id: frameDetails.frameId,
+      existsInFile:
+        initData.variants.length &&
+        initData.variants[0].displayFrame.existsInFile != undefined
+          ? initData.variants[0].displayFrame.existsInFile
+          : undefined,
     };
+
+    return initData;
   }
 
   validate(savedData) {

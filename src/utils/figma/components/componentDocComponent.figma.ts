@@ -5,6 +5,7 @@ import {
 import {
   BlockData,
   ComponentDocBlockData,
+  ComponentSharedData,
   EMPTY_COMPONENT_SHARED_DATA,
   EMPTY_VARIANT_SHARED_DATA,
   FIGMA_COMPONENT_DOCS_KEY,
@@ -13,28 +14,29 @@ import {
   Position,
   VariantSharedData,
 } from '../../constants';
-
-import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
-import { generateDisplayFrameInstance } from './displayFrameComponent.figma';
+import {
+  convertPropObjToArr,
+  generateSpecsFromNode,
+} from '../getSpecsFromInstance';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
   validateFigmaURL,
 } from '../../general/urlHandlers';
+
+import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
+import _ from 'lodash';
+import { clone } from '../../general/clone';
+import { generateDisplayFrameInstance } from './displayFrameComponent.figma';
+import { generateDividerInstance } from './dividerComponent.figma';
+import { generateHeaderInstance } from './headerComponent.figma';
 import { generateParagraphInstance } from './paragraphComponent.figma';
+import { generatePointerInstance } from './pointerComponent.figma';
 import { generateTableInstance } from './tableComponent.figma';
 import { getComponentData } from '../getComponentData';
 import { getPluginSettings } from '../getPluginSettings';
-import { setNodeFills } from '../setNodeFills';
-import { generatePointerInstance } from './pointerComponent.figma';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
-import {
-  convertPropObjToArr,
-  generateSpecsFromNode,
-} from '../getSpecsFromInstance';
-import { generateHeaderInstance } from './headerComponent.figma';
-import _ from 'lodash';
-import { clone } from '../../general/clone';
+import { setNodeFills } from '../setNodeFills';
 
 export async function createComponentDocComponent(parent: FrameNode) {
   let component: ComponentNode;
@@ -355,14 +357,16 @@ let processComponentLayer = async (
 
 async function generateOuterWrapper(
   specsComponent: InstanceNode,
-  parentComponent: ParentComponentData,
+  parentComponent: ComponentNode | ComponentSetNode,
   componentsToSpec: ComponentNode[],
   componentData: BaseComponentData,
   fileId: string,
-  brokenLinkCaption?: string,
-  componentVersion?: number
+  componentVersion: number,
+  brokenLinkCaption: string = ''
 ) {
   //console.log(parentComponent);
+
+  //Outer wrapper
   let outerWrapper = figma.createFrame();
   outerWrapper.layoutMode = 'VERTICAL';
   outerWrapper.counterAxisSizingMode = 'AUTO';
@@ -376,8 +380,22 @@ async function generateOuterWrapper(
     outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs: ${
       parentComponent.name ?? ''
     }`;
-    //Outer wrapper
-    let componentSharedData = clone(EMPTY_COMPONENT_SHARED_DATA);
+
+    //Description
+    if (parentComponent.description) {
+      generateParagraphInstance(
+        { text: parentComponent.description },
+        componentVersion
+      ).then((node) => {
+        outerWrapper.appendChild(node);
+        node.layoutSizingHorizontal = 'FILL';
+      });
+    }
+
+    let componentSharedData: ComponentSharedData = clone(
+      EMPTY_COMPONENT_SHARED_DATA
+    );
+    componentSharedData.fileId = fileId;
     componentSharedData.mainComponentId = parentComponent.id;
     componentSharedData.mainComponentName = parentComponent.name;
 
@@ -387,13 +405,18 @@ async function generateOuterWrapper(
     specsFrameWrapper.counterAxisSizingMode = 'AUTO';
     specsFrameWrapper.counterAxisSizingMode = 'AUTO';
     specsFrameWrapper.name = `${FIGMA_COMPONENT_PREFIX}Display frames for ${parentComponent.name}`;
-    componentSharedData.parentFrameId = specsFrameWrapper.id;
+    componentSharedData.anatomyFramesWrapper = {
+      id: specsFrameWrapper.id,
+      existsInFile: true,
+    };
 
-    //Generate specs per component variant
+    //Generate anatomy per component variant
     for (let i = 0; i < componentsToSpec.length; i++) {
       const component = componentsToSpec[i];
 
-      let variantSharedData = clone(EMPTY_VARIANT_SHARED_DATA);
+      let variantSharedData: VariantSharedData = clone(
+        EMPTY_VARIANT_SHARED_DATA
+      );
       variantSharedData.variantId = component.id;
       variantSharedData.variantName = component.name;
 
@@ -416,11 +439,11 @@ async function generateOuterWrapper(
 
       let specsFrame = figma.createFrame();
       let padding = 64;
-      specsFrame.appendChild(componentInstance);
       specsFrame.resize(
         componentInstance.absoluteRenderBounds.width + padding * 2,
         componentInstance.absoluteRenderBounds.height + padding * 2
       );
+      specsFrame.appendChild(componentInstance);
       componentInstance.x += padding;
       componentInstance.y += padding;
       componentInstance.constraints = {
@@ -428,7 +451,10 @@ async function generateOuterWrapper(
         horizontal: 'CENTER',
       };
       specsFrame.name = specsFrameName;
-      variantSharedData.frameId = specsFrame.id;
+      variantSharedData.displayFrame = {
+        id: specsFrame.id,
+        existsInFile: true,
+      };
 
       let pointerCoords: PointerCoordsObj = {
         left: [],
@@ -465,6 +491,20 @@ async function generateOuterWrapper(
         FIGMA_COMPONENT_VERSION_KEY,
         componentVersion.toString()
       );
+
+      await generateHeaderInstance(
+        {
+          level: 5,
+          text:
+            componentsToSpec.length > 1
+              ? `Variant ${component.name}`
+              : component.name,
+        },
+        componentVersion
+      ).then((node) => {
+        outerWrapper.appendChild(node);
+        node.layoutSizingHorizontal = 'FILL';
+      });
 
       //Display
       await generateDisplayFrameInstance(
@@ -538,8 +578,30 @@ async function generateOuterWrapper(
             }
           }
         }
+
+        await generateDividerInstance(componentVersion).then((node) => {
+          outerWrapper.appendChild(node);
+          node.layoutSizingHorizontal = 'FILL';
+        });
       });
     }
+
+    outerWrapper.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_DOCS_KEY,
+      JSON.stringify(componentSharedData)
+    );
+
+    componentSharedData.documentationFrame = {
+      id: outerWrapper.id,
+      existsInFile: true,
+    };
+
+    figma.root.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      `${FIGMA_COMPONENT_DOCS_KEY}:${componentSharedData.mainComponentId}`,
+      componentSharedData.documentationFrame.id
+    );
   } else {
     //Display
     generateDisplayFrameInstance(
@@ -547,7 +609,7 @@ async function generateOuterWrapper(
         frameId: '',
         fileId: '',
         frameExistsInFile: false,
-        caption: ``,
+        caption: brokenLinkCaption,
         maxHeight: 300,
       },
       componentVersion,
@@ -565,13 +627,20 @@ async function generateOuterWrapper(
     JSON.stringify(componentSharedData)
   );*/
 
+  /*
+  parent componentId
+  specs frame wrapper id
+  frames id contained in the wrapper
+  
+  */
+
   return outerWrapper;
 }
 
 export function getComponentsToDoc(
   node: ComponentNode | ComponentSetNode,
   componentsToSpec: ComponentNode[]
-) {
+): ComponentNode | ComponentSetNode {
   let specChildParent = node.parent;
   if (specChildParent && specChildParent.type == 'COMPONENT_SET') {
     for (const variant of specChildParent.children) {
@@ -580,10 +649,10 @@ export function getComponentsToDoc(
       }
     }
 
-    return { name: specChildParent.name, id: specChildParent.id };
+    return specChildParent;
   } else {
     componentsToSpec.push(node as ComponentNode);
-    return { name: node.name, id: node.id };
+    return node;
   }
 }
 
@@ -592,71 +661,105 @@ export async function generateComponentDocInstance(
   componentVersion: number
 ): Promise<FrameNode> {
   let componentData: BaseComponentData = getComponentData();
-  let parentComponent: { name: string; id: string };
+  let parentComponent: ComponentNode | ComponentSetNode;
   let specsComponent: BaseNode;
   let componentsToSpec: ComponentNode[] = []; // We define an array because a component can have multiple variants
   let specsFrame: FrameNode;
-  await figma
-    .getNodeByIdAsync(data.frameToDisplay.frameId)
+  return await figma
+    .getNodeByIdAsync(data.documentationFrame.id)
     .then(async (node) => {
-      if (node && node.type === 'FRAME') {
-        let specChild = node.findChild(
-          (n) =>
-            n.type === 'INSTANCE' ||
-            n.type === 'COMPONENT' ||
-            n.type === 'COMPONENT_SET'
+      if (node && node.type == 'FRAME') {
+        //Check if the frame that is pointing to is an already generated doc wrapper
+        let dataCheck = node.getSharedPluginData(
+          FIGMA_NAMESPACE,
+          FIGMA_COMPONENT_DOCS_KEY
         );
+        if (dataCheck) {
+          let duplicatedOuterWrapper = node.clone();
+          return duplicatedOuterWrapper;
+        } else {
+          // If not, check if the frame contains a component or instance
+          let specChild = node.findChild(
+            (n) =>
+              n.type === 'INSTANCE' ||
+              n.type === 'COMPONENT' ||
+              n.type === 'COMPONENT_SET'
+          );
 
-        switch (specChild.type) {
-          case 'INSTANCE':
-            await specChild
-              .getMainComponentAsync()
-              .then(async (componentNode) => {
-                parentComponent = getComponentsToDoc(
-                  componentNode,
-                  componentsToSpec
-                );
+          switch (specChild.type) {
+            case 'INSTANCE':
+              await specChild
+                .getMainComponentAsync()
+                .then(async (componentNode) => {
+                  parentComponent = getComponentsToDoc(
+                    componentNode,
+                    componentsToSpec
+                  );
+                });
+              break;
+            case 'COMPONENT':
+              parentComponent = getComponentsToDoc(specChild, componentsToSpec);
+              break;
+            case 'COMPONENT_SET':
+              parentComponent = getComponentsToDoc(specChild, componentsToSpec);
+              break;
+            default:
+              break;
+          }
+
+          //If it does, check if that component already has a doc frame generated
+          if (parentComponent) {
+            let existingDocFrameId = figma.root.getSharedPluginData(
+              FIGMA_NAMESPACE,
+              `${FIGMA_COMPONENT_DOCS_KEY}:${parentComponent.id}`
+            );
+            //If it does, just clone the frame
+            if (existingDocFrameId) {
+              await figma.getNodeByIdAsync(existingDocFrameId).then((node) => {
+                if (node && node.type == 'FRAME') {
+                  let duplicatedOuterWrapper = node.clone();
+                  return duplicatedOuterWrapper;
+                }
               });
-            break;
-          case 'COMPONENT':
-            parentComponent = getComponentsToDoc(specChild, componentsToSpec);
-            break;
-          case 'COMPONENT_SET':
-            parentComponent = getComponentsToDoc(specChild, componentsToSpec);
-            break;
-          default:
-            break;
+            }
+          }
         }
       }
+
+      //If not, then we generate the component frame
+      await figma
+        .getNodeByIdAsync(componentData.components.componentDoc.id)
+        .then((node) => {
+          specsComponent = node;
+        });
+      if (specsComponent.type == 'COMPONENT') {
+        let instance = specsComponent.createInstance();
+
+        await generateOuterWrapper(
+          instance,
+          parentComponent,
+          componentsToSpec,
+          componentData,
+          data.fileId,
+          componentVersion,
+          `The component referenced was deleted`
+        ).then((node) => (specsFrame = node));
+
+        instance.setSharedPluginData(
+          FIGMA_NAMESPACE,
+          FIGMA_COMPONENT_VERSION_KEY,
+          componentVersion.toString()
+        );
+
+        console.log('specs frame');
+        console.log(specsFrame);
+
+        return specsFrame;
+        //instance.set
+      }
+
+      return null;
     });
-  await figma
-    .getNodeByIdAsync(componentData.components.componentDoc.id)
-    .then((node) => {
-      specsComponent = node;
-    });
-  if (specsComponent.type == 'COMPONENT') {
-    let instance = specsComponent.createInstance();
-
-    await generateOuterWrapper(
-      instance,
-      parentComponent,
-      componentsToSpec,
-      componentData,
-      data.frameToDisplay.fileId,
-      `The component referenced was deleted`,
-      componentVersion
-    ).then((node) => (specsFrame = node));
-
-    instance.setSharedPluginData(
-      FIGMA_NAMESPACE,
-      FIGMA_COMPONENT_VERSION_KEY,
-      componentVersion.toString()
-    );
-
-    return specsFrame;
-    //instance.set
-  }
-  return null;
 }
 
 export async function generateBlockDataFromComponentDoc(
@@ -665,66 +768,29 @@ export async function generateBlockDataFromComponentDoc(
   lastEdited: number = Date.now(),
   figmaNodeId?: string
 ): Promise<BlockData> {
-  // TODO JUST CHECK IF THE PARENT FRAME ID CHANGED, DON'T REGENERATE THE WHOLE DOC!!!!!! maybe?
-
   let blockType = 'componentDoc';
-  let url =
-    instNode.componentProperties[
-      componentData.components.componentDoc.componentSourceProp
-    ].value ?? '';
-  let frameDetails;
-  let frameExistsInFile: boolean | undefined = undefined;
-  let componentName: string;
-  let componentsToSpec = [];
   let blockData = {
     type: blockType,
     lastEdited,
     figmaNodeId,
-    data: {
-      componentName: '',
-      frameToDisplay: {
-        frameId: '',
-        fileId: '',
-        frameExistsInFile,
-      },
-      documentation: [],
-    },
+    data: clone(EMPTY_COMPONENT_SHARED_DATA) as ComponentSharedData,
   };
-  if (validateFigmaURL(url as string)) {
-    frameDetails = getDetailsFromFigmaURL(<string>url, 'decode');
 
-    await figma.getNodeByIdAsync(frameDetails.frameId).then(async (node) => {
-      if (node && node.type === 'FRAME') {
-        let specChild = node.findChild(
-          (n) => n.type === 'INSTANCE'
-        ) as InstanceNode;
-        await specChild.getMainComponentAsync().then((componentNode) => {
-          let parentComponent = getComponentsToDoc(
-            componentNode,
-            componentsToSpec
-          );
-          componentName = parentComponent.name;
-        });
-      }
-    });
+  blockData.data.variants.push(EMPTY_VARIANT_SHARED_DATA);
 
-    await figma
-      .getNodeByIdAsync(frameDetails.frameId)
-      .then((node) => {
-        frameExistsInFile = node != null ? true : false;
-        blockData = {
-          type: blockType,
-          lastEdited,
-          figmaNodeId,
-          data: {
-            componentName,
-            frameToDisplay: { ...frameDetails, frameExistsInFile },
-            documentation: [],
-          },
-        };
-      })
-      .catch((e) => console.error(e));
+  if (instNode.parent && instNode.parent.type == 'FRAME') {
+    let storedData = instNode.parent.getSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_COMPONENT_DOCS_KEY
+    );
+    console.log('stored data');
+    console.log(storedData);
+
+    if (storedData) {
+      blockData.data = JSON.parse(storedData);
+    }
   }
+
   return blockData;
 }
 

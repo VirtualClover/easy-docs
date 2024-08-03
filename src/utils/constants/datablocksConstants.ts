@@ -72,16 +72,6 @@ export interface ComponentDocumentation {
   specs: LayerSpecs[];
 }
 
-export interface ComponentDocBlockData {
-  componentName: string;
-  frameToDisplay: {
-    frameId: string;
-    fileId: string;
-    frameExistsInFile: boolean | undefined;
-  };
-  documentation: ComponentDocumentation[];
-}
-
 export const EMPTY_LAYER_PROPERTIES: AnatomySpecs = {
   width: { value: null, source: 'rawValue' },
   height: { value: null, source: 'rawValue' },
@@ -128,17 +118,30 @@ export const EMPTY_VARIANT_SHARED_DATA = {
   variantId: '',
   variantName: '',
   layers: [] as LayerSharedData[],
-  frameId: '',
+  displayFrame: {
+    id: '',
+    existsInFile: undefined,
+  },
 };
 export type VariantSharedData = typeof EMPTY_VARIANT_SHARED_DATA;
 
 export const EMPTY_COMPONENT_SHARED_DATA = {
   mainComponentId: '',
-  parentFrameId: '',
-  variants: [] as VariantSharedData[],
   mainComponentName: '',
+  anatomyFramesWrapper: {
+    id: '',
+    existsInFile: undefined,
+  },
+  documentationFrame: {
+    id: '',
+    existsInFile: undefined,
+  },
+  fileId: '',
+  variants: [] as VariantSharedData[],
 };
 export type ComponentSharedData = typeof EMPTY_COMPONENT_SHARED_DATA;
+
+export interface ComponentDocBlockData extends ComponentSharedData {}
 
 export interface BlockData extends OutputBlockData {
   figmaNodeId: string;

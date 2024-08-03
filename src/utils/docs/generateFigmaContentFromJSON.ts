@@ -232,6 +232,9 @@ async function generateBlockInstanceFromJSON(
       await generateComponentDocInstance(block.data, componentVersion).then(
         (n) => {
           if (n) {
+            console.log('node doc');
+            console.log(n);
+            
             node = n;
           }
         }
