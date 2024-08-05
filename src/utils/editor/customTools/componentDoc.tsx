@@ -175,8 +175,8 @@ export class ComponentDoc {
       ).value;
       frameDetails = getDetailsFromFigmaURL(frameUrl, 'decode');
     }
-    console.log('this data');
-    console.log(this.data);
+    //console.log('this data');
+    //console.log(this.data);
 
     let initData = {
       ...EMPTY_COMPONENT_SHARED_DATA,
@@ -197,7 +197,7 @@ export class ComponentDoc {
           ? initData.variants[0].displayFrame.existsInFile
           : undefined,
     };
-    console.log(initData);
+    //console.log(initData);
 
     return initData;
   }

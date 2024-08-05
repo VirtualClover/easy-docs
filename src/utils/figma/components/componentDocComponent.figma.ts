@@ -601,6 +601,9 @@ async function generateOuterWrapper(
 
     returnedFrame = outerWrapper.clone();
 
+    console.log('parent componwt written in shared plugin data');
+    console.log(componentSharedData.mainComponentId);
+
     figma.root.setSharedPluginData(
       FIGMA_NAMESPACE,
       `${FIGMA_COMPONENT_DOCS_KEY}:${componentSharedData.mainComponentId}`,
@@ -722,18 +725,32 @@ export async function generateComponentDocInstance(
 
       //If it does, check if that component already has a doc frame generated
       if (parentComponent) {
+        console.log('parent component id');
+        console.log(parentComponent.id);
+
         let existingDocFrameId = figma.root.getSharedPluginData(
           FIGMA_NAMESPACE,
           `${FIGMA_COMPONENT_DOCS_KEY}:${parentComponent.id}`
         );
+
+        console.log('existing frame ID');
+
+        console.log(existingDocFrameId);
+
         //If it does, just clone the frame
         if (existingDocFrameId) {
-          await figma.getNodeByIdAsync(existingDocFrameId).then((node) => {
-            if (node && node.type == 'FRAME') {
-              let duplicatedOuterWrapper = node.clone();
-              return duplicatedOuterWrapper;
-            }
-          });
+          return await figma
+            .getNodeByIdAsync(existingDocFrameId)
+            .then((node) => {
+              console.log('node from frame ID');
+
+              console.log(node);
+
+              if (node && node.type == 'FRAME') {
+                let duplicatedOuterWrapper = node.clone();
+                return duplicatedOuterWrapper;
+              }
+            });
         }
       }
     }
