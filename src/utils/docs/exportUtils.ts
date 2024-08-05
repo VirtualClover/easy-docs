@@ -21,7 +21,10 @@ import {
 } from '../general/urlHandlers';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
+import { ComponentDocBlockData } from '../constants';
 import { addIndentation } from '../general/addIndentation';
+import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
+import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
 import { formatStringToFileName } from '../general/formatStringToFileName';
 import { generateBaseExportStyles } from '../../styles/generateBaseExportStyles';
 import { getURLFromAnchor } from '../general/flavoredText';
@@ -170,6 +173,47 @@ let generateMDList = (data, docMap: DocMapItem[]): string => {
   return items.join('  \n');
 };
 
+let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
+  let mdArray: string[] = [];
+  //desc
+  //Variants
+  for (const variant of data.variants) {
+    mdArray.push(`##### ${variant.variantName}`);
+    let src = generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed');
+    mdArray.push(
+      `${generateIFrame(
+        src,
+        `The anatomy of ${
+          data.mainComponentName != variant.variantName
+            ? `${data.mainComponentName} with ${variant.variantName}`
+            : data.mainComponentName
+        }.`
+      )}\n`
+    );
+    for (const [i, layer] of variant.layers.entries()) {
+      mdArray.push(
+        `###### ${i}. ${decidedAsciiForNodeType(layer.layerType)} ${
+          layer.layerName
+        }`
+      );
+      mdArray.push(
+        generateMDTable(
+          {
+            withHeadings: true,
+            content: [
+              ['Property', 'Value', 'Source'],
+              ...convertPropObjToArr(layer.properties),
+            ],
+          },
+          []
+        )
+      );
+      mdArray.push('\n---\n');
+    }
+  }
+  return mdArray.join('\n');
+};
+
 /**
  * Generates markdown from the JSON page doc object
  * @param data
@@ -266,6 +310,9 @@ export async function generateMarkdownPage(
         break;
       case 'divider':
         markdown.push('\n---\n');
+        break;
+      case 'componentDoc':
+        markdown.push(generateMDComponentDoc(block.data));
         break;
       default:
         break;
