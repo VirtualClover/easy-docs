@@ -91,11 +91,18 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
             switch (event.data.pluginMessage.type) {
               case 'new-node-data':
                 setOutdatedComponents(false);
-                //console.log('new doc data');
-                //console.log(incomingEditorChanges);
                 let data: DocData = event.data.pluginMessage.data;
-                if (data && data.pages && !incomingEditorChanges) {
+
+                if (
+                  data &&
+                  data.pages &&
+                  (!incomingEditorChanges ||
+                    event.data.pluginMessage.overrideEditorChanges)
+                ) {
                   setIncomingFigmaChanges(true);
+                  //console.log('setting this data');
+                  //console.log(data);
+
                   setCurrentDocData(data);
                   let selectedFrame = event.data.pluginMessage.selectedFrame;
                   setActiveTab(selectedFrame);

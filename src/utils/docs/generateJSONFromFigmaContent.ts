@@ -37,16 +37,19 @@ import { styleFrame } from '../figma/styleFrame';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
-): Promise<DocData> {
-  let JSONData: DocData = {
-    title: encodeStringForHTML(section.name),
-    pages: [],
-    sectionId: section.id,
-    author: {
-      changesMadeIn: 'figma',
-      user: getUserDetailsInFigma(),
+): Promise<{ docData: DocData; overrideEditorChanges: boolean }> {
+  let response: { docData: DocData; overrideEditorChanges: boolean } = {
+    docData: {
+      title: encodeStringForHTML(section.name),
+      pages: [],
+      sectionId: section.id,
+      author: {
+        changesMadeIn: 'figma',
+        user: getUserDetailsInFigma(),
+      },
+      lastEdited: Date.now().toString(),
     },
-    lastEdited: Date.now().toString(),
+    overrideEditorChanges: false,
   };
 
   let settings = getPluginSettings();
@@ -63,16 +66,21 @@ export async function generateJSONFromFigmaContent(
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
       if (child.type == 'FRAME') {
-        JSONData.pages.push(
-          await generatePageDataFromFrame(child, componentData, settings)
+        await generatePageDataFromFrame(child, componentData, settings).then(
+          (res) => {
+            response.docData.pages.push(res.pageData);
+            if (res.hasComponentDocBlock) {
+              response.overrideEditorChanges = true;
+            }
+          }
         );
       }
     }
 
-    return JSONData;
+    return response;
   }
 
-  return EMPTY_DOC_OBJECT;
+  return { docData: EMPTY_DOC_OBJECT, overrideEditorChanges: false };
 }
 
 function scanInsideAFrame(frame: FrameNode, idToExclude: string = '') {
@@ -98,11 +106,10 @@ async function generatePageDataFromFrame(
   frame: FrameNode,
   componentData: BaseComponentData,
   settings: PluginSettings
-): Promise<PageData> {
-  let pageData: PageData = {
-    blocks: [],
-    title: '',
-    frameId: frame.id,
+): Promise<{ pageData: PageData; hasComponentDocBlock: boolean }> {
+  let response: { pageData: PageData; hasComponentDocBlock: boolean } = {
+    pageData: { blocks: [], title: '', frameId: frame.id },
+    hasComponentDocBlock: false,
   };
   if (frame.layoutMode != 'VERTICAL') {
     styleFrame(frame, settings);
@@ -149,14 +156,14 @@ async function generatePageDataFromFrame(
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
               case componentData.components.paragraph.id:
                 generateBlockDataFromParagraph(
                   childNode,
                   editedDate,
                   childNode.id
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
               case componentData.components.quote.id:
                 generateBlockDataFromQuote(
@@ -164,7 +171,7 @@ async function generatePageDataFromFrame(
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
 
                 break;
               case componentData.components.list.id:
@@ -172,7 +179,7 @@ async function generatePageDataFromFrame(
                   childNode,
                   editedDate,
                   childNode.id
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
               case componentData.components.alert.id:
                 generateBlockDataFromAlert(
@@ -180,7 +187,7 @@ async function generatePageDataFromFrame(
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
               case componentData.components.code.id:
                 generateBlockDataFromCode(
@@ -188,11 +195,11 @@ async function generatePageDataFromFrame(
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
               case componentData.components.divider.id:
                 generateBlockDataFromDivider(editedDate, childNode.id).then(
-                  (data) => pageData.blocks.push(data)
+                  (data) => response.pageData.blocks.push(data)
                 );
                 break;
               case componentData.components.dosAndDonts.id:
@@ -202,7 +209,7 @@ async function generatePageDataFromFrame(
                   frame,
                   i,
                   componentData
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
               case componentData.components.displayFrame.id:
                 //Probably a dehydrated frame
@@ -211,7 +218,7 @@ async function generatePageDataFromFrame(
                   frame,
                   i,
                   componentData
-                ).then((data) => pageData.blocks.push(data));
+                ).then((data) => response.pageData.blocks.push(data));
                 break;
 
               default:
@@ -258,7 +265,7 @@ async function generatePageDataFromFrame(
                     editedDate,
                     childNode.id
                   ).then((data) => {
-                    pageData.blocks.push(data);
+                    response.pageData.blocks.push(data);
                   });
                   break;
                 case componentData.components.dosAndDonts.id:
@@ -267,7 +274,7 @@ async function generatePageDataFromFrame(
                     componentData,
                     editedDate,
                     childNode.id
-                  ).then((data) => pageData.blocks.push(data));
+                  ).then((data) => response.pageData.blocks.push(data));
 
                   break;
                 case componentData.components.tableCell.id:
@@ -278,7 +285,7 @@ async function generatePageDataFromFrame(
                     editedDate,
                     childNode.id
                   ).then((data) => {
-                    pageData.blocks.push(data);
+                    response.pageData.blocks.push(data);
                   });
 
                   break;
@@ -290,7 +297,8 @@ async function generatePageDataFromFrame(
                     editedDate,
                     childNode.id
                   ).then((data) => {
-                    pageData.blocks.push(data);
+                    response.pageData.blocks.push(data);
+                    response.hasComponentDocBlock = true;
                   });
 
                   break;
@@ -311,7 +319,7 @@ async function generatePageDataFromFrame(
     }
   }
 
-  formatPageData(pageData);
+  formatPageData(response.pageData);
   //frame.name = encodeStringForHTML(pageData.title);
-  return pageData;
+  return response;
 }

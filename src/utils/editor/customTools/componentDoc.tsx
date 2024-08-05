@@ -151,7 +151,9 @@ export class ComponentDoc {
 
   constructor({ data }) {
     this.data = data;
-    //console.log(data);
+    console.log('data');
+    
+    console.log(data);
   }
 
   render() {
@@ -173,14 +175,13 @@ export class ComponentDoc {
       ).value;
       frameDetails = getDetailsFromFigmaURL(frameUrl, 'decode');
     }
-    //console.log('frame ei¿xists');
-    //console.log(this.data.frameExistsInFile);
-
-    let initData = _.merge(EMPTY_COMPONENT_SHARED_DATA, this.data) as any;
-
-    console.log('Init data');
+    console.log('this data');
     console.log(this.data);
-    console.log(initData);
+
+    let initData = {
+      ...EMPTY_COMPONENT_SHARED_DATA,
+      ...this.data,
+    } as ComponentDocBlockData;
 
     initData.fileId = frameDetails.fileId;
 
@@ -196,6 +197,7 @@ export class ComponentDoc {
           ? initData.variants[0].displayFrame.existsInFile
           : undefined,
     };
+    console.log(initData);
 
     return initData;
   }

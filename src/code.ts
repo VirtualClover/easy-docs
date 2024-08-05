@@ -62,15 +62,16 @@ figma.ui.onmessage = (msg) => {
     //console.log(context);
     createNewDoc(createNewDocJSON()).then((s) => {
       section = s;
-      generateJSONFromFigmaContent(section).then(async (data) => {
+      generateJSONFromFigmaContent(section).then(async (res) => {
         stopUpdates = false;
-        lastFetchDoc = data;
+        lastFetchDoc = res.docData;
         figma.viewport.scrollAndZoomIntoView([section]);
         //context.stopUpdates = false;
         //context.lastFetchDoc = data;
         figma.ui.postMessage({
           type: 'new-node-data',
-          data: data,
+          data: res.docData,
+          overrideEditorChanges: res.overrideEditorChanges,
         });
       });
     });
@@ -89,23 +90,23 @@ figma.ui.onmessage = (msg) => {
         if (res.type === 'no-node') {
           cachedMsg == null;
         }
-        figma.ui.postMessage({
-          type: res.type,
-          data: res.data,
-          selectedFrame: res.selectedFrame,
-        });
+        figma.ui.postMessage(res);
       });
     }
   }
 
   //Get updates from editor
   if (msg.type == 'update-selected-doc' || cachedMsg != null) {
+    console.log('msg');
+    console.log(msg);
+
     let section: BaseNode;
     let msgToGenerate;
     let isCached = false;
     if (msg.type == 'update-selected-doc') {
       msgToGenerate = msg;
     } else {
+      console.log('cached');
       msgToGenerate = cachedMsg;
       isCached = true;
     }
