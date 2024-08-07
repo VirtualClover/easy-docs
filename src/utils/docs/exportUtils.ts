@@ -179,7 +179,7 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
   mdArray.push(data.description);
   //Variants
   for (const variant of data.variants) {
-    mdArray.push(`##### ${variant.variantName}`);
+    mdArray.push(`##### Variant: ${variant.variantName}`);
     let src = generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed');
     mdArray.push(
       `${generateIFrame(
@@ -195,7 +195,7 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
       mdArray.push(
         `###### ${i}. ${decidedAsciiForNodeType(layer.layerType)}${
           layer.layerName
-        }`
+        }  \n`
       );
       mdArray.push(
         generateMDTable(
@@ -207,10 +207,10 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
             ],
           },
           []
-        )
+        ) + '  \n'
       );
-      mdArray.push('\n---\n');
     }
+    mdArray.push('\n---\n');
   }
   return mdArray.join('\n');
 };
@@ -376,6 +376,93 @@ let generateHTMLTable = (data, initialIndentation: number = 0) => {
   return html.join('\n');
 };
 
+let generateHTMLComponentDoc = (
+  data: ComponentDocBlockData,
+  initialIndentation: number = 0
+): string => {
+  let html: string[] = [];
+  let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
+  html.push(
+    `${addIndentation(
+      initialIndentation
+    )}<div class="${classPrefix}component-doc">`
+  );
+  html.push(
+    `${addIndentation(
+      initialIndentation + 1
+    )}<p class="${classPrefix}component-doc-desc ${classPrefix}p">${
+      data.description
+    }</p>`
+  );
+
+  for (const variant of data.variants) {
+    html.push(
+      `${addIndentation(
+        initialIndentation + 1
+      )}<div class="${classPrefix}component-doc-variant-wrapper">`
+    );
+
+    html.push(
+      `${addIndentation(
+        initialIndentation + 2
+      )}<h5 class="${classPrefix}h5">Variant: ${variant.variantName}</h5>`
+    );
+    html.push(
+      `${generateIFrame(
+        generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed'),
+        `The anatomy of ${
+          data.mainComponentName != variant.variantName
+            ? `${data.mainComponentName} with ${variant.variantName}`
+            : data.mainComponentName
+        }.`,
+        initialIndentation + 2
+      )}`
+    );
+
+    for (const [i, layer] of variant.layers.entries()) {
+      html.push(
+        `${addIndentation(
+          initialIndentation + 2
+        )}<div class="${classPrefix}component-doc-layer-anatomy-wrapper">`
+      );
+
+      html.push(
+        `${addIndentation(
+          initialIndentation + 3
+        )}<h6 class="${classPrefix}h6">${i}. ${decidedAsciiForNodeType(
+          layer.layerType
+        )}${layer.layerName}</h6>`
+      );
+
+      html.push(
+        `${generateHTMLTable(
+          {
+            withHeadings: true,
+            content: [
+              ['Property', 'Value', 'Source'],
+              ...convertPropObjToArr(layer.properties),
+            ],
+          },
+          initialIndentation + 3
+        )}`
+      );
+
+      html.push(`${addIndentation(initialIndentation + 2)}</div>`);
+    }
+
+    html.push(
+      `${addIndentation(
+        initialIndentation + 1
+      )}<div class="${classPrefix}divider"><hr /></div>`
+    );
+
+    html.push(`${addIndentation(initialIndentation + 1)}</div>`);
+  }
+
+  html.push(`${addIndentation(initialIndentation)}</div>`);
+  return html.join('\n');
+};
+
 let indentCodeBlock = (data: string, indentationLevel = 0): string => {
   let lines = data.split('\n');
   let formattedString = [];
@@ -529,6 +616,10 @@ export async function generateHTMLPage(
         html.push(
           `${addIndentation(3)}<div class="${classPrefix}divider"><hr /></div>`
         );
+        break;
+
+      case 'componentDoc':
+        html.push(generateHTMLComponentDoc(block.data, 3));
         break;
       default:
         break;
