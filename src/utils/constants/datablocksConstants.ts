@@ -128,6 +128,7 @@ export type VariantSharedData = typeof EMPTY_VARIANT_SHARED_DATA;
 export const EMPTY_COMPONENT_SHARED_DATA = {
   mainComponentId: '',
   mainComponentName: '',
+  description: '',
   anatomyFramesWrapper: {
     id: '',
     existsInFile: undefined,

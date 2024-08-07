@@ -176,6 +176,7 @@ let generateMDList = (data, docMap: DocMapItem[]): string => {
 let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
   let mdArray: string[] = [];
   //desc
+  mdArray.push(data.description);
   //Variants
   for (const variant of data.variants) {
     mdArray.push(`##### ${variant.variantName}`);
@@ -192,7 +193,7 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
     );
     for (const [i, layer] of variant.layers.entries()) {
       mdArray.push(
-        `###### ${i}. ${decidedAsciiForNodeType(layer.layerType)} ${
+        `###### ${i}. ${decidedAsciiForNodeType(layer.layerType)}${
           layer.layerName
         }`
       );

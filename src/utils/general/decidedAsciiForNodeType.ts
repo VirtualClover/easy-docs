@@ -1,13 +1,13 @@
 export let decidedAsciiForNodeType = (nodeType: string): string => {
   switch (nodeType) {
     case 'Main Component':
-      return '❖';
+      return '❖ ';
     case 'INSTANCE':
-      return '◇';
+      return '◇ ';
     case 'FRAME':
-      return '□';
+      return '□ ';
     case 'TEXT':
-      return 'Tₜ';
+      return 'Tₜ ';
     default:
       return '';
   }

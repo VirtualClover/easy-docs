@@ -27,6 +27,7 @@ import {
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import _ from 'lodash';
 import { clone } from '../../general/clone';
+import { decidedAsciiForNodeType } from '../../general/decidedAsciiForNodeType';
 import { generateDisplayFrameInstance } from './displayFrameComponent.figma';
 import { generateDividerInstance } from './dividerComponent.figma';
 import { generateHeaderInstance } from './headerComponent.figma';
@@ -333,7 +334,7 @@ let processComponentLayer = async (
 ) => {
   await generateSpecsFromNode(instance).then((res) => {
     variantSharedData.layers.push({
-      layerName: `❖ ${res.nodeName}`,
+      layerName: res.nodeName,
       layerType: 'Main Component',
       properties: res.propertiesObj,
     });
@@ -375,6 +376,7 @@ async function generateOuterWrapper(
   outerWrapper.itemSpacing = 0;
   outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs:`;
   outerWrapper.appendChild(specsComponent);
+  specsComponent.layoutSizingHorizontal = 'FILL';
 
   if (parentComponent && parentComponent.id && componentsToSpec.length) {
     outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs: ${
@@ -398,6 +400,7 @@ async function generateOuterWrapper(
     componentSharedData.fileId = fileId;
     componentSharedData.mainComponentId = parentComponent.id;
     componentSharedData.mainComponentName = parentComponent.name;
+    componentSharedData.description = parentComponent.description;
 
     //Generate specs frame
     let specsFrameWrapper = figma.createFrame();
@@ -539,7 +542,7 @@ async function generateOuterWrapper(
             await generateHeaderInstance(
               {
                 level: 6,
-                text: `${i + 1}. ${layer.layerType == 'INSTANCE' ? '◇' : ''} ${
+                text: `${i + 1}. ${decidedAsciiForNodeType(layer.layerType)} ${
                   layer.layerName
                 }`,
               },
@@ -645,6 +648,129 @@ async function generateOuterWrapper(
   return returnedFrame;
 }
 
+let componentDocFrameIntegrityCheck = async (documentationFrameId: string) => {
+  let frameIsComplete = false;
+  let frame: FrameNode | null;
+  let data: ComponentSharedData | null | string;
+  if (documentationFrameId) {
+    await figma.getNodeByIdAsync(documentationFrameId).then((node) => {
+      frame = node as FrameNode;
+      if (node && node.type == 'FRAME') {
+        let stringData = frame.getSharedPluginData(
+          FIGMA_NAMESPACE,
+          FIGMA_COMPONENT_DOCS_KEY
+        );
+        if (stringData) {
+          data = JSON.parse(stringData);
+        }
+        if (data) {
+          frameIsComplete = true;
+        }
+      }
+    });
+  }
+  return { frameIsComplete, frame, data };
+};
+
+let componentDocIntegrityCheck = async (initialDisplayFrameId: string) => {
+  let docIsComplete = false;
+  let isComponentFrameComplete = false;
+  let isDisplayFrameWrapperComplete = true;
+  let displayFrameWrapper: BaseNode | null;
+  let componentDocFrame: FrameNode | null;
+  let initialDisplayFrame: BaseNode | null;
+  let parentComponent: ComponentNode | ComponentSetNode;
+  let componentsToSpec: ComponentNode[] = [];
+  let componentDocFrameData: ComponentSharedData | null | string;
+
+  await figma
+    .getNodeByIdAsync(initialDisplayFrameId)
+    .then((node) => (initialDisplayFrame = node));
+
+  if (initialDisplayFrame && initialDisplayFrame.type == 'FRAME') {
+    // If not, check if the frame contains a component or instance
+    let specChild = initialDisplayFrame.findChild(
+      (n) =>
+        n.type === 'INSTANCE' ||
+        n.type === 'COMPONENT' ||
+        n.type === 'COMPONENT_SET'
+    );
+
+    switch (specChild.type) {
+      case 'INSTANCE':
+        await specChild.getMainComponentAsync().then(async (componentNode) => {
+          parentComponent = getComponentsToDoc(componentNode, componentsToSpec);
+        });
+        break;
+      case 'COMPONENT':
+        parentComponent = getComponentsToDoc(specChild, componentsToSpec);
+        break;
+      case 'COMPONENT_SET':
+        parentComponent = getComponentsToDoc(specChild, componentsToSpec);
+        break;
+      default:
+        break;
+    }
+
+    //If it does, check if that component already has a doc frame generated
+    if (parentComponent) {
+      //console.log('parent component id');
+      //console.log(parentComponent.id);
+
+      let existingDocFrameId = figma.root.getSharedPluginData(
+        FIGMA_NAMESPACE,
+        `${FIGMA_COMPONENT_DOCS_KEY}:${parentComponent.id}`
+      );
+
+      if (existingDocFrameId) {
+        await componentDocFrameIntegrityCheck(existingDocFrameId).then(
+          (res) => {
+            isComponentFrameComplete = res.frameIsComplete;
+            componentDocFrame = res.frame;
+            componentDocFrameData = res.data;
+          }
+        );
+      }
+    }
+
+    if (componentDocFrameData && typeof componentDocFrameData != 'string') {
+      await figma
+        .getNodeByIdAsync(componentDocFrameData.anatomyFramesWrapper.id)
+        .then((node) => {
+          if (!node || node.type != 'FRAME') {
+            isDisplayFrameWrapperComplete = false;
+          } else {
+            displayFrameWrapper = node;
+          }
+        });
+
+      for (const variant of componentDocFrameData.variants) {
+        await figma.getNodeByIdAsync(variant.displayFrame.id).then((node) => {
+          if (!node || node.type != 'FRAME') {
+            isDisplayFrameWrapperComplete = false;
+          }
+        });
+      }
+    }
+  }
+
+  if (isComponentFrameComplete && isDisplayFrameWrapperComplete) {
+    docIsComplete = true;
+  } else {
+    componentDocFrame && componentDocFrame.remove();
+    displayFrameWrapper && displayFrameWrapper.remove();
+  }
+
+  return {
+    docIsComplete,
+    componentDocFrame,
+    displayFrameWrapper,
+    parentComponent,
+    componentsToSpec,
+    componentDocFrameData,
+  };
+};
+
 export function getComponentsToDoc(
   node: ComponentNode | ComponentSetNode,
   componentsToSpec: ComponentNode[]
@@ -669,125 +795,52 @@ export async function generateComponentDocInstance(
   componentVersion: number
 ): Promise<FrameNode> {
   let componentData: BaseComponentData = getComponentData();
-  let parentComponent: ComponentNode | ComponentSetNode;
   let specsComponent: BaseNode;
-  let componentsToSpec: ComponentNode[] = []; // We define an array because a component can have multiple variants
   let specsFrame: FrameNode;
 
-  return await Promise.all([
-    figma.getNodeByIdAsync(data.documentationFrame.id),
-    figma.getNodeByIdAsync(data.variants[0].displayFrame.id),
-  ]).then(async (values) => {
-    console.log('values');
-    console.log(values);
+  return await componentDocIntegrityCheck(
+    data.variants[0].displayFrame.id
+  ).then(async (res) => {
+    console.log('integrity check');
+    console.log(res);
 
-    let documentationFrame = values[0];
-    let initialDisplayFrame = values[1];
-    if (documentationFrame && documentationFrame.type == 'FRAME') {
-      let dataCheck = documentationFrame.getSharedPluginData(
-        FIGMA_NAMESPACE,
-        FIGMA_COMPONENT_DOCS_KEY
-      );
-      if (dataCheck) {
-        let duplicatedOuterWrapper = documentationFrame.clone();
-        return duplicatedOuterWrapper;
-      }
-    }
-    if (initialDisplayFrame && initialDisplayFrame.type == 'FRAME') {
-      // If not, check if the frame contains a component or instance
-      let specChild = initialDisplayFrame.findChild(
-        (n) =>
-          n.type === 'INSTANCE' ||
-          n.type === 'COMPONENT' ||
-          n.type === 'COMPONENT_SET'
-      );
+    if (res.docIsComplete) {
+      return res.componentDocFrame.clone();
+    } else {
+      //If not, then we generate the component frame
+      await figma
+        .getNodeByIdAsync(componentData.components.componentDoc.id)
+        .then((node) => {
+          specsComponent = node;
+        });
+      if (specsComponent.type == 'COMPONENT') {
+        let instance = specsComponent.createInstance();
 
-      switch (specChild.type) {
-        case 'INSTANCE':
-          await specChild
-            .getMainComponentAsync()
-            .then(async (componentNode) => {
-              parentComponent = getComponentsToDoc(
-                componentNode,
-                componentsToSpec
-              );
-            });
-          break;
-        case 'COMPONENT':
-          parentComponent = getComponentsToDoc(specChild, componentsToSpec);
-          break;
-        case 'COMPONENT_SET':
-          parentComponent = getComponentsToDoc(specChild, componentsToSpec);
-          break;
-        default:
-          break;
-      }
-
-      //If it does, check if that component already has a doc frame generated
-      if (parentComponent) {
-        console.log('parent component id');
-        console.log(parentComponent.id);
-
-        let existingDocFrameId = figma.root.getSharedPluginData(
+        instance.setSharedPluginData(
           FIGMA_NAMESPACE,
-          `${FIGMA_COMPONENT_DOCS_KEY}:${parentComponent.id}`
+          FIGMA_COMPONENT_VERSION_KEY,
+          componentVersion.toString()
         );
 
-        console.log('existing frame ID');
+        await generateOuterWrapper(
+          instance,
+          res.parentComponent,
+          res.componentsToSpec,
+          componentData,
+          data.fileId,
+          componentVersion,
+          `The component referenced was deleted`
+        ).then((node) => (specsFrame = node));
 
-        console.log(existingDocFrameId);
+        console.log('specs frame');
+        console.log(specsFrame);
 
-        //If it does, just clone the frame
-        if (existingDocFrameId) {
-          return await figma
-            .getNodeByIdAsync(existingDocFrameId)
-            .then((node) => {
-              console.log('node from frame ID');
-
-              console.log(node);
-
-              if (node && node.type == 'FRAME') {
-                let duplicatedOuterWrapper = node.clone();
-                return duplicatedOuterWrapper;
-              }
-            });
-        }
+        return specsFrame;
+        //instance.set
       }
+
+      return null;
     }
-
-    //If not, then we generate the component frame
-    await figma
-      .getNodeByIdAsync(componentData.components.componentDoc.id)
-      .then((node) => {
-        specsComponent = node;
-      });
-    if (specsComponent.type == 'COMPONENT') {
-      let instance = specsComponent.createInstance();
-
-      instance.setSharedPluginData(
-        FIGMA_NAMESPACE,
-        FIGMA_COMPONENT_VERSION_KEY,
-        componentVersion.toString()
-      );
-
-      await generateOuterWrapper(
-        instance,
-        parentComponent,
-        componentsToSpec,
-        componentData,
-        data.fileId,
-        componentVersion,
-        `The component referenced was deleted`
-      ).then((node) => (specsFrame = node));
-
-      console.log('specs frame');
-      console.log(specsFrame);
-
-      return specsFrame;
-      //instance.set
-    }
-
-    return null;
   });
 }
 
