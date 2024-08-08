@@ -58,6 +58,9 @@ export let slowUpdateOutdatedComponentBlocks = async () => {
           case 'Divider':
           mainCompId = componentData.components.divider.id;
           break;
+          case 'Specs':
+          mainCompId = componentData.components.componentDoc.id;
+          break;
         default:
           break;
       }

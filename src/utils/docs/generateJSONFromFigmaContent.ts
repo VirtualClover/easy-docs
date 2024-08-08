@@ -12,6 +12,10 @@ import {
   FIGMA_NAMESPACE,
 } from '../constants';
 import {
+  generateBlockDataFromComponentDoc,
+  hydrateComponentDoc,
+} from '../figma/components/componentDocComponent.figma';
+import {
   generateBlockDataFromDisplayFrame,
   hydrateDisplayFrame,
 } from '../figma/components/displayFrameComponent.figma';
@@ -24,7 +28,6 @@ import { encodeStringForHTML } from '../general/cleanseTextData';
 import { formatPageData } from './formatPageData';
 import { generateBlockDataFromAlert } from '../figma/components/AlertComponent.figma';
 import { generateBlockDataFromCode } from '../figma/components/codeComponent.figma';
-import { generateBlockDataFromComponentDoc } from '../figma/components/componentDocComponent.figma';
 import { generateBlockDataFromDivider } from '../figma/components/dividerComponent.figma';
 import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
 import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
@@ -220,6 +223,12 @@ async function generatePageDataFromFrame(
                   componentData
                 ).then((data) => response.pageData.blocks.push(data));
                 break;
+              case componentData.components.componentDoc.id:
+                //Probably a dehydrated frame
+                await hydrateComponentDoc(childNode, i, componentData).then(
+                  (data) => response.pageData.blocks.push(data)
+                );
+                break;
 
               default:
                 break;
@@ -295,7 +304,8 @@ async function generatePageDataFromFrame(
                     instInsideAFrame,
                     componentData,
                     editedDate,
-                    childNode.id
+                    childNode.id,
+                    i
                   ).then((data) => {
                     response.pageData.blocks.push(data);
                     response.hasComponentDocBlock = true;

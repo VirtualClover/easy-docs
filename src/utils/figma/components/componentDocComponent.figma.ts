@@ -118,7 +118,6 @@ interface PointerCoordsObj {
   bottom: number[];
 }
 
-type ParentComponentData = { name: string; id: string } | null;
 let difference = function (a, b) {
   return Math.abs(a - b);
 };
@@ -689,28 +688,11 @@ let componentDocIntegrityCheck = async (initialDisplayFrameId: string) => {
 
   if (initialDisplayFrame && initialDisplayFrame.type == 'FRAME') {
     // If not, check if the frame contains a component or instance
-    let specChild = initialDisplayFrame.findChild(
-      (n) =>
-        n.type === 'INSTANCE' ||
-        n.type === 'COMPONENT' ||
-        n.type === 'COMPONENT_SET'
+    await getComponentsToDoc(initialDisplayFrame, componentsToSpec).then(
+      (component) => {
+        parentComponent = component;
+      }
     );
-
-    switch (specChild.type) {
-      case 'INSTANCE':
-        await specChild.getMainComponentAsync().then(async (componentNode) => {
-          parentComponent = getComponentsToDoc(componentNode, componentsToSpec);
-        });
-        break;
-      case 'COMPONENT':
-        parentComponent = getComponentsToDoc(specChild, componentsToSpec);
-        break;
-      case 'COMPONENT_SET':
-        parentComponent = getComponentsToDoc(specChild, componentsToSpec);
-        break;
-      default:
-        break;
-    }
 
     //If it does, check if that component already has a doc frame generated
     if (parentComponent) {
@@ -771,22 +753,47 @@ let componentDocIntegrityCheck = async (initialDisplayFrameId: string) => {
   };
 };
 
-export function getComponentsToDoc(
-  node: ComponentNode | ComponentSetNode,
-  componentsToSpec: ComponentNode[]
-): ComponentNode | ComponentSetNode {
-  let specChildParent = node.parent;
-  if (specChildParent && specChildParent.type == 'COMPONENT_SET') {
-    for (const variant of specChildParent.children) {
+export async function getComponentsToDoc(
+  containingFrame: FrameNode,
+  componentsToSpec?: ComponentNode[]
+): Promise<ComponentNode | ComponentSetNode> {
+  let nodeToInspect: ComponentNode | ComponentSetNode;
+  let frameChild = containingFrame.findChild(
+    (n) =>
+      n.type === 'INSTANCE' ||
+      n.type === 'COMPONENT' ||
+      n.type === 'COMPONENT_SET'
+  );
+
+  switch (frameChild.type) {
+    case 'INSTANCE':
+      await frameChild.getMainComponentAsync().then(async (componentNode) => {
+        nodeToInspect = componentNode;
+      });
+      break;
+    case 'COMPONENT':
+      nodeToInspect = frameChild;
+      break;
+    case 'COMPONENT_SET':
+      nodeToInspect = frameChild;
+      break;
+    default:
+      break;
+  }
+
+  let nodeParent = nodeToInspect.parent;
+  if (nodeParent && nodeParent.type == 'COMPONENT_SET') {
+    for (const variant of nodeParent.children) {
       if (variant.type == 'COMPONENT') {
-        componentsToSpec.push(variant);
+        componentsToSpec && componentsToSpec.push(variant);
       }
     }
 
-    return specChildParent;
-  } else {
-    componentsToSpec.push(node as ComponentNode);
-    return node;
+    return nodeParent;
+  }
+  if (nodeToInspect.type == 'COMPONENT') {
+    componentsToSpec && componentsToSpec.push(nodeToInspect);
+    return nodeToInspect;
   }
 }
 
@@ -848,8 +855,16 @@ export async function generateBlockDataFromComponentDoc(
   instNode: InstanceNode,
   componentData: BaseComponentData,
   lastEdited: number = Date.now(),
-  figmaNodeId?: string
+  figmaNodeId: string = '',
+  indexInFrame: number = 0,
+  isHydratedInstance: boolean = false
 ): Promise<BlockData> {
+  let url =
+    instNode.componentProperties[
+      componentData.components.componentDoc.componentSourceProp
+    ].value ?? '';
+  let componentIdFromUrl: string;
+  let componentIdFromData: string;
   let blockType = 'componentDoc';
   let blockData = {
     type: blockType,
@@ -857,23 +872,83 @@ export async function generateBlockDataFromComponentDoc(
     figmaNodeId,
     data: clone(EMPTY_COMPONENT_SHARED_DATA) as ComponentSharedData,
   };
-
+  let parsedData: ComponentSharedData;
   blockData.data.variants.push(EMPTY_VARIANT_SHARED_DATA);
 
-  if (instNode.parent && instNode.parent.type == 'FRAME') {
-    let storedData = instNode.parent.getSharedPluginData(
-      FIGMA_NAMESPACE,
-      FIGMA_COMPONENT_DOCS_KEY
-    );
-    //console.log('stored data');
-    //console.log(storedData);
+  if (validateFigmaURL(url)) {
+    let frameDetails = getDetailsFromFigmaURL(url, 'decode');
 
-    if (storedData) {
-      blockData.data = JSON.parse(storedData);
+    //Get master component from the source property of instance
+    console.log(frameDetails);
+
+    await figma.getNodeByIdAsync(frameDetails.frameId).then(async (node) => {
+      if (node.type == 'FRAME') {
+        await getComponentsToDoc(node).then(
+          (component) => (componentIdFromUrl = component.id)
+        );
+      }
+    });
+
+    // Get master component from frame data
+    if (instNode.parent && instNode.parent.type == 'FRAME') {
+      let storedData = instNode.parent.getSharedPluginData(
+        FIGMA_NAMESPACE,
+        FIGMA_COMPONENT_DOCS_KEY
+      );
+      //console.log('stored data');
+      //console.log(storedData);
+
+      if (storedData) {
+        parsedData = JSON.parse(storedData);
+        componentIdFromData = parsedData.mainComponentId;
+      }
+    }
+
+    //Check if both master components are the same, if not, give preference to the source prop one
+    if (componentIdFromData == componentIdFromUrl) {
+      blockData.data = parsedData;
+    } else {
+      blockData.data.variants[0].displayFrame.id = frameDetails.frameId;
+      //Regenerate block
+      generateComponentDocInstance(
+        blockData.data,
+        componentData.lastGenerated
+      ).then((n) => {
+        let parentFrame: FrameNode;
+        let nodeToRemove: InstanceNode;
+        if (isHydratedInstance) {
+          parentFrame = instNode.parent as FrameNode;
+        } else {
+          parentFrame = instNode.parent.parent as FrameNode;
+        }
+        parentFrame.insertChild(indexInFrame, n);
+        n.layoutSizingHorizontal = 'FILL';
+        let dehydratedNode = parentFrame.children[indexInFrame + 1];
+        dehydratedNode.remove();
+        blockData.figmaNodeId = n.id;
+      });
     }
   }
 
   return blockData;
+}
+
+export async function hydrateComponentDoc(
+  instance: InstanceNode,
+  indexInFrame: number,
+  componentData: BaseComponentData
+): Promise<BlockData> {
+  let block;
+  //componentsToSpec &&
+  await generateBlockDataFromComponentDoc(
+    instance,
+    componentData,
+    Date.now(),
+    instance.id,
+    indexInFrame,
+    true
+  ).then((data) => (block = data));
+  return block;
 }
 
 /*

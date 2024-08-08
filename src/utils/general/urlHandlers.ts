@@ -10,10 +10,10 @@ type FigmaURLType = 'embed' | 'share';
  * @returns
  */
 export function validateFigmaURL(
-  url: string,
+  url: string | boolean,
   validationType: FigmaURLType | 'both' = 'share'
 ): false | RegExpMatchArray {
-  if (url) {
+  if (url && typeof url == 'string') {
     switch (validationType) {
       case 'share':
         return url.match(
@@ -59,10 +59,10 @@ export function formatFrameIdForURLs(
  * @returns
  */
 export function getDetailsFromFigmaURL(
-  url: string,
+  url: string | boolean,
   frameIdTreatment: FrameIdTreatment = 'encode'
 ): FrameDetailsFromURL {
-  if (url && validateFigmaURL(url)) {
+  if (url && typeof url == 'string' && validateFigmaURL(url)) {
     url = cleanURL(url);
     let fileMatch = url.match(
       /(?<=file|design\/)(.*?)(?=\/)/ // (?<=file|design\/)(.*?)(?=\/)
