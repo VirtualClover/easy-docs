@@ -879,8 +879,6 @@ export async function generateBlockDataFromComponentDoc(
     let frameDetails = getDetailsFromFigmaURL(url, 'decode');
 
     //Get master component from the source property of instance
-    console.log(frameDetails);
-
     await figma.getNodeByIdAsync(frameDetails.frameId).then(async (node) => {
       if (node.type == 'FRAME') {
         await getComponentsToDoc(node).then(

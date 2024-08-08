@@ -193,7 +193,7 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
     );
     for (const [i, layer] of variant.layers.entries()) {
       mdArray.push(
-        `###### ${i}. ${decidedAsciiForNodeType(layer.layerType)}${
+        `###### ${i+1}. ${decidedAsciiForNodeType(layer.layerType)}${
           layer.layerName
         }  \n`
       );
@@ -429,7 +429,7 @@ let generateHTMLComponentDoc = (
       html.push(
         `${addIndentation(
           initialIndentation + 3
-        )}<h6 class="${classPrefix}h6">${i}. ${decidedAsciiForNodeType(
+        )}<h6 class="${classPrefix}h6">${i+1}. ${decidedAsciiForNodeType(
           layer.layerType
         )}${layer.layerName}</h6>`
       );

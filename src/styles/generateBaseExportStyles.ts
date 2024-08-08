@@ -24,6 +24,9 @@ export let generateBaseExportStyles = (
   styles.push(
     `h1, h2, h3, h4, h5, h6, h7, h8, h9, h10 {font-weight: 700; color: ${basePalette.onBackground.high};}`
   );
+  styles.push(
+    `.ed-h2{font-size: 1.8em;}.ed-h3{font-size: 1.6em;}.ed-h4{font-size: 1.4em;}.ed-h5{font-size: 1.2em;}.ed-h6{font-size: 1em;}`
+  );
   styles.push(`a{color: ${basePalette.onBackground.link};}`);
   styles.push(`hr{border: 1px solid ${basePalette.divider.simple};}`);
   styles.push(

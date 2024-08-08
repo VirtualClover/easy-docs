@@ -148,6 +148,10 @@ export const PluginContainer = styled(Container, {
     },
   },
 
+  '.cdx-alert': {
+    margin: `12px auto`,
+  },
+
   '.cdx-alert-info': {
     background: theme.palette.info.light,
     border: 0,
