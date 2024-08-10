@@ -4,6 +4,7 @@ import {
   DocMapItem,
   ExportFileFormat,
   PageData,
+  PluginSettings,
 } from '../constants/constants';
 import {
   decideEmojiBasedOnDosAndDonts,
@@ -17,7 +18,6 @@ import {
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
-  validateFigmaURL,
 } from '../general/urlHandlers';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
@@ -193,22 +193,27 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
     );
     for (const [i, layer] of variant.layers.entries()) {
       mdArray.push(
-        `###### ${i+1}. ${decidedAsciiForNodeType(layer.layerType)}${
+        `###### ${i + 1}. ${decidedAsciiForNodeType(layer.layerType)}${
           layer.layerName
         }  \n`
       );
-      mdArray.push(
-        generateMDTable(
-          {
-            withHeadings: true,
-            content: [
-              ['Property', 'Value', 'Source'],
-              ...convertPropObjToArr(layer.properties),
-            ],
-          },
-          []
-        ) + '  \n'
-      );
+      if (layer.properties) {
+        mdArray.push(
+          generateMDTable(
+            {
+              withHeadings: true,
+              content: [
+                ['Property', 'Value', 'Source'],
+                ...convertPropObjToArr(layer.properties),
+              ],
+            },
+            []
+          ) + '  \n'
+        );
+      }
+      if (layer.layerType === 'INSTANCE') {
+        mdArray.push(`Instance dependant on ${layer.layerName}  \n`);
+      }
     }
     mdArray.push('\n---\n');
   }
@@ -222,6 +227,7 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
  */
 export async function generateMarkdownPage(
   data: PageData,
+  settings: PluginSettings,
   docMap: DocMapItem[] = []
 ): Promise<string> {
   //console.log(data);
@@ -252,18 +258,26 @@ export async function generateMarkdownPage(
             block.data.frameId,
             'embed'
           );
-          markdown.push(
-            `${generateIFrame(
-              src,
-              block.data.caption,
-              0,
-              generateIFrameStyle(
-                DEFAULT_SETTINGS.customization.palette.status.neutral.default,
-                3
-              ),
-              'display-frame'
-            )}  \n`
-          );
+          if (settings.export.md.linkIframes) {
+            markdown.push(
+              `[${src}](${src})${
+                block.data.caption ? `  \n${block.data.caption}` : ``
+              }  \n`
+            );
+          } else {
+            markdown.push(
+              `${generateIFrame(
+                src,
+                block.data.caption,
+                0,
+                generateIFrameStyle(
+                  DEFAULT_SETTINGS.customization.palette.status.neutral.default,
+                  3
+                ),
+                'display-frame'
+              )}  \n`
+            );
+          }
         }
         break;
       case 'dosAndDonts':
@@ -325,6 +339,7 @@ export async function generateMarkdownPage(
 
 export async function generateJSONPage(
   data: PageData,
+  settings: PluginSettings,
   docMap: DocMapItem[] = []
 ): Promise<string> {
   return JSON.stringify(data, null, 2);
@@ -429,23 +444,35 @@ let generateHTMLComponentDoc = (
       html.push(
         `${addIndentation(
           initialIndentation + 3
-        )}<h6 class="${classPrefix}h6">${i+1}. ${decidedAsciiForNodeType(
+        )}<h6 class="${classPrefix}h6">${i + 1}. ${decidedAsciiForNodeType(
           layer.layerType
         )}${layer.layerName}</h6>`
       );
 
-      html.push(
-        `${generateHTMLTable(
-          {
-            withHeadings: true,
-            content: [
-              ['Property', 'Value', 'Source'],
-              ...convertPropObjToArr(layer.properties),
-            ],
-          },
-          initialIndentation + 3
-        )}`
-      );
+      if (layer.properties) {
+        html.push(
+          `${generateHTMLTable(
+            {
+              withHeadings: true,
+              content: [
+                ['Property', 'Value', 'Source'],
+                ...convertPropObjToArr(layer.properties),
+              ],
+            },
+            initialIndentation + 3
+          )}`
+        );
+      }
+
+      if (layer.layerType == 'INSTANCE') {
+        html.push(
+          `${addIndentation(
+            initialIndentation + 3
+          )}<p class="${classPrefix}p">Instance dependant on ${
+            layer.layerName
+          }</p>`
+        );
+      }
 
       html.push(`${addIndentation(initialIndentation + 2)}</div>`);
     }
@@ -476,6 +503,7 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
 
 export async function generateHTMLPage(
   data: PageData,
+  settings: PluginSettings,
   docMap: DocMapItem[] = []
 ): Promise<string> {
   //console.log(data);
@@ -636,9 +664,14 @@ export async function generateHTMLPage(
 export async function generatePageExport(
   data: PageData,
   format: ExportFileFormat,
+  settings: PluginSettings,
   docMap: DocMapItem[] = []
 ): Promise<string> {
-  let exportFunc: (data: PageData, docMap: DocMapItem[]) => Promise<string>;
+  let exportFunc: (
+    data: PageData,
+    settings: PluginSettings,
+    docMap: DocMapItem[]
+  ) => Promise<string>;
   let exportData = '';
   switch (format) {
     case 'md':
@@ -652,7 +685,9 @@ export async function generatePageExport(
   }
 
   if (data && data.blocks) {
-    await exportFunc(data, docMap).then((string) => (exportData = string));
+    await exportFunc(data, settings, docMap).then(
+      (string) => (exportData = string)
+    );
   } else {
     console.error(`The data provided didn't have any content`);
   }

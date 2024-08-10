@@ -12,7 +12,10 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { generateDocMap, generatePageExport } from '../../utils/docs/exportUtils';
+import {
+  generateDocMap,
+  generatePageExport,
+} from '../../utils/docs/exportUtils';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { CodeBlock } from './CodeBlock';
@@ -24,10 +27,10 @@ import React from 'react';
 import { formatStringToFileName } from '../../utils/general/formatStringToFileName';
 
 export const ExportView = (): JSX.Element => {
-  const [format, setFormat] = React.useState('md' as ExportFileFormat);
+  const pluginContext = React.useContext(PluginDataContext);
+  const [format, setFormat] = React.useState(pluginContext.lastFormatUsed);
   const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(false);
-  const pluginContext = React.useContext(PluginDataContext);
   //Freezing data so it doesnt mutate if something's changes in figma
   const [mountedData, setMountedData] = React.useState(
     pluginContext.currentDocData
@@ -36,16 +39,19 @@ export const ExportView = (): JSX.Element => {
     pluginContext.activeTab
   );
   const [previewData, setPreviewdata] = React.useState('');
-  const [docMap,setDocMap] = React.useState(generateDocMap(mountedData));
+  const [docMap, setDocMap] = React.useState(generateDocMap(mountedData));
 
   React.useEffect(() => {
     setLoading(true);
-    generatePageExport(mountedData.pages[mountedActiveTab], format,docMap).then(
-      (data) => {
-        setPreviewdata(data);
-        setLoading(false);
-      }
-    );
+    generatePageExport(
+      mountedData.pages[mountedActiveTab],
+      format,
+      pluginContext.settings,
+      docMap
+    ).then((data) => {
+      setPreviewdata(data);
+      setLoading(false);
+    });
   }, [format]);
 
   return (
@@ -65,6 +71,7 @@ export const ExportView = (): JSX.Element => {
             label="Choose a format"
             onChange={(e) => {
               setFormat(e.target.value as ExportFileFormat);
+              pluginContext.setLastFormatUsed(e.target.value as ExportFileFormat);
             }}
           >
             <MenuItem value={'md'}>Markdown</MenuItem>

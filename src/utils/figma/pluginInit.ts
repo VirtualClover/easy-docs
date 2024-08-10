@@ -4,13 +4,10 @@ import {
   DEFAULT_SETTINGS,
   PluginSettings,
 } from '../constants/constants';
-import {
-  FIGMA_NAMESPACE,
-  FIGMA_PLUGIN_SETTINGS_KEY,
-} from '../constants';
+import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from '../constants';
+import { getPluginSettings, initPluginSettings } from './getPluginSettings';
 
 import { getComponentData } from './getComponentData';
-import { getPluginSettings } from './getPluginSettings';
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { initComponents } from './components/initComponents';
 import { objectIsNull } from '../general/objectisNull';
@@ -21,13 +18,7 @@ import { objectIsNull } from '../general/objectisNull';
 export async function pluginInit() {
   let userData: AuthorUser = getUserDetailsInFigma();
   let componentData: BaseComponentData = getComponentData();
-  let pluginSettings: PluginSettings = getPluginSettings();
-
-  figma.root.setSharedPluginData(
-    FIGMA_NAMESPACE,
-    FIGMA_PLUGIN_SETTINGS_KEY,
-    JSON.stringify(pluginSettings)
-  );
+  let pluginSettings: PluginSettings = initPluginSettings();
   //console.log(componentData);
   //Check if object exists
   if (objectIsNull(componentData)) {
@@ -55,6 +46,6 @@ export async function pluginInit() {
 
   figma.ui.postMessage({
     type: 'data-loaded',
-    data: { settings: DEFAULT_SETTINGS, user: userData },
+    data: { settings: pluginSettings, user: userData },
   });
 }

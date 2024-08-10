@@ -38,6 +38,8 @@
     "editorjs-alert": "^1.1.4",
     "figma-plugin-ds": "^1.0.1",
     "lodash": "^4.17.21",
+    "markdown-to-jsx": "^7.4.7",
+    "mui-markdown": "^1.1.14",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",

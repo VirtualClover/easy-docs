@@ -127,8 +127,6 @@ const InputUI = (blockData: ComponentDocBlockData) => {
         style={{ flex: 1 }}
         defaultValue={src}
         onChange={(e) => {
-          //console.log(e.target.value);
-          //console.log(src);
           setSrc(e.target.value);
           setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
         }}
@@ -151,16 +149,12 @@ export class ComponentDoc {
 
   constructor({ data }) {
     this.data = data;
-    console.log('data');
-    
-    console.log(data);
   }
 
   render() {
     let ui = document.createElement('div');
     let root = createRoot(ui);
     root.render(<InputUI {...this.data} />);
-    //console.log('render');
     ui.classList.add('component-specs');
 
     return ui;
@@ -175,8 +169,6 @@ export class ComponentDoc {
       ).value;
       frameDetails = getDetailsFromFigmaURL(frameUrl, 'decode');
     }
-    //console.log('this data');
-    //console.log(this.data);
 
     let initData = {
       ...EMPTY_COMPONENT_SHARED_DATA,
@@ -197,7 +189,6 @@ export class ComponentDoc {
           ? initData.variants[0].displayFrame.existsInFile
           : undefined,
     };
-    //console.log(initData);
 
     return initData;
   }

@@ -11,6 +11,7 @@ import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
+import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from './utils/constants';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -53,6 +54,16 @@ figma.ui.onmessage = (msg) => {
   if (msg.type === 'load-data') {
     //Get keys
     pluginInit();
+  }
+
+  if (msg.type === 'update-settings') {
+    //Get keys
+    console.log(msg.settings);
+    figma.root.setSharedPluginData(
+      FIGMA_NAMESPACE,
+      FIGMA_PLUGIN_SETTINGS_KEY,
+      JSON.stringify(msg.settings)
+    );
   }
 
   if (msg.type === 'create-new-doc') {

@@ -1,6 +1,6 @@
 # 📝 Easy docs
 
-Easy Docs is Figma plugin, that helps you create and edit documentation more efficiently.
+Easy Docs is an open source Figma plugin, that helps you create and edit documentation more efficiently!
 
 ## Special mentions  
 

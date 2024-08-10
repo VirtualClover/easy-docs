@@ -20,6 +20,12 @@ module.exports = (env, argv) => ({
         rules: [
             // Converts TypeScript code to JavaScript
             { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
+            //Import markdown as string
+            {
+                test: /\.md$/,
+                // This is the asset module.
+                type: 'asset/source',
+            },
 
             // Enables including CSS by doing "import './file.css'" in your TypeScript code
             { test: /\.css$/, use: ['style-loader', { loader: 'css-loader' }] },

@@ -71,6 +71,10 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
   const [activeTab, setActiveTab] = React.useState(initialPluginData.activeTab);
 
+  const [lastFormatUsed, setLastFormatUsed] = React.useState(
+    initialPluginData.lastFormatUsed
+  );
+
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
   }, [navigation.currentView]);
@@ -183,35 +187,37 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   ]);
 
   return (
-    <PluginDataContext.Provider
-      value={{
-        currentDocData,
-        setCurrentDocData,
-        currentUser,
-        setCurrentUser,
-        navigation,
-        setNavigation,
-        loadingState,
-        setLoadingState,
-        settings,
-        setSettings,
-        incomingFigmaChanges,
-        setIncomingFigmaChanges,
-        incomingEditorChanges,
-        setIncomingEditorChanges,
-        activeTab,
-        setActiveTab,
-        sheetOpen,
-        setSheetOpen,
-        sheetContent,
-        setSheetContent,
-        sheetZIndex,
-        setSheetZIndex,
-        outdatedComponents,
-        setOutdatedComponents,
-      }}
-    >
-      <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
+    <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
+      <PluginDataContext.Provider
+        value={{
+          currentDocData,
+          setCurrentDocData,
+          currentUser,
+          setCurrentUser,
+          navigation,
+          setNavigation,
+          loadingState,
+          setLoadingState,
+          settings,
+          setSettings,
+          incomingFigmaChanges,
+          setIncomingFigmaChanges,
+          incomingEditorChanges,
+          setIncomingEditorChanges,
+          activeTab,
+          setActiveTab,
+          sheetOpen,
+          setSheetOpen,
+          sheetContent,
+          setSheetContent,
+          sheetZIndex,
+          setSheetZIndex,
+          outdatedComponents,
+          setOutdatedComponents,
+          lastFormatUsed,
+          setLastFormatUsed,
+        }}
+      >
         <PluginContainer
           disableGutters
           sx={{
@@ -225,8 +231,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           <VersionBanner />
           <BottomSheet zIndex={sheetZIndex} />
         </PluginContainer>
-      </ThemeProvider>
-    </PluginDataContext.Provider>
+      </PluginDataContext.Provider>
+    </ThemeProvider>
   );
 }
 

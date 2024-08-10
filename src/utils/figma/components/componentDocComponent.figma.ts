@@ -24,7 +24,6 @@ import {
   validateFigmaURL,
 } from '../../general/urlHandlers';
 
-import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import _ from 'lodash';
 import { clone } from '../../general/clone';
 import { decidedAsciiForNodeType } from '../../general/decidedAsciiForNodeType';
@@ -42,19 +41,17 @@ import { setNodeFills } from '../setNodeFills';
 export async function createComponentDocComponent(parent: FrameNode) {
   let component: ComponentNode;
   let componentProperty: string;
+  let settings = getPluginSettings();
   await figma
-    .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Semi Bold' })
+    .loadFontAsync({ family: settings.customization.fontFamily, style: 'Semi Bold' })
     .then(() => {
       //Component
-
-      let settings = getPluginSettings();
-
       component = figma.createComponent();
       component.resizeWithoutConstraints(300, 1);
       component.layoutMode = 'VERTICAL';
       component.primaryAxisSizingMode = 'AUTO';
       component.itemSpacing = 16;
-      component.name = `${FIGMA_COMPONENT_PREFIX}Specs`;
+      component.name = `${FIGMA_COMPONENT_PREFIX}Component Documentation`;
 
       //Tag
       let tag = figma.createFrame();
@@ -70,12 +67,12 @@ export async function createComponentDocComponent(parent: FrameNode) {
 
       //Tag caption
       let tagCaption = figma.createText();
-      tagCaption.characters = '❖ Component specs';
-      setNodeFills(tagCaption, '#7E4CC0');
+      tagCaption.characters = '❖ Component Documentation';
+      setNodeFills(tagCaption, settings.customization.palette.component.content);
       tag.appendChild(tagCaption);
       tagCaption.layoutSizingHorizontal = 'HUG';
       tagCaption.fontName = {
-        family: DEFAULT_FONT_FAMILIES[0],
+        family: settings.customization.fontFamily,
         style: 'Semi Bold',
       };
 
@@ -373,12 +370,12 @@ async function generateOuterWrapper(
   outerWrapper.primaryAxisSizingMode = 'AUTO';
   outerWrapper.paddingBottom = 32;
   outerWrapper.itemSpacing = 0;
-  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs:`;
+  outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Documentation:`;
   outerWrapper.appendChild(specsComponent);
   specsComponent.layoutSizingHorizontal = 'FILL';
 
   if (parentComponent && parentComponent.id && componentsToSpec.length) {
-    outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Specs: ${
+    outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Documentation: ${
       parentComponent.name ?? ''
     }`;
 
@@ -808,8 +805,6 @@ export async function generateComponentDocInstance(
   return await componentDocIntegrityCheck(
     data.variants[0].displayFrame.id
   ).then(async (res) => {
-    console.log('integrity check');
-    console.log(res);
 
     if (res.docIsComplete) {
       return res.componentDocFrame.clone();
@@ -838,9 +833,6 @@ export async function generateComponentDocInstance(
           componentVersion,
           `The component referenced was deleted`
         ).then((node) => (specsFrame = node));
-
-        console.log('specs frame');
-        console.log(specsFrame);
 
         return specsFrame;
         //instance.set

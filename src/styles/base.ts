@@ -4,6 +4,11 @@ const BASE_COLOR_PALETTE = {
   secondary: '#D6E9FF',
   onSecondary: '#275488',
   background: { default: '#FFF', tonal_low: '#F4F7F9', tonal_high: '#E3EBF2' },
+  component: {
+    muted: '#E6D7FA',
+    default: '#7E4CC0',
+    content: '#7E4CC0',
+  },
   onBackground: {
     high: '#22264F',
     mid: '#626582',
@@ -54,7 +59,7 @@ export type ColorPalette = typeof BASE_COLOR_PALETTE;
 export const DEFAULT_FONT_FAMILIES = ['Inter', 'Arial', 'sans-serif'];
 
 export const BASE_STYLE_TOKENS = {
-  fontFamily: DEFAULT_FONT_FAMILIES.join(','),
+  fontFamily: DEFAULT_FONT_FAMILIES[0],
   codeFontFamily: ['Consolas', 'Monaco', 'monospace'].join(','),
   baseFontSize: 12,
   units: {

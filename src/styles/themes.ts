@@ -4,10 +4,20 @@ import { BASE_STYLE_TOKENS } from './base';
 
 interface CustomPaletteOptions extends PaletteOptions {
   link: string;
+  component: {
+    muted: string;
+    default: string;
+    content: string;
+  };
 }
 
 export interface CustomPalette extends Palette {
   link: string;
+  component: {
+    muted: string;
+    default: string;
+    content: string;
+  };
 }
 
 export interface CustomTheme extends Theme {
@@ -35,6 +45,7 @@ export const darkTheme = createTheme({
       main: BASE_STYLE_TOKENS.palette.primary,
       contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
     },
+    component: BASE_STYLE_TOKENS.palette.component,
     link: '#7EB4E1',
     background: {
       default: '#2C2C2C',
@@ -51,6 +62,7 @@ export const lightTheme = createTheme({
       main: BASE_STYLE_TOKENS.palette.primary,
       contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
     },
+    component: BASE_STYLE_TOKENS.palette.component,
     link: BASE_STYLE_TOKENS.palette.primary,
     text: {
       primary: BASE_STYLE_TOKENS.palette.onBackground.high,
