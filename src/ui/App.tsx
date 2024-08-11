@@ -169,6 +169,17 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
                 setOutdatedComponents(false);
                 break;
 
+              case 'generating-component-doc':
+                console.log('Mayor loading');
+                
+                setLoadingState('MINOR');
+                break;
+
+              case 'finished-generating-component-doc':
+                setLoadingState('NONE');
+                console.log('None loading');
+                break;
+
               default:
                 break;
             }
