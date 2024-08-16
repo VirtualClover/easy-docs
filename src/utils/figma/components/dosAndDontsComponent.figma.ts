@@ -406,7 +406,9 @@ export async function hydrateDosAndDontsFrame(
         parentFrame.insertChild(indexInFrame, n);
         n.layoutSizingHorizontal = 'FILL';
         let dehydratedNode = parentFrame.children[indexInFrame + 1];
-        dehydratedNode.remove();
+        if (dehydratedNode) {
+          dehydratedNode.remove();
+        }
         block.data.figmaNodeId = n.id;
         block.data.frameExistsInFile = true;
       }

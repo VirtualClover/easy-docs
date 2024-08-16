@@ -297,6 +297,8 @@ export const DEFAULT_PLUGIN_DATA = {
   setOutdatedComponents: (state: boolean) => {},
   lastFormatUsed: 'md' as ExportFileFormat,
   setLastFormatUsed: (format: ExportFileFormat) => {},
+  buildingComponentDoc: false,
+  setBuildingComponentDoc: (state: boolean) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;
 

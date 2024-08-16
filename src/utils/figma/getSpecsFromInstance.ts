@@ -27,14 +27,13 @@ export let generateSpecsFromNode = async (
     let anatomy: AnatomySpecs | null = null;
 
     if (!avoidInstances || (avoidInstances && node.type !== 'INSTANCE')) {
-
       // TODO Effects
       anatomy = clone(EMPTY_LAYER_PROPERTIES);
       anatomy.minWidth.value = node.minWidth;
       anatomy.maxWidth.value = node.maxWidth;
       anatomy.maxHeight.value = node.maxHeight;
 
-      if ( node.opacity < 1) {
+      if (node.opacity < 1) {
         anatomy.opacity.value = node.opacity;
       }
 
@@ -97,7 +96,12 @@ export let generateSpecsFromNode = async (
       // Fill
       //console.log('node fills', node.fills);
 
-      if (node.fills && node.fills != figma.mixed && node.fills.length) {
+      if (
+        node.fills &&
+        node.fills != figma.mixed &&
+        node.fills[0] &&
+        node.fills[0].visible
+      ) {
         let baseFillValue = null;
         switch (node.fills[0].type) {
           case 'SOLID':

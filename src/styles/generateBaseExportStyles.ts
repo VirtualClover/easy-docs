@@ -72,7 +72,7 @@ export let generateBaseExportStyles = (
   styles.push(`.ed-text-center {text-align: center;}`);
   styles.push(`.ed-text-left {text-align: left;}`);
   styles.push(`.ed-text-right {text-align: right;}`);
-  styles.push('</style>');
+  styles.push('</style> \n');
 
   return styles.join('');
 };

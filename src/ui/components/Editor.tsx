@@ -151,7 +151,7 @@ export const Editor = () => {
 
   return (
     <>
-      {(pluginContext.incomingFigmaChanges ||
+      {(pluginContext.incomingFigmaChanges || pluginContext.buildingComponentDoc ||
         skeleton ||
         pluginContext.loadingState != 'NONE') && (
         <Box

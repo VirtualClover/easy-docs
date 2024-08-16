@@ -1,3 +1,4 @@
+import { ComponentDocBlockData, FigmaURLType } from '../constants';
 import {
   DEFAULT_SETTINGS,
   DocData,
@@ -16,12 +17,16 @@ import {
   encodeStringForHTML,
 } from '../general/cleanseTextData';
 import {
+  generateDisplayFrameCaptionForAnatomyFrame,
+  generateHeaderContentForVariant,
+  generateLayerDescription,
+} from '../figma/components/componentDocComponent.figma';
+import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
 } from '../general/urlHandlers';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
-import { ComponentDocBlockData } from '../constants';
 import { addIndentation } from '../general/addIndentation';
 import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
 import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
@@ -41,11 +46,17 @@ let generateIFrameStyle = (
 let generateIFrame = (
   iframeSrc: string,
   iFrameCaption: string,
+  exportLink: boolean = false,
   identation: number = 0,
   style: string = '',
   extraClass: string = '',
   classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
 ) => {
+  if (exportLink) {
+    return `${addIndentation(identation)}${iframeSrc}${
+      iFrameCaption ? `  \n${iFrameCaption}` : ``
+    }  \n`;
+  }
   return `${addIndentation(
     identation
   )}<figure class="${classPrefix}figma-frame ${
@@ -173,30 +184,44 @@ let generateMDList = (data, docMap: DocMapItem[]): string => {
   return items.join('  \n');
 };
 
-let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
+let generateMDComponentDoc = (
+  data: ComponentDocBlockData,
+  settings: PluginSettings,
+  displayFrameSrcType: FigmaURLType
+): string => {
   let mdArray: string[] = [];
   //desc
   mdArray.push(data.description);
   //Variants
   for (const variant of data.variants) {
-    mdArray.push(`##### Variant: ${variant.variantName}`);
-    let src = generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed');
+    mdArray.push(
+      `##### ${generateHeaderContentForVariant(
+        variant.variantName,
+        data.variants.length > 1
+      )}`
+    );
+    let src = generateFigmaURL(
+      data.fileId,
+      variant.displayFrame.id,
+      displayFrameSrcType
+    );
     mdArray.push(
       `${generateIFrame(
         src,
-        `The anatomy of ${
-          data.mainComponentName != variant.variantName
-            ? `${data.mainComponentName} with ${variant.variantName}`
-            : data.mainComponentName
-        }.`
+        generateDisplayFrameCaptionForAnatomyFrame(
+          data.mainComponentName,
+          variant.variantName
+        ),
+        settings.export.md.linkIframes
       )}\n`
     );
     for (const [i, layer] of variant.layers.entries()) {
       mdArray.push(
         `###### ${i + 1}. ${decidedAsciiForNodeType(layer.layerType)}${
           layer.layerName
-        }  \n`
+        }`
       );
+      mdArray.push(`${generateLayerDescription(layer)}  \n`);
       if (layer.properties) {
         mdArray.push(
           generateMDTable(
@@ -210,9 +235,6 @@ let generateMDComponentDoc = (data: ComponentDocBlockData): string => {
             []
           ) + '  \n'
         );
-      }
-      if (layer.layerType === 'INSTANCE') {
-        mdArray.push(`Instance dependant on ${layer.layerName}  \n`);
       }
     }
     mdArray.push('\n---\n');
@@ -233,6 +255,9 @@ export async function generateMarkdownPage(
   //console.log(data);
 
   let markdown = [];
+  let displayFrameSrcType: FigmaURLType = settings.export.md.linkIframes
+    ? 'share'
+    : 'embed';
 
   for (let i = 0; i < data.blocks.length; i++) {
     const block = data.blocks[i];
@@ -256,28 +281,21 @@ export async function generateMarkdownPage(
           let src = generateFigmaURL(
             block.data.fileId,
             block.data.frameId,
-            'embed'
+            displayFrameSrcType
           );
-          if (settings.export.md.linkIframes) {
-            markdown.push(
-              `[${src}](${src})${
-                block.data.caption ? `  \n${block.data.caption}` : ``
-              }  \n`
-            );
-          } else {
-            markdown.push(
-              `${generateIFrame(
-                src,
-                block.data.caption,
-                0,
-                generateIFrameStyle(
-                  DEFAULT_SETTINGS.customization.palette.status.neutral.default,
-                  3
-                ),
-                'display-frame'
-              )}  \n`
-            );
-          }
+          markdown.push(
+            `${generateIFrame(
+              src,
+              block.data.caption,
+              settings.export.md.linkIframes,
+              0,
+              generateIFrameStyle(
+                DEFAULT_SETTINGS.customization.palette.status.neutral.default,
+                3
+              ),
+              'display-frame'
+            )}  \n`
+          );
         }
         break;
       case 'dosAndDonts':
@@ -285,7 +303,7 @@ export async function generateMarkdownPage(
           let src = generateFigmaURL(
             block.data.fileId,
             block.data.frameId,
-            'embed'
+            displayFrameSrcType
           );
           markdown.push(
             `${generateIFrame(
@@ -293,6 +311,7 @@ export async function generateMarkdownPage(
               `${decideEmojiBasedOnDosAndDonts(block.data.type)} ${
                 block.data.caption
               }`,
+              settings.export.md.linkIframes,
               0,
               generateIFrameStyle(
                 DEFAULT_SETTINGS.customization.palette.status[
@@ -327,7 +346,9 @@ export async function generateMarkdownPage(
         markdown.push('\n---\n');
         break;
       case 'componentDoc':
-        markdown.push(generateMDComponentDoc(block.data));
+        markdown.push(
+          generateMDComponentDoc(block.data, settings, displayFrameSrcType)
+        );
         break;
       default:
         break;
@@ -358,8 +379,8 @@ let generateHTMLTableRow = (
       let cell = rowData[i];
       let cellTag = isHeader ? 'th' : 'td';
       htmlRow.push(
-        `${addIndentation(initialIndentation + 2)}<${cellTag} ${
-          isHeader ? `class="${classPrefix}table-header"` : ''
+        `${addIndentation(initialIndentation + 2)}<${cellTag}${
+          isHeader ? ` class="${classPrefix}table-header"` : ''
         }>${cell}</${cellTag}>`
       );
     }
@@ -420,16 +441,19 @@ let generateHTMLComponentDoc = (
     html.push(
       `${addIndentation(
         initialIndentation + 2
-      )}<h5 class="${classPrefix}h5">Variant: ${variant.variantName}</h5>`
+      )}<h5 class="${classPrefix}h5">${generateHeaderContentForVariant(
+        variant.variantName,
+        data.variants.length > 1
+      )}</h5>`
     );
     html.push(
       `${generateIFrame(
         generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed'),
-        `The anatomy of ${
-          data.mainComponentName != variant.variantName
-            ? `${data.mainComponentName} with ${variant.variantName}`
-            : data.mainComponentName
-        }.`,
+        generateDisplayFrameCaptionForAnatomyFrame(
+          data.mainComponentName,
+          variant.variantName
+        ),
+        false,
         initialIndentation + 2
       )}`
     );
@@ -449,6 +473,13 @@ let generateHTMLComponentDoc = (
         )}${layer.layerName}</h6>`
       );
 
+      html.push(
+        `${addIndentation(
+          initialIndentation + 3
+        )}<p class="${classPrefix}p">${generateLayerDescription(layer)}
+        </p>`
+      );
+
       if (layer.properties) {
         html.push(
           `${generateHTMLTable(
@@ -461,16 +492,6 @@ let generateHTMLComponentDoc = (
             },
             initialIndentation + 3
           )}`
-        );
-      }
-
-      if (layer.layerType == 'INSTANCE') {
-        html.push(
-          `${addIndentation(
-            initialIndentation + 3
-          )}<p class="${classPrefix}p">Instance dependant on ${
-            layer.layerName
-          }</p>`
         );
       }
 
@@ -509,19 +530,27 @@ export async function generateHTMLPage(
   //console.log(data);
 
   let html = [];
-  html.push('<!DOCTYPE html>');
-  html.push('<html>');
-  let htmlHeadData = `${addIndentation(1)}<head>\n${addIndentation(2)}<title>${
-    data.title
-  }</title>\n${generateBaseExportStyles(
-    BASE_STYLE_TOKENS.fontFamily,
-    BASE_STYLE_TOKENS.palette,
-    2
-  )}\n${addIndentation(1)}</head>`;
-  html.push(htmlHeadData);
+  let bodyIdentation = 0;
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
-  html.push(`${addIndentation(1)}<body>`);
-  html.push(`${addIndentation(2)}<main class="${classPrefix}body">`);
+  if (!settings.export.html.bodyOnly) {
+    bodyIdentation = 3;
+    html.push('<!DOCTYPE html>');
+    html.push('<html>');
+    let htmlHeadData = `${addIndentation(1)}<head>\n${addIndentation(
+      2
+    )}<title>${data.title}</title>\n${
+      settings.export.html.addStyling
+        ? generateBaseExportStyles(
+            BASE_STYLE_TOKENS.fontFamily,
+            BASE_STYLE_TOKENS.palette,
+            2
+          )
+        : ''
+    }${addIndentation(1)}</head>`;
+    html.push(htmlHeadData);
+    html.push(`${addIndentation(1)}<body>`);
+    html.push(`${addIndentation(2)}<main class="${classPrefix}body">`);
+  }
 
   for (let i = 0; i < data.blocks.length; i++) {
     const block = data.blocks[i];
@@ -529,14 +558,16 @@ export async function generateHTMLPage(
     switch (block.type) {
       case 'header':
         html.push(
-          `${addIndentation(3)}<h${block.data.level} class="${classPrefix}h${
+          `${addIndentation(bodyIdentation)}<h${
             block.data.level
-          }">${block.data.text}</h${block.data.level}>`
+          } class="${classPrefix}h${block.data.level}">${block.data.text}</h${
+            block.data.level
+          }>`
         );
         break;
       case 'paragraph':
         html.push(
-          `${addIndentation(3)}<p class="${classPrefix}p">${
+          `${addIndentation(bodyIdentation)}<p class="${classPrefix}p">${
             block.data.text
           }</p>`
         );
@@ -547,14 +578,16 @@ export async function generateHTMLPage(
             3
           )}<figure class="${classPrefix}quote">\n${addIndentation(
             4
-          )}<blockquote>\n${addIndentation(5)}${
+          )}<blockquote>\n${addIndentation(bodyIdentation + 2)}${
             block.data.text
-          }\n${addIndentation(6)}</blockquote>\n${
+          }\n${addIndentation(bodyIdentation + 3)}</blockquote>\n${
             block.data.caption &&
-            `${addIndentation(6)}<figcaption>\n${addIndentation(5)}${
+            `${addIndentation(
+              bodyIdentation + 3
+            )}<figcaption>\n${addIndentation(5)}${
               block.data.caption
-            }\n${addIndentation(6)}</figcaption>\n`
-          }${addIndentation(5)}</figure>`
+            }\n${addIndentation(bodyIdentation + 3)}</figcaption>\n`
+          }${addIndentation(bodyIdentation + 2)}</figure>`
         );
         break;
       case 'displayFrame':
@@ -568,7 +601,8 @@ export async function generateHTMLPage(
             generateIFrame(
               src,
               block.data.caption,
-              3,
+              false,
+              bodyIdentation,
               generateIFrameStyle(
                 DEFAULT_SETTINGS.customization.palette.status.neutral.default,
                 3
@@ -591,7 +625,8 @@ export async function generateHTMLPage(
               `${decideEmojiBasedOnDosAndDonts(block.data.type)} ${
                 block.data.caption
               }`,
-              3,
+              false,
+              bodyIdentation,
               generateIFrameStyle(
                 DEFAULT_SETTINGS.customization.palette.status[
                   mapDosAndDontsToStatus(block.data.type)
@@ -605,17 +640,21 @@ export async function generateHTMLPage(
         break;
       case 'list':
         let tag = block.data.style == 'unordered' ? 'ul' : 'ol';
-        html.push(`${addIndentation(3)}<${tag} class="${classPrefix}${tag}">`);
+        html.push(
+          `${addIndentation(
+            bodyIdentation
+          )}<${tag} class="${classPrefix}${tag}">`
+        );
         if (block.data.items.length) {
           for (let i = 0; i < block.data.items.length; i++) {
             const listItem = block.data.items[i];
             html.push(`${addIndentation(4)}<li>${listItem}</li>`);
           }
         }
-        html.push(`${addIndentation(3)}</${tag}>`);
+        html.push(`${addIndentation(bodyIdentation)}</${tag}>`);
         break;
       case 'table':
-        html.push(generateHTMLTable(block.data, 3));
+        html.push(generateHTMLTable(block.data, bodyIdentation));
         break;
       case 'alert':
         html.push(
@@ -632,31 +671,39 @@ export async function generateHTMLPage(
         break;
       case 'code':
         html.push(
-          `${addIndentation(3)}<pre class=${classPrefix}code>\n${addIndentation(
-            4
+          `${addIndentation(
+            bodyIdentation
+          )}<pre class=${classPrefix}code>\n${addIndentation(
+            bodyIdentation + 1
           )}<code>\n${indentCodeBlock(
             encodeStringForHTML(block.data.code),
-            5
-          )}\n${addIndentation(4)}</code>\n${addIndentation(3)}</pre>`
+            bodyIdentation + 2
+          )}\n${addIndentation(bodyIdentation + 1)}</code>\n${addIndentation(
+            bodyIdentation
+          )}</pre>`
         );
         break;
       case 'divider':
         html.push(
-          `${addIndentation(3)}<div class="${classPrefix}divider"><hr /></div>`
+          `${addIndentation(
+            bodyIdentation
+          )}<div class="${classPrefix}divider"><hr /></div>`
         );
         break;
 
       case 'componentDoc':
-        html.push(generateHTMLComponentDoc(block.data, 3));
+        html.push(generateHTMLComponentDoc(block.data, bodyIdentation));
         break;
       default:
         break;
     }
   }
 
-  html.push(`${addIndentation(2)}</main>`);
-  html.push(`${addIndentation(1)}</body>`);
-  html.push(`</html>`);
+  if (!settings.export.html.bodyOnly) {
+    html.push(`${addIndentation(2)}</main>`);
+    html.push(`${addIndentation(1)}</body>`);
+    html.push(`</html>`);
+  }
 
   return html.join('  \n');
 }
@@ -705,31 +752,3 @@ export function generateDocMap(data: DocData): DocMapItem[] {
   }
   return pagesArr;
 }
-
-/*
-
-  if (boldMatches.length) {
-    regularMatches.forEach((match) => {
-      let url = getURLFromAnchor(match[0], 'html');
-      text =
-        text.slice(0, match.index + globalOffset) +
-        `[**${match[1]}**](${url.href})` +
-        text.slice(match.index + globalOffset + match[0].length);
-      globalOffset -= 15;
-    });
-  }
-  if (italicMatches.length) {
-    regularMatches.forEach((match) => {
-      let url = getURLFromAnchor(match[0], 'html');
-      text =
-        text.slice(0, match.index + globalOffset) +
-        `[*${match[1]}*](${url.href})` +
-        text.slice(match.index + globalOffset + match[0].length);
-      globalOffset -= 13;
-    });
-  }
-
-
-
-
-*/

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
+import { CircularProgress, Snackbar } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants/constants';
 import { darkTheme, lightTheme } from '../styles/themes';
 
@@ -74,6 +75,12 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   const [lastFormatUsed, setLastFormatUsed] = React.useState(
     initialPluginData.lastFormatUsed
   );
+
+  const [buildingComponentDoc, setBuildingComponentDoc] = React.useState(
+    initialPluginData.buildingComponentDoc
+  );
+
+  const circularLoader = <CircularProgress size={16} />;
 
   React.useEffect(() => {
     setView(decideView(navigation.currentView));
@@ -171,12 +178,12 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
 
               case 'generating-component-doc':
                 console.log('Mayor loading');
-                
-                setLoadingState('MINOR');
+
+                setBuildingComponentDoc(true);
                 break;
 
               case 'finished-generating-component-doc':
-                setLoadingState('NONE');
+                setBuildingComponentDoc(false);
                 console.log('None loading');
                 break;
 
@@ -227,6 +234,8 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           setOutdatedComponents,
           lastFormatUsed,
           setLastFormatUsed,
+          buildingComponentDoc,
+          setBuildingComponentDoc,
         }}
       >
         <PluginContainer
@@ -241,6 +250,13 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           {view}
           <VersionBanner />
           <BottomSheet zIndex={sheetZIndex} />
+          <Snackbar
+            open={buildingComponentDoc}
+            autoHideDuration={1000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            message={'Generating a component documentation...'}
+            action={circularLoader}
+          />
         </PluginContainer>
       </PluginDataContext.Provider>
     </ThemeProvider>

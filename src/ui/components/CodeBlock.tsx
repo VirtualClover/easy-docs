@@ -12,7 +12,7 @@ declare var Prism: any;
 export const CodeBlock = ({ code, language, loading }) => {
   React.useEffect(() => {
     Prism.highlightAll();
-  }, [code, language]);
+  }, [code, language, loading]);
 
   return (
     <PrimsWrapper sx={{}}>

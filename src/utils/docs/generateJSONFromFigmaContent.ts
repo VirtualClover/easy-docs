@@ -40,7 +40,10 @@ import { styleFrame } from '../figma/styleFrame';
 
 export async function generateJSONFromFigmaContent(
   section: SectionNode
-): Promise<{ docData: DocData; overrideEditorChanges: boolean }> {
+): Promise<{
+  docData: DocData;
+  overrideEditorChanges: boolean;
+}> {
   let response: { docData: DocData; overrideEditorChanges: boolean } = {
     docData: {
       title: encodeStringForHTML(section.name),
@@ -83,7 +86,10 @@ export async function generateJSONFromFigmaContent(
     return response;
   }
 
-  return { docData: EMPTY_DOC_OBJECT, overrideEditorChanges: false };
+  return {
+    docData: EMPTY_DOC_OBJECT,
+    overrideEditorChanges: false,
+  };
 }
 
 function scanInsideAFrame(frame: FrameNode, idToExclude: string = '') {

@@ -10,21 +10,16 @@ import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 
-const options = [
-  'Export current page',
-  'Export current document',
-  'Export all docs in file',
-  'Generate doc site',
-];
-
-export const ExportButton = ({ disabled = false }) => {
+export const ExportButton = ({
+  disabled = false,
+  actions,
+}: {
+  disabled: boolean;
+  actions: { label: string; onClick: () => void }[];
+}) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
-
-  const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
-  };
 
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -56,8 +51,8 @@ export const ExportButton = ({ disabled = false }) => {
         ref={anchorRef}
         aria-label="Button group with a nested menu"
       >
-        <Button onClick={handleClick} disabled={disabled}>
-          {options[selectedIndex]}
+        <Button onClick={actions[selectedIndex].onClick} disabled={disabled}>
+          {actions[selectedIndex].label}
         </Button>
         <Button
           disabled={disabled}
@@ -91,13 +86,13 @@ export const ExportButton = ({ disabled = false }) => {
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
-                  {options.map((option, index) => (
+                  {actions.map((action, index) => (
                     <MenuItem
-                      key={option}
+                      key={index}
                       selected={index === selectedIndex}
                       onClick={(event) => handleMenuItemClick(event, index)}
                     >
-                      {option}
+                      {action.label}
                     </MenuItem>
                   ))}
                 </MenuList>
