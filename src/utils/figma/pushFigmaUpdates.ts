@@ -1,7 +1,7 @@
 import { DocData } from '../constants/constants';
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { reconcileDocData } from '../docs/reconcileData';
-import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
+import { scanCurrentSelectionForDocs } from './scans';
 
 /**
  * Generates doc data from a section and then pushes it

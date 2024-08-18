@@ -17,6 +17,12 @@ import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
 import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from './utils/constants';
+import { setPluginSettings } from './utils/figma/getPluginSettings';
+import {
+  scanWholeFileForDocuments,
+  scanWholePageForDocuments,
+} from './utils/figma/scans';
+import { handleFigmaError } from './utils/figma/handleFigmaError';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -29,48 +35,14 @@ figma.skipInvisibleInstanceChildren = true;
 let cachedMsg = null;
 let stopUpdates = false;
 let lastFetchDoc = EMPTY_DOC_OBJECT;
-let scanWholePageForDocuments = async (
-  page: PageNode
-): Promise<FigmaPageDocData> => {
-  let documents: DocData[] = [];
-  for (const child of page.children) {
-    if (child.type === 'SECTION') {
-      if (child.children.length) {
-        let generatedDoc: DocData;
-        await generateJSONFromFigmaContent(child).then((res) => {
-          if (res.docData.pages.length) {
-            generatedDoc = res.docData;
-            documents.push(generatedDoc);
-          }
-        });
-      }
-    }
-  }
-  return { title: page.name, data: documents };
-};
-let scanWholeFileForDocuments = async (
-  file: DocumentNode
-): Promise<FigmaFileDocData> => {
-  let fileData: FigmaFileDocData = { title: file.name, data: [] };
-  await figma.loadAllPagesAsync().then(async () => {
-    for (const page of file.children) {
-      if (page.children.length) {
-        await scanWholePageForDocuments(page).then((data) => {
-          if (data.data.length) {
-            fileData.data.push(data);
-          }
-        });
-      }
-    }
-  });
-  return fileData;
-};
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
 figma.ui.onmessage = (msg) => {
-
   if (msg.type) {
+    // If statements instead of a switch let's me control the order of events more easily, for example, when there is a cahced data that needs to be generated
+
+    //Selects a node given an ID
     if (msg.type === 'select-node') {
       let id: SceneNode | any = { id: msg.id };
       selectNode(id);
@@ -80,6 +52,7 @@ figma.ui.onmessage = (msg) => {
       //figma.viewport.scrollAndZoomIntoView([id]);
     }
 
+    //Returns the id of the first node of the current selection
     if (msg.type === 'get-selected-node') {
       const selection = <any>figma.currentPage.selection[0];
       //console.log(selection);
@@ -90,44 +63,36 @@ figma.ui.onmessage = (msg) => {
       });
     }
 
+    //Initializes the plugin
     if (msg.type === 'load-data') {
-      //Get keys
-      pluginInit();
+      pluginInit().catch((e) => handleFigmaError(`The plugin couldn't load correclty`, 'ED-F0001',e));
     }
 
+    //Saves the current settings in the file sotrage
     if (msg.type === 'update-settings') {
-      //Get keys
-      //console.log(msg.settings);
-      figma.root.setSharedPluginData(
-        FIGMA_NAMESPACE,
-        FIGMA_PLUGIN_SETTINGS_KEY,
-        JSON.stringify(msg.settings)
-      );
+      setPluginSettings(msg.settings);
     }
 
+    //Creates a new document
     if (msg.type === 'create-new-doc') {
-      //context.stopUpdates = true;
       stopUpdates = true;
       let section: SectionNode;
-      //console.log(context);
       createNewDoc(createNewDocJSON()).then((s) => {
         section = s;
         generateJSONFromFigmaContent(section).then(async (res) => {
           stopUpdates = false;
           lastFetchDoc = res.docData;
           figma.viewport.scrollAndZoomIntoView([section]);
-          //context.stopUpdates = false;
-          //context.lastFetchDoc = data;
           figma.ui.postMessage({
             type: 'new-node-data',
             data: res.docData,
             overrideEditorChanges: res.overrideEditorChanges,
           });
         });
-      });
+      }).catch((e) => handleFigmaError(`There was an error creating a new document`, 'ED-F0005',e));
     }
 
-    //Push updates from figma
+    //Push updates from Figma to the Editor
     if (msg.type === 'node-update') {
       if (!stopUpdates && cachedMsg == null) {
         pushFigmaUpdates(lastFetchDoc).then((res) => {
@@ -145,7 +110,7 @@ figma.ui.onmessage = (msg) => {
       }
     }
 
-    //Get updates from editor
+    //Get updates from the Editor
     if (msg.type == 'update-selected-doc' || cachedMsg != null) {
       console.log('msg');
       console.log(msg);
@@ -196,7 +161,7 @@ figma.ui.onmessage = (msg) => {
         }
       }
     }
-
+    //Updates outdated components, or components that were generated directly from grabbing the from the assets panel on Figma
     if (msg.type === 'update-outdated-components') {
       stopUpdates = true;
       slowUpdateOutdatedComponentBlocks().then(async () => {
@@ -205,6 +170,7 @@ figma.ui.onmessage = (msg) => {
       });
     }
 
+    //Scans the current Figma page for Documents
     if (msg.type === 'scan-whole-page-for-docs') {
       let page = figma.currentPage;
 
@@ -216,6 +182,7 @@ figma.ui.onmessage = (msg) => {
       });
     }
 
+    //Scans the current Figma file for documents
     if (msg.type === 'scan-whole-file-for-docs') {
       let file = figma.root;
       scanWholeFileForDocuments(file).then((res) =>

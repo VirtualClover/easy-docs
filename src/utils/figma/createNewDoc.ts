@@ -2,6 +2,7 @@ import { DocData, PluginSettings } from '../constants/constants';
 
 import { generateFigmaContentFromJSON } from '../docs/generateFigmaContentFromJSON';
 import { getPluginSettings } from './getPluginSettings';
+import { handleFigmaError } from './handleFigmaError';
 import { setNodeFills } from './setNodeFills';
 
 /**
@@ -26,6 +27,6 @@ export async function createNewDoc(
   await generateFigmaContentFromJSON(
     data,
     parentSection,
-  );
+  ).catch((e) => handleFigmaError(`There was an error creating a new document`, 'ED-F0006',e));
   return parentSection;
 }

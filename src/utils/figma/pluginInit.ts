@@ -9,6 +9,7 @@ import { getPluginSettings, initPluginSettings } from './getPluginSettings';
 
 import { getComponentData } from './getComponentData';
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
+import { handleFigmaError } from './handleFigmaError';
 import { initComponents } from './components/initComponents';
 import { objectIsNull } from '../general/objectisNull';
 
@@ -36,7 +37,7 @@ export async function pluginInit() {
               !currentNode ||
               (currentNode.type != 'PAGE' && !currentNode.parent)
             ) {
-              initComponents(componentData, false);
+              initComponents(componentData, false).catch((e) => handleFigmaError(`There was an error generating the components`, 'ED-F0002',e));
             }
           });
         break;

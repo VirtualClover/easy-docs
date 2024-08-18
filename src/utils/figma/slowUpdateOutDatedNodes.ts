@@ -1,11 +1,10 @@
-import {
-  BaseComponentData,
-  FIGMA_COMPONENT_PREFIX,
-} from '../constants/constants';
 import { FIGMA_COMPONENT_VERSION_KEY, FIGMA_NAMESPACE } from '../constants';
 
+import {
+  FIGMA_COMPONENT_PREFIX,
+} from '../constants/constants';
 import { getComponentData } from './getComponentData';
-import { scanCurrentSelectionForDocs } from './scanCurrentSelectionForDocs';
+import { scanCurrentSelectionForDocs } from './scans';
 
 export let slowUpdateOutdatedComponentBlocks = async () => {
   let section: SectionNode;
@@ -72,7 +71,6 @@ export let slowUpdateOutdatedComponentBlocks = async () => {
           if (node.type == 'COMPONENT_SET') {
             let parentNode = node;
             instance.getMainComponentAsync().then((oldNode) => {
-              console.log(oldNode.name);
               let childNode = parentNode.findOne(
                 (n) => n.name === oldNode.name
               );

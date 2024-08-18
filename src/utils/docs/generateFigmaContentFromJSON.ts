@@ -25,9 +25,17 @@ import { generateQuoteInstance } from '../figma/components/quoteComponent.figma'
 import { generateTableInstance } from '../figma/components/tableComponent.figma';
 import { getComponentData } from '../figma/getComponentData';
 import { getPluginSettings } from '../figma/getPluginSettings';
+import { handleFigmaError } from '../figma/handleFigmaError';
 import { resizeSection } from '../figma/resizeSection';
 import { selectNode } from '../figma/selectNode';
 
+/**
+ * Generates Figma nodes based on doc data passed
+ * @param data -The Document data
+ * @param parentSection - The section where it should be generated in
+ * @param editedFrames - The page that were edited compared to the current data 
+ * @returns 
+ */
 export async function generateFigmaContentFromJSON(
   data: DocData,
   parentSection: SectionNode,
@@ -63,20 +71,30 @@ export async function generateFigmaContentFromJSON(
           .then(async (node) => {
             if (node.type === 'FRAME') {
               frame = node;
-              await generateFrameDataFromJSON(
-                page,
-                frame,
-                componentVersion
-              ).then(() => resizeSection(parentSection));
+              await generateFrameDataFromJSON(page, frame, componentVersion)
+                .then(() => resizeSection(parentSection))
+                .catch((e) =>
+                  handleFigmaError(
+                    `There was an error generating the frame data`,
+                    'ED-F0007',
+                    e
+                  )
+                );
             }
           })
           .catch((e) => console.error(e));
       } else {
         frame = createPageFrame(parentSection, page.title, settings);
         selectNode(frame);
-        await generateFrameDataFromJSON(page, frame, componentVersion).then(
-          () => resizeSection(parentSection)
-        );
+        await generateFrameDataFromJSON(page, frame, componentVersion)
+          .then(() => resizeSection(parentSection))
+          .catch((e) =>
+            handleFigmaError(
+              `There was an error generating the frame data`,
+              'ED-F0008',
+              e
+            )
+          );
       }
     }
   }
@@ -84,6 +102,12 @@ export async function generateFigmaContentFromJSON(
   return parentSection;
 }
 
+/**
+ * Generates a Page frame from page data
+ * @param data - The page data
+ * @param frame - The frame where it should be generated in
+ * @param componentVersion -The current component version
+ */
 async function generateFrameDataFromJSON(
   data: PageData,
   frame: FrameNode,
@@ -126,7 +150,15 @@ async function generateFrameDataFromJSON(
             frame,
             indexInFrame,
             componentVersion
-          ).then(() => figmaNode.remove());
+          )
+            .then(() => figmaNode.remove())
+            .catch((e) =>
+              handleFigmaError(
+                `There was an error generating an instance`,
+                'ED-F0009',
+                e
+              )
+            );
         }
       } else {
         figmaNode.remove();
@@ -137,12 +169,25 @@ async function generateFrameDataFromJSON(
         frame,
         indexInFrame,
         componentVersion
+      ).catch((e) =>
+        handleFigmaError(
+          `There was an error generating an instance`,
+          'ED-F0010',
+          e
+        )
       );
     }
   }
   frame.opacity = 1;
 }
 
+/**
+ * Generates an isntances from the plugin components depending on the type of block data it recieves
+ * @param block -The block data
+ * @param frame -The current page frame
+ * @param indexInFrame -The index where the block is located in the page data
+ * @param componentVersion - The current component version
+ */
 async function generateBlockInstanceFromJSON(
   block: BlockData,
   frame: FrameNode,
@@ -152,93 +197,172 @@ async function generateBlockInstanceFromJSON(
   let node: InstanceNode | FrameNode;
   switch (block.type) {
     case 'header':
-      await generateHeaderInstance(block.data, componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
+      await generateHeaderInstance(block.data, componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Header instance`,
+            'ED-F0011',
+            e
+          )
+        );
       break;
     case 'paragraph':
-      await generateParagraphInstance(block.data, componentVersion).then(
-        (n) => {
+      await generateParagraphInstance(block.data, componentVersion)
+        .then((n) => {
           if (n) {
             node = n;
           }
-        }
-      );
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Paragraph instance`,
+            'ED-F0012',
+            e
+          )
+        );
       break;
     case 'quote':
-      await generateQuoteInstance(block.data, componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
-      //node = generateParagraphInstance(block.data);
+      await generateQuoteInstance(block.data, componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Quote instance`,
+            'ED-F0013',
+            e
+          )
+        );
       break;
     case 'displayFrame':
-      await generateDisplayFrameInstance(block.data, componentVersion).then(
-        (n) => {
+      await generateDisplayFrameInstance(block.data, componentVersion)
+        .then((n) => {
           if (n) {
             node = n;
           }
-        }
-      );
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Display Frame instance`,
+            'ED-F0014',
+            e
+          )
+        );
       break;
     case 'dosAndDonts':
-      await generateDosAndDontsInstance(block.data, componentVersion).then(
-        (n) => {
+      await generateDosAndDontsInstance(block.data, componentVersion)
+        .then((n) => {
           if (n) {
             node = n;
           }
-        }
-      );
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Dos and dont's instance`,
+            'ED-F0015',
+            e
+          )
+        );
       break;
     case 'list':
-      await generateListInstance(block.data, componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
+      await generateListInstance(block.data, componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a List instance`,
+            'ED-F0016',
+            e
+          )
+        );
       break;
     case 'table':
-      await generateTableInstance(block.data, componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
+      await generateTableInstance(block.data, componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Table instance`,
+            'ED-F0017',
+            e
+          )
+        );
       break;
     case 'alert':
-      await generateAlertInstance(block.data, componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
+      await generateAlertInstance(block.data, componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating an Alert instance`,
+            'ED-F0018',
+            e
+          )
+        );
       break;
     case 'code':
-      await generateCodeInstance(block.data, componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
+      await generateCodeInstance(block.data, componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Code block instance`,
+            'ED-F0019',
+            e
+          )
+        );
       break;
     case 'divider':
-      await generateDividerInstance(componentVersion).then((n) => {
-        if (n) {
-          node = n;
-        }
-      });
+      await generateDividerInstance(componentVersion)
+        .then((n) => {
+          if (n) {
+            node = n;
+          }
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Divider instance`,
+            'ED-F0020',
+            e
+          )
+        );
       break;
     case 'componentDoc':
-      await generateComponentDocInstance(block.data, componentVersion).then(
-        (n) => {
+      await generateComponentDocInstance(block.data, componentVersion)
+        .then((n) => {
           if (n) {
             console.log('node doc');
             console.log(n);
-            
+
             node = n;
           }
-        }
-      );
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error generating a Component Doc instance`,
+            'ED-F0021',
+            e
+          )
+        );
       break;
     //node = generateParagraphInstance(block.data);
     default:

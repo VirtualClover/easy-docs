@@ -14,6 +14,7 @@ import { createParagraphComponent } from './paragraphComponent.figma';
 import { createPointerComponent } from './pointerComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
 import { createTableCellComponent } from './tableComponent.figma';
+import { handleFigmaError } from '../handleFigmaError';
 
 /**
  * Generates the main components in a Figma file
@@ -71,42 +72,50 @@ export async function initComponents(
     createCodeComponent(frame),
     createDividerComponent(frame),
     createComponentDocComponent(frame),
-    createPointerComponent(frame)
-  ]).then((values) => {
-    let header = values[0];
-    let paragraph = values[1];
-    let quote = values[2];
-    let displayFrame = values[3];
-    let dosAndDonts = values[4];
-    let brokenLink = values[5];
-    let list = values[6];
-    let tableCell = values[7];
-    let alert = values[8];
-    let code = values[9];
-    let divider = values[10];
-    let componentDoc = values[11];
-    let pointer = values[12];
-    componentData.components.header = header;
-    componentData.components.paragraph = paragraph;
-    componentData.components.quote = quote;
-    componentData.components.displayFrame = displayFrame;
-    componentData.components.dosAndDonts = dosAndDonts;
-    componentData.components.brokenLink = brokenLink;
-    componentData.components.list = list;
-    componentData.components.tableCell = tableCell;
-    componentData.components.alert = alert;
-    componentData.components.code = code;
-    componentData.components.divider = divider;
-    componentData.components.componentDoc = componentDoc;
-    componentData.components.pointer = pointer;
-    componentData.components.componentsPage.id = page.id;
-    componentData.lastGenerated = Date.now();
-    figma.root.setSharedPluginData(
-      FIGMA_NAMESPACE,
-      FIGMA_COMPONENT_DATA_KEY,
-      JSON.stringify(componentData)
+    createPointerComponent(frame),
+  ])
+    .then((values) => {
+      let header = values[0];
+      let paragraph = values[1];
+      let quote = values[2];
+      let displayFrame = values[3];
+      let dosAndDonts = values[4];
+      let brokenLink = values[5];
+      let list = values[6];
+      let tableCell = values[7];
+      let alert = values[8];
+      let code = values[9];
+      let divider = values[10];
+      let componentDoc = values[11];
+      let pointer = values[12];
+      componentData.components.header = header;
+      componentData.components.paragraph = paragraph;
+      componentData.components.quote = quote;
+      componentData.components.displayFrame = displayFrame;
+      componentData.components.dosAndDonts = dosAndDonts;
+      componentData.components.brokenLink = brokenLink;
+      componentData.components.list = list;
+      componentData.components.tableCell = tableCell;
+      componentData.components.alert = alert;
+      componentData.components.code = code;
+      componentData.components.divider = divider;
+      componentData.components.componentDoc = componentDoc;
+      componentData.components.pointer = pointer;
+      componentData.components.componentsPage.id = page.id;
+      componentData.lastGenerated = Date.now();
+      figma.root.setSharedPluginData(
+        FIGMA_NAMESPACE,
+        FIGMA_COMPONENT_DATA_KEY,
+        JSON.stringify(componentData)
+      );
+    })
+    .catch((e) =>
+      handleFigmaError(
+        `There was an error generating the components`,
+        'ED-F0003',
+        e
+      )
     );
-  });
   await page.loadAsync();
   page.appendChild(frame);
 }

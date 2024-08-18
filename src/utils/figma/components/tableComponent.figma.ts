@@ -21,6 +21,7 @@ import {
 
 import { clone } from '../../general/clone';
 import { getComponentData } from '../getComponentData';
+import { getMainCompIdFromInstance } from '../getMainCompIdFromInstance';
 import { getPluginSettings } from '../getPluginSettings';
 import { isOdd } from '../../general/isOdd';
 import { setNodeFills } from '../setNodeFills';
@@ -249,14 +250,10 @@ export async function generateBlockDataFromTable(
       for (let ci = 0; ci < currentRow.children.length; ci++) {
         const cell = currentRow.children[ci];
         if (cell.type === 'INSTANCE') {
-          await instNode.getMainComponentAsync().then((component) => {
-            mainCompId =
-              component.parent.type == 'COMPONENT_SET'
-                ? component.parent.id
-                : component.id;
-
+          await getMainCompIdFromInstance(instNode).then((id) => {
+            mainCompId == id;
             if (mainCompId === componentData.components.tableCell.id) {
-              // check if header
+              // Check if header
               if (i == 0 && ci == 0) {
                 withHeadings =
                   cell.componentProperties[

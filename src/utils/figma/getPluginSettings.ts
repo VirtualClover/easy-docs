@@ -13,8 +13,6 @@ export let getPluginSettings = (): PluginSettings | null => {
     FIGMA_PLUGIN_SETTINGS_KEY
   );
 
-  //console.log(JSON.parse(stringPluginSettings));
-
   return stringPluginSettings ? JSON.parse(stringPluginSettings) : null;
 };
 
