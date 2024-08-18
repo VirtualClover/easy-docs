@@ -37,6 +37,7 @@ import { generateBlockDataFromTable } from '../figma/components/tableComponent.f
 import { getMainCompIdFromInstance } from '../figma/getMainCompIdFromInstance';
 import { getPluginSettings } from '../figma/getPluginSettings';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
+import { handleFigmaError } from '../figma/handleFigmaError';
 import { scanForInstancesInsideAFrame } from '../figma/scans';
 import { styleFrame } from '../figma/styleFrame';
 
@@ -79,14 +80,20 @@ export let generateJSONFromFigmaContent = async (
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
       if (child.type == 'FRAME') {
-        await generatePageDataFromFrame(child, componentData, settings).then(
-          (res) => {
+        await generatePageDataFromFrame(child, componentData, settings)
+          .then((res) => {
             response.docData.pages.push(res.pageData);
             if (res.hasComponentDocBlock) {
               response.overrideEditorChanges = true;
             }
-          }
-        );
+          })
+          .catch((e) =>
+            handleFigmaError(
+              `There was an error generating a the page data from the Figma content`,
+              'ED-F0022',
+              e
+            )
+          );
       }
     }
 
@@ -98,7 +105,6 @@ export let generateJSONFromFigmaContent = async (
     overrideEditorChanges: false,
   };
 };
-
 
 /**
  * Generates Page Data from a Figma Frame
