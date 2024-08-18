@@ -38,6 +38,11 @@ import { getPluginSettings } from '../figma/getPluginSettings';
 import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
 import { styleFrame } from '../figma/styleFrame';
 
+/**
+ * Generates a Document from a Figma Section
+ * @param section 
+ * @returns 
+ */
 export async function generateJSONFromFigmaContent(
   section: SectionNode
 ): Promise<{
@@ -111,6 +116,13 @@ async function getMainCompIdFromInstance(instance: InstanceNode) {
   return mainCompId;
 }
 
+/**
+ * Generates Page Data from a Figma Frame
+ * @param frame 
+ * @param componentData 
+ * @param settings 
+ * @returns 
+ */
 async function generatePageDataFromFrame(
   frame: FrameNode,
   componentData: BaseComponentData,
@@ -336,6 +348,5 @@ async function generatePageDataFromFrame(
   }
 
   formatPageData(response.pageData);
-  //frame.name = encodeStringForHTML(pageData.title);
   return response;
 }

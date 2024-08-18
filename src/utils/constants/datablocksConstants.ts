@@ -144,6 +144,9 @@ export type ComponentSharedData = typeof EMPTY_COMPONENT_SHARED_DATA;
 
 export interface ComponentDocBlockData extends ComponentSharedData {}
 
+/**
+ * The basic block found in a page
+ */
 export interface BlockData extends OutputBlockData {
   figmaNodeId: string;
   lastEdited: number;

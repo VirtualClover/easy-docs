@@ -1,6 +1,5 @@
 import {
   BaseComponentData,
-  DEFAULT_SETTINGS,
   FIGMA_COMPONENT_PREFIX,
 } from '../../constants/constants';
 
@@ -194,13 +193,13 @@ async function generateOuterWrapper(
 export async function generateDisplayFrameInstance(
   data: DisplayFrameBlockData,
   componentVersion: number,
-  backgroundColor: string = DEFAULT_SETTINGS.customization.palette.status
-    .neutral.default,
+  backgroundColor: string= '',
   maxHeight: number = 900
 ): Promise<FrameNode | null> {
   let settings = getPluginSettings();
   let componentData = getComponentData();
   let component: BaseNode;
+  let background = backgroundColor ?? settings.customization.palette.status.neutral.default;
 
   await figma
     .getNodeByIdAsync(componentData.components.displayFrame.id)
@@ -250,7 +249,7 @@ export async function generateDisplayFrameInstance(
 
     let outerWrapper = await generateOuterWrapper(
       instance,
-      backgroundColor,
+      background,
       maxHeight,
       nodeToDisplay,
       'Frame not found in file',
@@ -326,6 +325,7 @@ export async function hydrateDisplayFrame(
   componentData: BaseComponentData
 ) {
   let block;
+  let settings = getPluginSettings();
   await generateBlockDataFromDisplayFrame(
     instance,
     componentData,

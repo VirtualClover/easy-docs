@@ -31,9 +31,14 @@ const SettingsButton = () => {
   const pluginContext = React.useContext(PluginDataContext);
   return (
     <Tooltip title="Settings">
-      <IconButton onClick={() => navigate('SETTINGS', pluginContext)}>
-        <SettingsOutlined />
-      </IconButton>
+      <span>
+        <IconButton
+          onClick={() => navigate('SETTINGS', pluginContext)}
+          disabled={pluginContext.loadingState != 'NONE'}
+        >
+          <SettingsOutlined />
+        </IconButton>
+      </span>
     </Tooltip>
   );
 };
@@ -174,13 +179,17 @@ const SettingsBar = () => {
   return (
     <>
       {
-        <IconButton
-          onClick={() =>
-            navigate(pluginContext.navigation.prevView, pluginContext)
-          }
-        >
-          <ArrowBack />
-        </IconButton>
+        <Tooltip title="Exit settings">
+          <span>
+            <IconButton
+              onClick={() =>
+                navigate(pluginContext.navigation.prevView, pluginContext)
+              }
+            >
+              <ArrowBack />
+            </IconButton>
+          </span>
+        </Tooltip>
       }
       <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
         Settings

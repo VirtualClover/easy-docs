@@ -2,7 +2,7 @@ import { PageData } from '../constants/constants';
 
 /**
  * Creates a new page JSON
- * @param arrayNumber
+ * @param arrayNumber - The index of the page to be created in the current document
  * @returns
  */
 export const createNewPageJSON = (arrayNumber: number): PageData => {

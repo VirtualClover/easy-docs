@@ -844,7 +844,6 @@ export async function getComponentsToDoc(
         break;
     }
   } else {
-    //console.log('Gets here x3');
 
     nodeToInspect = componentFallback;
   }

@@ -1,5 +1,10 @@
 import { PluginData } from '../constants/constants';
 
+/**
+ * Tells Figma to select another page within the Figma Section
+ * @param pageIndex
+ * @param pluginContext
+ */
 export const selectNewPageFromEditor = (
   pageIndex: number,
   pluginContext: PluginData
@@ -21,6 +26,5 @@ export const selectNewPageFromEditor = (
     );
   } else {
     console.error('The selected pages does not exist.');
-    
   }
 };

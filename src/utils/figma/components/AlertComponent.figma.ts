@@ -26,7 +26,6 @@ import {
 
 import { DEFAULT_FONT_FAMILIES } from '../../../styles/base';
 import { getPluginSettings } from '../getPluginSettings';
-import { setFlavoredTextOnFigmaNode } from '../../general/flavoredText';
 import { setNodeFills } from '../setNodeFills';
 import { setNodeStrokeColor } from '../setNodeStrokeColor';
 

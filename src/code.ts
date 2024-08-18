@@ -1,7 +1,12 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import { DocData, EMPTY_DOC_OBJECT } from './utils/constants/constants';
+import {
+  DocData,
+  EMPTY_DOC_OBJECT,
+  FigmaFileDocData,
+  FigmaPageDocData,
+} from './utils/constants/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
@@ -12,7 +17,6 @@ import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
 import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from './utils/constants';
-import { scanCurrentSelectionForDocs } from './utils/figma/scanCurrentSelectionForDocs';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -22,11 +26,12 @@ import { scanCurrentSelectionForDocs } from './utils/figma/scanCurrentSelectionF
 figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 figma.skipInvisibleInstanceChildren = true;
 
-//let context = INITIAL_PLUGIN_CONTEXT;
 let cachedMsg = null;
 let stopUpdates = false;
 let lastFetchDoc = EMPTY_DOC_OBJECT;
-let scanWholePageForDocuments = async (page: PageNode): Promise<DocData[]> => {
+let scanWholePageForDocuments = async (
+  page: PageNode
+): Promise<FigmaPageDocData> => {
   let documents: DocData[] = [];
   for (const child of page.children) {
     if (child.type === 'SECTION') {
@@ -41,14 +46,29 @@ let scanWholePageForDocuments = async (page: PageNode): Promise<DocData[]> => {
       }
     }
   }
-  return documents;
+  return { title: page.name, data: documents };
+};
+let scanWholeFileForDocuments = async (
+  file: DocumentNode
+): Promise<FigmaFileDocData> => {
+  let fileData: FigmaFileDocData = { title: file.name, data: [] };
+  await figma.loadAllPagesAsync().then(async () => {
+    for (const page of file.children) {
+      if (page.children.length) {
+        await scanWholePageForDocuments(page).then((data) => {
+          if (data.data.length) {
+            fileData.data.push(data);
+          }
+        });
+      }
+    }
+  });
+  return fileData;
 };
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
 figma.ui.onmessage = (msg) => {
-  // One way of distinguishing between different types of messages sent from
-  // your HTML page is to use an object with a "type" property like this.
 
   if (msg.type) {
     if (msg.type === 'select-node') {
@@ -188,17 +208,24 @@ figma.ui.onmessage = (msg) => {
     if (msg.type === 'scan-whole-page-for-docs') {
       let page = figma.currentPage;
 
-      scanWholePageForDocuments(page).then((docs) => {
+      scanWholePageForDocuments(page).then((res) => {
         figma.ui.postMessage({
           type: 'docs-in-page',
-          data: { title: page.name, documents: docs },
+          data: res,
         });
       });
     }
 
-    //figma.ui.postMessage(figkeysAsync());
-    // Make sure to close the plugin when you're done. Otherwise the plugin will
-    // keep running, which shows the cancel button at the bottom of the screen.
+    if (msg.type === 'scan-whole-file-for-docs') {
+      let file = figma.root;
+      scanWholeFileForDocuments(file).then((res) =>
+        figma.ui.postMessage({
+          type: 'docs-in-file',
+          data: res,
+        })
+      );
+    }
+
     //figma.closePlugin();
   }
 };

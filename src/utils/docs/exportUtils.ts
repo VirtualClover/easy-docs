@@ -34,8 +34,6 @@ import { formatStringToFileName } from '../general/formatStringToFileName';
 import { generateBaseExportStyles } from '../../styles/generateBaseExportStyles';
 import { getURLFromAnchor } from '../general/flavoredText';
 
-// TODO Add Nextra
-
 let generateIFrameStyle = (
   borderColor: string,
   borderWidth: number,
@@ -81,7 +79,13 @@ let generateMDTableRow = (rowData: string[], docMap: DocMapItem[]): string => {
   return mdRow.join('');
 };
 
-let convertFlavoredText = (text: string, docMap: DocMapItem[] = []) => {
+/**
+ * Converts flavored text found in the JSON to markdown flavored text
+ * @param text - The text to convert
+ * @param docMap - Used if the reference links settings is enabled
+ * @returns A string of markdwon flavored text
+ */
+let convertFlavoredText = (text: string, docMap: DocMapItem[] = []): string => {
   let globalOffset = 0;
   let regularMatches = [
     ...text.matchAll(/(?<!<(b|i)>)<a[^>]*>([^<]+)<\/a>(?!<\/(b|i)>)/g),
@@ -243,7 +247,7 @@ let generateMDComponentDoc = (
 };
 
 /**
- * Generates markdown from the JSON page doc object
+ * Generates markdown from Page Data
  * @param data
  * @returns
  */
@@ -358,6 +362,11 @@ export async function generateMarkdownPage(
   return decodeStringForFigma(markdown.join('  \n'));
 }
 
+/**
+ * Stringifies the current Page data and returns it
+ * @param data - Page data
+ * @returns
+ */
 export async function generateJSONPage(
   data: PageData,
   settings: PluginSettings,
@@ -522,6 +531,13 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
   return formattedString.join('\n');
 };
 
+/**
+ * Generates HTML from Page Data; if the HTML body only setting is enabled it will only return the content inside <body>
+ * @param data - The page data
+ * @param settings - The current plugin settings
+ * @param docMap - Used if the reference links settings is enabled
+ * @returns
+ */
 export async function generateHTMLPage(
   data: PageData,
   settings: PluginSettings,
@@ -708,6 +724,14 @@ export async function generateHTMLPage(
   return html.join('  \n');
 }
 
+/**
+ * Transforms Page Data into a string of formatted content
+ * @param data - Page Data
+ * @param format - The format 
+ * @param settings - The current plugin settings
+ * @param docMap - Used if the reference links settings is enabled
+ * @returns 
+ */
 export async function generatePageExport(
   data: PageData,
   format: ExportFileFormat,
@@ -752,3 +776,16 @@ export function generateDocMap(data: DocData): DocMapItem[] {
   }
   return pagesArr;
 }
+
+/**
+ * Triggers a file download
+ * @param file - The file to download
+ * @param fileName - The file name
+ * @param extension - The extension of the file
+ */
+export let downloadFile = (file: any, fileName: string, extension: string) => {
+  let link = document.createElement('a');
+  link.href = URL.createObjectURL(file);
+  link.download = `${fileName}.${extension}`;
+  link.click();
+};

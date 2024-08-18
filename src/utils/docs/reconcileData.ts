@@ -11,7 +11,7 @@ import { clone } from '../general/clone';
 import { formatPageData } from './formatPageData';
 
 /**
- * Evaluates if there are changes between two doc JSONs
+ * Evaluates if there are changes between two Documents
  * @param newData
  * @param currentData
  * @param useCurrentDataFramesId
@@ -74,7 +74,7 @@ export function reconcileDocData(
 }
 
 /**
- * Evaluates if there are changes between two page JSONs
+ * Evaluates if there are changes between two Pages
  * @param newData
  * @param currentData
  * @param useCurrentDataFrameId

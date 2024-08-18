@@ -8,7 +8,7 @@ import {
   FormControlLabel,
   FormGroup,
   FormHelperText,
-  FormLabel,
+  IconButton,
   Snackbar,
   Stack,
   Switch,
@@ -16,11 +16,13 @@ import {
   Tab,
   Tabs,
   Toolbar,
+  Tooltip,
   Typography,
   styled,
 } from '@mui/material';
 import { PluginSettings, SETTINGS_GROUPS } from '../utils/constants/constants';
 
+import { GitHub } from '@mui/icons-material';
 import { MuiMarkdown } from 'mui-markdown';
 import { PluginDataContext } from '../utils/constants/PluginDataContext';
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
@@ -28,6 +30,7 @@ import { ViewContainer } from './components/ViewContainer';
 import aboutDoc from '../../README.md';
 import { clone } from '../utils/general/clone';
 import { generateA11yProps } from '../utils/editor/generateA11yProps';
+import metadata from '../../package.json';
 
 let AboutView = () => {
   {
@@ -37,17 +40,29 @@ let AboutView = () => {
 
     return (
       <AboutTabWrapper>
-        <MuiMarkdown>{aboutDoc}</MuiMarkdown>
-        <Typography
+        <Box
           sx={{
-            position: 'absolute',
-            bottom: 0,
             pb: 16,
-            color: 'text.secondary',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
+          style={{ flexDirection: 'row' }}
         >
-          Plugin version: {process.env.npm_package_version}
-        </Typography>
+          <Typography
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
+            Plugin version: {process.env.npm_package_version}
+          </Typography>
+          <Tooltip title="Go to the GitHub repo">
+            <IconButton href={metadata.repository.url} target="_blank">
+              <GitHub />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <MuiMarkdown>{aboutDoc}</MuiMarkdown>
       </AboutTabWrapper>
     );
   }

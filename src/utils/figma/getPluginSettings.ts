@@ -4,7 +4,7 @@ import { DEFAULT_SETTINGS, PluginSettings } from '../constants/constants';
 import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from '../constants';
 
 /**
- * Returns the plugin settings from the file storage, if there's none, it returns the default settings
+ * Returns the plugin settings from the file storage, if there's none, it returns null
  * @returns
  */
 export let getPluginSettings = (): PluginSettings | null => {
@@ -18,6 +18,10 @@ export let getPluginSettings = (): PluginSettings | null => {
   return stringPluginSettings ? JSON.parse(stringPluginSettings) : null;
 };
 
+/**
+ * Sets the plugin settings in the file storage
+ * @param settings
+ */
 export let setPluginSettings = (settings: PluginSettings) => {
   figma.root.setSharedPluginData(
     FIGMA_NAMESPACE,
@@ -26,16 +30,14 @@ export let setPluginSettings = (settings: PluginSettings) => {
   );
 };
 
+/**
+ * Checks if plugin settings exists in the file storage and if not it sets them
+ * @returns
+ */
 export let initPluginSettings = (): PluginSettings => {
-  let stringPluginSettings = figma.root.getSharedPluginData(
-    FIGMA_NAMESPACE,
-    FIGMA_PLUGIN_SETTINGS_KEY
-  );
 
   let pluginSettings = getPluginSettings();
 
-  console.log(DEFAULT_SETTINGS);
-  console.log(stringPluginSettings);
   //console.log(JSON.parse(stringPluginSettings));
   let mergedSettings = pluginSettings
     ? _.merge(DEFAULT_SETTINGS, pluginSettings)
