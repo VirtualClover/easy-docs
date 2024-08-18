@@ -1,7 +1,8 @@
 import { Divider as DividerComp, ThemeProvider, styled } from '@mui/material';
 import { darkTheme, lightTheme } from '../../../styles/themes';
 
-import { DEFAULT_SETTINGS } from '../../constants/constants';
+import { DEFAULT_SETTINGS } from '../../constants';
+import { PluginThemeProvider } from '../../../ui/components/PluginThemeProvider';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { dividerIcon } from '../../../assets/svgs';
@@ -49,13 +50,12 @@ export class Divider {
   }
 
   render() {
-    const themeMode = document.documentElement.className;
     let ui = document.createElement('div');
     let root = createRoot(ui);
     root.render(
-      <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
+      <PluginThemeProvider>
         <InputUI {...this.data} />
-      </ThemeProvider>
+      </PluginThemeProvider>
     );
     //console.log('render');
     ui.classList.add('divider');

@@ -1,10 +1,8 @@
 import {
   BaseComponentData,
+  BlockData,
   DEFAULT_TABLE_CELL_TYPES,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants/constants';
-import {
-  BlockData,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   TableBlockData,

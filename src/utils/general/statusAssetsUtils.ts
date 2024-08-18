@@ -1,4 +1,4 @@
-import { GuidelineType, StatusType } from '../constants/constants';
+import { GuidelineType, StatusType } from '../constants';
 export const mapDosAndDontsToStatus = (type: GuidelineType): string => {
   switch (type) {
     case 'do':

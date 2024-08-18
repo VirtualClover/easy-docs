@@ -6,7 +6,7 @@ import {
   ExportFileFormat,
   PageData,
   PluginSettings,
-} from '../constants/constants';
+} from '../constants';
 import {
   decideEmojiBasedOnDosAndDonts,
   decideEmojiBasedOnStatus,
@@ -727,10 +727,10 @@ export async function generateHTMLPage(
 /**
  * Transforms Page Data into a string of formatted content
  * @param data - Page Data
- * @param format - The format 
+ * @param format - The format
  * @param settings - The current plugin settings
  * @param docMap - Used if the reference links settings is enabled
- * @returns 
+ * @returns
  */
 export async function generatePageExport(
   data: PageData,

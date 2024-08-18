@@ -1,7 +1,11 @@
 import * as _ from 'lodash';
 
-import { DEFAULT_SETTINGS, PluginSettings } from '../constants/constants';
-import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from '../constants';
+import {
+  DEFAULT_SETTINGS,
+  FIGMA_NAMESPACE,
+  FIGMA_PLUGIN_SETTINGS_KEY,
+  PluginSettings,
+} from '../constants';
 
 /**
  * Returns the plugin settings from the file storage, if there's none, it returns null
@@ -33,7 +37,6 @@ export let setPluginSettings = (settings: PluginSettings) => {
  * @returns
  */
 export let initPluginSettings = (): PluginSettings => {
-
   let pluginSettings = getPluginSettings();
 
   //console.log(JSON.parse(stringPluginSettings));

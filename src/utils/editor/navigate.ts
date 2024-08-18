@@ -1,4 +1,4 @@
-import { PluginData, PluginViews } from '../constants/constants';
+import { PluginData, PluginViews } from '../constants';
 
 /**
  * Navigation state for the UI of the plugin

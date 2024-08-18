@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants/constants';
+import { DocData, EMPTY_AUTHOR_DATA, PageData } from '../../utils/constants';
 
 import { Box } from '@mui/material';
 import { EDITOR_TOOLS } from '../../utils/editor/editorConfig';

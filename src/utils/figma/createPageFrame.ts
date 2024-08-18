@@ -1,4 +1,4 @@
-import { PluginSettings } from '../constants/constants';
+import { PluginSettings } from '../constants';
 import { styleFrame } from './styleFrame';
 
 /**

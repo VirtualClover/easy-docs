@@ -1,6 +1,5 @@
-import { FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
+import { BaseComponentData, FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
 
-import { BaseComponentData } from '../../constants/constants';
 import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
 import { createCodeComponent } from './codeComponent.figma';

@@ -5,23 +5,17 @@ import {
   ComponentDocBlockData,
   EMPTY_COMPONENT_SHARED_DATA,
   EMPTY_VARIANT_SHARED_DATA,
-} from '../../constants';
-import {
-  DEFAULT_SETTINGS,
   FrameDetailsFromURL,
-} from '../../constants/constants';
-import { componentIcon, figmaIcon } from '../../../assets/svgs';
-import {
-  decodeStringForFigma,
-  encodeStringForHTML,
-} from '../../general/cleanseTextData';
+} from '../../constants';
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
 } from '../../general/urlHandlers';
 
+import { PluginThemeProvider } from '../../../ui/components/PluginThemeProvider';
 import React from 'react';
 import { clone } from '../../general/clone';
+import { componentIcon } from '../../../assets/svgs';
 import { createRoot } from 'react-dom/client';
 
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
@@ -154,7 +148,7 @@ export class ComponentDoc {
   render() {
     let ui = document.createElement('div');
     let root = createRoot(ui);
-    root.render(<InputUI {...this.data} />);
+    root.render(<PluginThemeProvider><InputUI {...this.data} /></PluginThemeProvider>);
     ui.classList.add('component-specs');
 
     return ui;

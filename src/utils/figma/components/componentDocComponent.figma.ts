@@ -1,14 +1,12 @@
 import {
   BaseComponentData,
-  FIGMA_COMPONENT_PREFIX,
-} from '../../constants/constants';
-import {
   BlockData,
   ComponentDocBlockData,
   ComponentSharedData,
   EMPTY_COMPONENT_SHARED_DATA,
   EMPTY_VARIANT_SHARED_DATA,
   FIGMA_COMPONENT_DOCS_KEY,
+  FIGMA_COMPONENT_PREFIX,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
   Position,
@@ -21,7 +19,6 @@ import {
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
-  validateFigmaURL,
 } from '../../general/urlHandlers';
 
 import _ from 'lodash';

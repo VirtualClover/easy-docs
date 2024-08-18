@@ -2,7 +2,7 @@ import {
   BaseComponentData,
   BlockData,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants/constants';
+} from '../../constants';
 import {
   FIGMA_COMPONENT_DATA_KEY,
   FIGMA_COMPONENT_VERSION_KEY,

@@ -1,4 +1,4 @@
-import { PluginData } from '../constants/constants';
+import { PluginData } from '../constants';
 
 /**
  * Tells Figma to select another page within the Figma Section

@@ -3,7 +3,7 @@ import {
   DEFAULT_GUIDELINES,
   FIGMA_COMPONENT_PREFIX,
   GuidelineType,
-} from '../../constants/constants';
+} from '../../constants';
 import { cautionIcon, doIcon, dontIcon } from '../../../assets/svgs';
 import {
   decodeStringForFigma,

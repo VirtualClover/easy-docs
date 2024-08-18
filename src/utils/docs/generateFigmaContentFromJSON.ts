@@ -1,14 +1,5 @@
-import {
-  BlockData,
-  DocData,
-  PageData,
-  PluginSettings,
-} from '../constants/constants';
-import {
-  FIGMA_COMPONENT_VERSION_KEY,
-  FIGMA_LAST_EDITED_KEY,
-  FIGMA_NAMESPACE,
-} from '../constants';
+import { BlockData, DocData, PageData } from '../constants';
+import { FIGMA_LAST_EDITED_KEY, FIGMA_NAMESPACE } from '../constants';
 
 import { createPageFrame } from '../figma/createPageFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
@@ -33,8 +24,8 @@ import { selectNode } from '../figma/selectNode';
  * Generates Figma nodes based on doc data passed
  * @param data -The Document data
  * @param parentSection - The section where it should be generated in
- * @param editedFrames - The page that were edited compared to the current data 
- * @returns 
+ * @param editedFrames - The page that were edited compared to the current data
+ * @returns
  */
 export async function generateFigmaContentFromJSON(
   data: DocData,

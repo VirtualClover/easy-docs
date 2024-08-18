@@ -1,4 +1,4 @@
-import { DocData } from '../constants/constants';
+import { DocData } from '../constants';
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { reconcileDocData } from '../docs/reconcileData';
 import { scanCurrentSelectionForDocs } from './scans';

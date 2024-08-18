@@ -20,7 +20,7 @@ import {
   Typography,
   styled,
 } from '@mui/material';
-import { PluginSettings, SETTINGS_GROUPS } from '../utils/constants/constants';
+import { PluginSettings, SETTINGS_GROUPS } from '../utils/constants';
 
 import { GitHub } from '@mui/icons-material';
 import { MuiMarkdown } from 'mui-markdown';

@@ -2,9 +2,7 @@ import * as _ from 'lodash';
 
 import {
   Box,
-  Button,
   FormControl,
-  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
@@ -19,7 +17,7 @@ import {
   ExportFileFormat,
   FigmaFileDocData,
   FigmaPageDocData,
-} from '../../utils/constants/constants';
+} from '../../utils/constants';
 import {
   downloadFile,
   generateDocMap,

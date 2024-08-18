@@ -1,5 +1,5 @@
 import { FigmaURLType } from '../constants';
-import { FrameDetailsFromURL } from '../constants/constants';
+import { FrameDetailsFromURL } from '../constants';
 
 type FrameIdTreatment = 'encode' | 'decode';
 

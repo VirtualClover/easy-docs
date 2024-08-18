@@ -1,16 +1,10 @@
-import {
-  AuthorUser,
-  BaseComponentData,
-  DEFAULT_SETTINGS,
-  PluginSettings,
-} from '../constants/constants';
-import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from '../constants';
-import { getPluginSettings, initPluginSettings } from './getPluginSettings';
+import { AuthorUser, BaseComponentData, PluginSettings } from '../constants';
 
 import { getComponentData } from './getComponentData';
 import { getUserDetailsInFigma } from './getUserDetailsFigma';
 import { handleFigmaError } from './handleFigmaError';
 import { initComponents } from './components/initComponents';
+import { initPluginSettings } from './getPluginSettings';
 import { objectIsNull } from '../general/objectisNull';
 
 /**
@@ -20,7 +14,6 @@ export async function pluginInit() {
   let userData: AuthorUser = getUserDetailsInFigma();
   let componentData: BaseComponentData = getComponentData();
   let pluginSettings: PluginSettings = initPluginSettings();
-  //console.log(componentData);
   //Check if object exists
   if (objectIsNull(componentData)) {
     initComponents(componentData, true);
@@ -37,7 +30,13 @@ export async function pluginInit() {
               !currentNode ||
               (currentNode.type != 'PAGE' && !currentNode.parent)
             ) {
-              initComponents(componentData, false).catch((e) => handleFigmaError(`There was an error generating the components`, 'ED-F0002',e));
+              initComponents(componentData, false).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the components`,
+                  'ED-F0002',
+                  e
+                )
+              );
             }
           });
         break;

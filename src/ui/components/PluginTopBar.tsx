@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ArrowBack, SettingsOutlined } from '@mui/icons-material';
-import { DocData, PluginData } from '../../utils/constants/constants';
+import { DocData, PluginData, UNTITLED_DOC_PLACEHOLDER } from '../../utils/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -62,7 +62,7 @@ const EditorBar = () => {
   function handleInputChange(pluginContext: PluginData, title: string) {
     let tempDoc: DocData = {
       ...pluginContext.currentDocData,
-      title: encodeStringForHTML(title),
+      title: title ? encodeStringForHTML(title) : UNTITLED_DOC_PLACEHOLDER,
     };
     pushNewDataToFigma(pluginContext, tempDoc);
     setEditDocTitle(false);

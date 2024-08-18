@@ -1,18 +1,16 @@
 import {
   AlertBlockData,
+  BaseComponentData,
   BlockData,
+  DEFAULT_STATUSES,
   FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_COMPONENT_PREFIX,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
+  StatusType,
   TextAlignment,
   UpperCaseTextAligment,
 } from '../../constants';
-import {
-  BaseComponentData,
-  DEFAULT_STATUSES,
-  FIGMA_COMPONENT_PREFIX,
-  StatusType,
-} from '../../constants/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,

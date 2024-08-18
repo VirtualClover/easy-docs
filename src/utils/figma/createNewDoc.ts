@@ -1,4 +1,4 @@
-import { DocData, PluginSettings } from '../constants/constants';
+import { DocData, PluginSettings } from '../constants';
 
 import { generateFigmaContentFromJSON } from '../docs/generateFigmaContentFromJSON';
 import { getPluginSettings } from './getPluginSettings';

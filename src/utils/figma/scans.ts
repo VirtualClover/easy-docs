@@ -2,7 +2,7 @@ import {
   DocData,
   FigmaFileDocData,
   FigmaPageDocData,
-} from '../constants/constants';
+} from '../constants';
 
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { getCurrentSectionFromChildNode } from './getCurrentSectionFromChildNode';

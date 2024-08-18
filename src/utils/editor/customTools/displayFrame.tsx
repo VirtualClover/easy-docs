@@ -1,4 +1,5 @@
 import { Alert, Typography, styled } from '@mui/material';
+import { DEFAULT_SETTINGS, DisplayFrameBlockData } from '../../constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -8,8 +9,7 @@ import {
   getDetailsFromFigmaURL,
 } from '../../general/urlHandlers';
 
-import { DEFAULT_SETTINGS } from '../../constants/constants';
-import { DisplayFrameBlockData } from '../../constants';
+import { PluginThemeProvider } from '../../../ui/components/PluginThemeProvider';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { figmaIcon } from '../../../assets/svgs';
@@ -144,7 +144,7 @@ export class DisplayFrame {
   render() {
     let ui = document.createElement('div');
     let root = createRoot(ui);
-    root.render(<InputUI {...this.data} />);
+    root.render(<PluginThemeProvider><InputUI {...this.data} /></PluginThemeProvider>);
     //console.log('render');
     ui.classList.add('display-frame');
 

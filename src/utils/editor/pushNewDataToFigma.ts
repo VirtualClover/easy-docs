@@ -1,4 +1,4 @@
-import { DocData, PluginData } from '../constants/constants';
+import { DocData, PluginData } from '../constants';
 
 import { formatDocData } from '../docs/formatDocData';
 

@@ -2,14 +2,13 @@ import {
   BaseComponentData,
   DocData,
   EMPTY_DOC_OBJECT,
-  PageData,
-  PluginSettings,
-} from '../constants/constants';
-import {
   FIGMA_COMPONENT_DATA_KEY,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_LAST_EDITED_KEY,
   FIGMA_NAMESPACE,
+  PageData,
+  PluginSettings,
+  UNTITLED_DOC_PLACEHOLDER,
 } from '../constants';
 import {
   generateBlockDataFromComponentDoc,
@@ -52,6 +51,9 @@ export let generateJSONFromFigmaContent = async (
   docData: DocData;
   overrideEditorChanges: boolean;
 }> => {
+  if (!section.name) {
+    section.name = UNTITLED_DOC_PLACEHOLDER;
+  }
   let response: { docData: DocData; overrideEditorChanges: boolean } = {
     docData: {
       title: encodeStringForHTML(section.name),

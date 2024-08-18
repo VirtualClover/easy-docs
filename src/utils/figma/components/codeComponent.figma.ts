@@ -1,7 +1,7 @@
 import {
   BaseComponentData,
   FIGMA_COMPONENT_PREFIX,
-} from '../../constants/constants';
+} from '../../constants';
 import {
   BlockData,
   CodeBlockData,

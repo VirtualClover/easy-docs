@@ -1,12 +1,7 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import {
-  DocData,
-  EMPTY_DOC_OBJECT,
-  FigmaFileDocData,
-  FigmaPageDocData,
-} from './utils/constants/constants';
+import { DocData, EMPTY_DOC_OBJECT } from './utils/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
@@ -16,7 +11,6 @@ import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';
 import { createNewDocJSON } from './utils/docs/createNewDocJSON';
 import { slowUpdateOutdatedComponentBlocks } from './utils/figma/slowUpdateOutDatedNodes';
-import { FIGMA_NAMESPACE, FIGMA_PLUGIN_SETTINGS_KEY } from './utils/constants';
 import { setPluginSettings } from './utils/figma/getPluginSettings';
 import {
   scanWholeFileForDocuments,
@@ -65,7 +59,9 @@ figma.ui.onmessage = (msg) => {
 
     //Initializes the plugin
     if (msg.type === 'load-data') {
-      pluginInit().catch((e) => handleFigmaError(`The plugin couldn't load correclty`, 'ED-F0001',e));
+      pluginInit().catch((e) =>
+        handleFigmaError(`The plugin couldn't load correclty`, 'ED-F0001', e)
+      );
     }
 
     //Saves the current settings in the file sotrage
@@ -77,19 +73,27 @@ figma.ui.onmessage = (msg) => {
     if (msg.type === 'create-new-doc') {
       stopUpdates = true;
       let section: SectionNode;
-      createNewDoc(createNewDocJSON()).then((s) => {
-        section = s;
-        generateJSONFromFigmaContent(section).then(async (res) => {
-          stopUpdates = false;
-          lastFetchDoc = res.docData;
-          figma.viewport.scrollAndZoomIntoView([section]);
-          figma.ui.postMessage({
-            type: 'new-node-data',
-            data: res.docData,
-            overrideEditorChanges: res.overrideEditorChanges,
+      createNewDoc(createNewDocJSON())
+        .then((s) => {
+          section = s;
+          generateJSONFromFigmaContent(section).then(async (res) => {
+            stopUpdates = false;
+            lastFetchDoc = res.docData;
+            figma.viewport.scrollAndZoomIntoView([section]);
+            figma.ui.postMessage({
+              type: 'new-node-data',
+              data: res.docData,
+              overrideEditorChanges: res.overrideEditorChanges,
+            });
           });
-        });
-      }).catch((e) => handleFigmaError(`There was an error creating a new document`, 'ED-F0005',e));
+        })
+        .catch((e) =>
+          handleFigmaError(
+            `There was an error creating a new document`,
+            'ED-F0005',
+            e
+          )
+        );
     }
 
     //Push updates from Figma to the Editor

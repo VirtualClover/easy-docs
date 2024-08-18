@@ -1,5 +1,5 @@
 import { Alert, Stack, Typography, styled } from '@mui/material';
-import { DEFAULT_SETTINGS, GuidelineType } from '../../constants/constants';
+import { DEFAULT_SETTINGS, GuidelineType } from '../../constants';
 import {
   cautionIcon,
   doIcon,
@@ -16,13 +16,13 @@ import {
 } from '../../general/urlHandlers';
 
 import { DosAndDontsBlockData } from '../../constants';
+import { PluginThemeProvider } from '../../../ui/components/PluginThemeProvider';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { mapDosAndDontsToStatus } from '../../general/statusAssetsUtils';
 
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
 //`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
-
 
 let IFrame = styled('iframe')(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
@@ -71,7 +71,8 @@ const InputUI = (blockData: DosAndDontsBlockData) => {
             typeof frameExistsInFile !== 'undefined' &&
             !frameExistsInFile && (
               <Alert severity="warning">
-                The frame referenced in this block was possibly deleted or the frame is located on another file.
+                The frame referenced in this block was possibly deleted or the
+                frame is located on another file.
               </Alert>
             )}
           <IFrame
@@ -226,8 +227,11 @@ export class DosAndDonts {
   render() {
     let ui = document.createElement('div');
     let root = createRoot(ui);
-    root.render(<InputUI {...this.data} />);
-    //console.log('render');
+    root.render(
+      <PluginThemeProvider>
+        <InputUI {...this.data} />
+      </PluginThemeProvider>
+    );
     ui.classList.add('dos-and-donts');
 
     return ui;

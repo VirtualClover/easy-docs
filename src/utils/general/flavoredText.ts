@@ -1,7 +1,6 @@
 import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
-import { TextAlignment, UpperCaseTextAligment } from '../constants';
+import { StringFormats, TextAlignment, UpperCaseTextAligment } from '../constants';
 
-import { StringFormats } from '../constants/constants';
 import { setRangeNodeFills } from '../figma/setNodeFills';
 
 export let matchFlavoredText = (string: string) => {

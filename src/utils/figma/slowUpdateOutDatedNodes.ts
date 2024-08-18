@@ -2,7 +2,7 @@ import { FIGMA_COMPONENT_VERSION_KEY, FIGMA_NAMESPACE } from '../constants';
 
 import {
   FIGMA_COMPONENT_PREFIX,
-} from '../constants/constants';
+} from '../constants';
 import { getComponentData } from './getComponentData';
 import { scanCurrentSelectionForDocs } from './scans';
 

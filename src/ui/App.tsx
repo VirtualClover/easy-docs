@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 
 import { CircularProgress, Snackbar } from '@mui/material';
-import { DocData, PluginData, PluginViews } from '../utils/constants/constants';
-import { darkTheme, lightTheme } from '../styles/themes';
+import { DocData, PluginData, PluginViews } from '../utils/constants';
 
 import { BottomSheet } from './components/BottomSheet';
 import { EditorView } from './EditorView';
@@ -12,11 +11,9 @@ import { PluginContainer } from './components/PluginContainer';
 import { PluginDataContext } from '../utils/constants/PluginDataContext';
 import { PluginTopBar } from './components/PluginTopBar';
 import { SettingsView } from './SettingsView';
-import { ThemeProvider } from '@mui/material/styles';
 import { VersionBanner } from './components/VersionBanner';
 
 interface ComponentProps {
-  themeMode: string;
   initialPluginData: PluginData;
 }
 
@@ -37,7 +34,7 @@ function decideView(currentView: PluginViews) {
   }
 }
 
-function App({ themeMode, initialPluginData }: ComponentProps) {
+function App({ initialPluginData }: ComponentProps) {
   const [view, setView] = React.useState(<InspectView />);
   //Context states
   const [currentDocData, setCurrentDocData] = React.useState(
@@ -205,7 +202,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
   ]);
 
   return (
-    <ThemeProvider theme={themeMode == 'figma-dark' ? darkTheme : lightTheme}>
       <PluginDataContext.Provider
         value={{
           currentDocData,
@@ -259,7 +255,6 @@ function App({ themeMode, initialPluginData }: ComponentProps) {
           />
         </PluginContainer>
       </PluginDataContext.Provider>
-    </ThemeProvider>
   );
 }
 

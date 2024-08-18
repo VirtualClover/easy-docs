@@ -1,9 +1,4 @@
 import {
-  BaseComponentData,
-  FIGMA_COMPONENT_PREFIX,
-} from '../../constants/constants';
-
-import {
   decodeStringForFigma,
   encodeStringForHTML,
 } from '../../general/cleanseTextData';
@@ -18,7 +13,8 @@ import { setNodeFills } from '../setNodeFills';
 import {
   BlockData,
   DisplayFrameBlockData,
-  FIGMA_COMPONENT_DATA_KEY,
+  BaseComponentData,
+  FIGMA_COMPONENT_PREFIX,
   FIGMA_COMPONENT_VERSION_KEY,
   FIGMA_NAMESPACE,
 } from '../../constants';

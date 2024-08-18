@@ -150,15 +150,5 @@ export interface ComponentDocBlockData extends ComponentSharedData {}
 export interface BlockData extends OutputBlockData {
   figmaNodeId: string;
   lastEdited: number;
-  data:
-    | ParagraphBlockData
-    | HeaderBlockData
-    | QuoteBlockData
-    | AlertBlockData
-    | DisplayFrameBlockData
-    | DosAndDontsBlockData
-    | ListBlockData
-    | TableBlockData
-    | CodeBlockData
-    | ComponentDocBlockData;
+  data:any;
 }
