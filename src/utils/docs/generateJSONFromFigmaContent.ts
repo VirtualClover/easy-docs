@@ -91,7 +91,7 @@ export let generateJSONFromFigmaContent = async (
           })
           .catch((e) =>
             handleFigmaError(
-              `There was an error generating a the page data from the Figma content`,
+              `There was an error generating the page data from the Figma content`,
               'ED-F0022',
               e
             )
@@ -155,7 +155,12 @@ export let generatePageDataFromFrame = async (
           let mainCompId: string;
           await getMainCompIdFromInstance(childNode).then(
             (id) => (mainCompId = id)
-          );
+          ).catch((e) =>
+            handleFigmaError(
+              `There was an error generating the page data from the Figma content`,
+              'ED-F0023',
+              e
+            ));
 
           switch (mainCompId) {
             case componentData.components.header.id:
@@ -164,14 +169,24 @@ export let generatePageDataFromFrame = async (
                 componentData,
                 editedDate,
                 childNode.id
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from a header block`,
+                  'ED-F0024',
+                  e
+                ));
               break;
             case componentData.components.paragraph.id:
               generateBlockDataFromParagraph(
                 childNode,
                 editedDate,
                 childNode.id
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from a paragraph block`,
+                  'ED-F0025',
+                  e
+                ));
               break;
             case componentData.components.quote.id:
               generateBlockDataFromQuote(
@@ -179,7 +194,12 @@ export let generatePageDataFromFrame = async (
                 componentData,
                 editedDate,
                 childNode.id
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from a quote block`,
+                  'ED-F0026',
+                  e
+                ));
 
               break;
             case componentData.components.list.id:
@@ -187,7 +207,12 @@ export let generatePageDataFromFrame = async (
                 childNode,
                 editedDate,
                 childNode.id
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from a list block`,
+                  'ED-F0027',
+                  e
+                ));
               break;
             case componentData.components.alert.id:
               generateBlockDataFromAlert(
@@ -195,7 +220,12 @@ export let generatePageDataFromFrame = async (
                 componentData,
                 editedDate,
                 childNode.id
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from an alert block`,
+                  'ED-F0028',
+                  e
+                ));
               break;
             case componentData.components.code.id:
               generateBlockDataFromCode(
@@ -203,12 +233,22 @@ export let generatePageDataFromFrame = async (
                 componentData,
                 editedDate,
                 childNode.id
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from a code block`,
+                  'ED-F0029',
+                  e
+                ));
               break;
             case componentData.components.divider.id:
               generateBlockDataFromDivider(editedDate, childNode.id).then(
                 (data) => response.pageData.blocks.push(data)
-              );
+              ).catch((e) =>
+                handleFigmaError(
+                  `There was an error generating the page data from a divider block`,
+                  'ED-F0030',
+                  e
+                ));
               break;
             case componentData.components.dosAndDonts.id:
               //Probably a dehydrated frame
@@ -217,7 +257,12 @@ export let generatePageDataFromFrame = async (
                 frame,
                 i,
                 componentData
-              ).then((data) => response.pageData.blocks.push(data));
+              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
+                handleFigmaError(
+                  `There was an error hydrating and generating a the page data from a dos and dont's block`,
+                  'ED-F0031',
+                  e
+                ));
               break;
             case componentData.components.displayFrame.id:
               //Probably a dehydrated frame
@@ -232,7 +277,12 @@ export let generatePageDataFromFrame = async (
               //Probably a dehydrated frame
               await hydrateComponentDoc(childNode, i, componentData).then(
                 (data) => response.pageData.blocks.push(data)
-              );
+              ).catch((e) =>
+                handleFigmaError(
+                  `There was an error hydrating and generating a the page data from a component doc block`,
+                  'ED-F0031',
+                  e
+                ));
               break;
 
             default:
@@ -307,6 +357,8 @@ export let generatePageDataFromFrame = async (
                 break;
 
               case componentData.components.componentDoc.id:
+                console.log('gets here x4');
+                
                 await generateBlockDataFromComponentDoc(
                   instInsideAFrame,
                   componentData,
@@ -314,6 +366,8 @@ export let generatePageDataFromFrame = async (
                   childNode.id,
                   i
                 ).then((data) => {
+                  console.log('gets here x9');
+                  
                   response.pageData.blocks.push(data);
                   response.hasComponentDocBlock = true;
                 });
@@ -336,5 +390,6 @@ export let generatePageDataFromFrame = async (
   }
 
   formatPageData(response.pageData);
+  console.log('gets here x10');
   return response;
 };

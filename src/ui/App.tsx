@@ -73,6 +73,10 @@ function App({ initialPluginData }: ComponentProps) {
     initialPluginData.lastFormatUsed
   );
 
+  const [lastExportActionUsed, setLastExportActionUsed] = React.useState(
+    initialPluginData.lastExportActionUsed
+  );
+
   const [buildingComponentDoc, setBuildingComponentDoc] = React.useState(
     initialPluginData.buildingComponentDoc
   );
@@ -230,6 +234,8 @@ function App({ initialPluginData }: ComponentProps) {
           setOutdatedComponents,
           lastFormatUsed,
           setLastFormatUsed,
+          lastExportActionUsed,
+          setLastExportActionUsed,
           buildingComponentDoc,
           setBuildingComponentDoc,
         }}

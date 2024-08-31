@@ -8,6 +8,7 @@ import Grow from '@mui/material/Grow';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
+import { PluginDataContext } from '../../utils/constants/PluginDataContext';
 import Popper from '@mui/material/Popper';
 
 export const ExportButton = ({
@@ -17,15 +18,15 @@ export const ExportButton = ({
   disabled: boolean;
   actions: { label: string; onClick: () => void }[];
 }) => {
+  const pluginContext = React.useContext(PluginDataContext);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
 
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number
   ) => {
-    setSelectedIndex(index);
+    pluginContext.setLastExportActionUsed(index);
     setOpen(false);
   };
 
@@ -51,8 +52,8 @@ export const ExportButton = ({
         ref={anchorRef}
         aria-label="Button group with a nested menu"
       >
-        <Button onClick={actions[selectedIndex].onClick} disabled={disabled}>
-          {actions[selectedIndex].label}
+        <Button onClick={actions[pluginContext.lastExportActionUsed].onClick} disabled={disabled}>
+          {actions[pluginContext.lastExportActionUsed].label}
         </Button>
         <Button
           disabled={disabled}
@@ -89,7 +90,7 @@ export const ExportButton = ({
                   {actions.map((action, index) => (
                     <MenuItem
                       key={index}
-                      selected={index === selectedIndex}
+                      selected={index === pluginContext.lastExportActionUsed}
                       onClick={(event) => handleMenuItemClick(event, index)}
                     >
                       {action.label}

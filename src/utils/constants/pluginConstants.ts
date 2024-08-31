@@ -9,6 +9,7 @@ import {
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { ExportFileFormat } from './exportConstants';
+import { Palette } from '@mui/icons-material';
 
 const frameSettings = {
   minWidth: 1400,
@@ -42,6 +43,7 @@ export type SectionSettings = typeof sectionSettings;
 const customizationSettings = {
   fontFamily: BASE_STYLE_TOKENS.fontFamily,
   palette: BASE_STYLE_TOKENS.palette,
+  paletteDark: BASE_STYLE_TOKENS.palette_dark,
   frame: frameSettings,
   section: sectionSettings,
   key: 'Customization',
@@ -142,6 +144,8 @@ export const DEFAULT_PLUGIN_DATA = {
   setOutdatedComponents: (state: boolean) => {},
   lastFormatUsed: 'md' as ExportFileFormat,
   setLastFormatUsed: (format: ExportFileFormat) => {},
+  lastExportActionUsed: 0 as number,
+  setLastExportActionUsed: (index: number) => {},
   buildingComponentDoc: false,
   setBuildingComponentDoc: (state: boolean) => {},
 };

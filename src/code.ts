@@ -34,7 +34,7 @@ let lastFetchDoc = EMPTY_DOC_OBJECT;
 // posted message.
 figma.ui.onmessage = (msg) => {
   if (msg.type) {
-    // If statements instead of a switch let's me control the order of events more easily, for example, when there is a cahced data that needs to be generated
+    // If statements instead of a switch let's me control the order of events more easily, for example, when there is a cached data that needs to be generated
 
     //Selects a node given an ID
     if (msg.type === 'select-node') {
@@ -197,6 +197,16 @@ figma.ui.onmessage = (msg) => {
       );
     }
 
+    if (msg.type === 'scan-whole-file-for-doc-site') {
+      let file = figma.root;
+      scanWholeFileForDocuments(file).then((res) =>
+        figma.ui.postMessage({
+          type: 'docs-in-file-for-doc-site',
+          data: res,
+        })
+      );
+    }
+    //scan-whole-file-for-doc-site
     //figma.closePlugin();
   }
 };

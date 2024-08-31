@@ -211,7 +211,7 @@ let ExportsView = () => {
             label="[EXPERIMENTAL] Enable reference links"
           />
           <FormHelperText>
-            If a link reference another page frame in Figma, the exported file
+            If a link reference another page frame in  Figma, the exported file
             will try and reference the homogenus file instead of the figma
             frame.
           </FormHelperText>
@@ -235,7 +235,7 @@ let ExportsView = () => {
             label="Export iframes as links"
           />
           <FormHelperText>
-            Tells the plugin to export frames as links instead of iframes.
+            Tells the plugin to export frames as Figma links instead of iframes.
           </FormHelperText>
         </FormGroup>
       </SettingsSection>

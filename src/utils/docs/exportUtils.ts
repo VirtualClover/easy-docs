@@ -1,4 +1,20 @@
-import { ComponentDocBlockData, FigmaURLType } from '../constants';
+import {
+  ComponentDocBlockData,
+  CustomizationSettings,
+  DocumentBundleMetaData,
+  EMPTY_DOCUMENT_METADATA,
+  EMPTY_FIGMA_FILE_BUNDLE_METADATA,
+  EMPTY_FIGMA_PAGE_BUNDLE_METADATA,
+  EMPTY_PAGE_METADATA,
+  ExportScope,
+  FigmaFileBundleMetaData,
+  FigmaFileDocData,
+  FigmaPageBundleMetaData,
+  FigmaPageDocData,
+  FigmaURLType,
+  METADATA_FILENAME,
+  PageBundleMetaData,
+} from '../constants';
 import {
   DEFAULT_SETTINGS,
   DocData,
@@ -17,6 +33,12 @@ import {
   encodeStringForHTML,
 } from '../general/cleanseTextData';
 import {
+  generateBaseCSSDocSiteStyles,
+  generateBaseCSSDocumentStyles,
+  generateCSSVars,
+  generateInlineStyles,
+} from '../../styles/generateBaseExportStyles';
+import {
   generateDisplayFrameCaptionForAnatomyFrame,
   generateHeaderContentForVariant,
   generateLayerDescription,
@@ -25,13 +47,18 @@ import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
 } from '../general/urlHandlers';
+import {
+  getPathInDocument,
+  getPathInFigmaFile,
+  getPathInFigmaPage,
+} from '../exports/getPathToFile';
 
-import { BASE_STYLE_TOKENS } from '../../styles/base';
+import JSZip from 'jszip';
 import { addIndentation } from '../general/addIndentation';
+import { clone } from '../general/clone';
 import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
 import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
-import { formatStringToFileName } from '../general/formatStringToFileName';
-import { generateBaseExportStyles } from '../../styles/generateBaseExportStyles';
+import { formatDirName } from '../exports/formatDirName';
 import { getURLFromAnchor } from '../general/flavoredText';
 
 let generateIFrameStyle = (
@@ -41,12 +68,29 @@ let generateIFrameStyle = (
 ) =>
   `border: ${borderWidth}px solid ${borderColor}; border-radius:${borderRadius}px`;
 
+  let getPathBasedOnScope = (scope: ExportScope = 'figmaPage',frameId:string,currentIndex:number[], metadata) => {
+    switch(scope) {
+      case 'doc':
+        return getPathInDocument(frameId,metadata).path;
+        break;
+        case 'figmaPage':
+        return getPathInFigmaPage(frameId,metadata,currentIndex).path;
+        break;
+        case 'figmaFile':
+        return getPathInFigmaFile(frameId,metadata,currentIndex).path;
+        break;
+    }
+  };
+
 let generateIFrame = (
   iframeSrc: string,
   iFrameCaption: string,
   exportLink: boolean = false,
   identation: number = 0,
-  style: string = '',
+  style: string = generateIFrameStyle(
+    DEFAULT_SETTINGS.customization.palette.status.neutral.default,
+    3
+  ),
   extraClass: string = '',
   classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
 ) => {
@@ -251,11 +295,11 @@ let generateMDComponentDoc = (
  * @param data
  * @returns
  */
-export async function generateMarkdownPage(
+export let generateMarkdownPage = async (
   data: PageData,
   settings: PluginSettings,
   docMap: DocMapItem[] = []
-): Promise<string> {
+): Promise<string> => {
   //console.log(data);
 
   let markdown = [];
@@ -360,20 +404,20 @@ export async function generateMarkdownPage(
   }
 
   return decodeStringForFigma(markdown.join('  \n'));
-}
+};
 
 /**
  * Stringifies the current Page data and returns it
  * @param data - Page data
  * @returns
  */
-export async function generateJSONPage(
+export let generateJSONPage = async (
   data: PageData,
   settings: PluginSettings,
   docMap: DocMapItem[] = []
-): Promise<string> {
+): Promise<string> => {
   return JSON.stringify(data, null, 2);
-}
+};
 
 let generateHTMLTableRow = (
   rowData: string[],
@@ -538,15 +582,16 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
  * @param docMap - Used if the reference links settings is enabled
  * @returns
  */
-export async function generateHTMLPage(
+export let generateHTMLPage = async (
   data: PageData,
   settings: PluginSettings,
-  docMap: DocMapItem[] = []
-): Promise<string> {
+  docMap: DocMapItem[] = [],
+  initialIndentation: number = 0
+): Promise<string> => {
   //console.log(data);
 
   let html = [];
-  let bodyIdentation = 0;
+  let bodyIdentation = 0 + initialIndentation;
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
   if (!settings.export.html.bodyOnly) {
     bodyIdentation = 3;
@@ -556,16 +601,16 @@ export async function generateHTMLPage(
       2
     )}<title>${data.title}</title>\n${
       settings.export.html.addStyling
-        ? generateBaseExportStyles(
-            BASE_STYLE_TOKENS.fontFamily,
-            BASE_STYLE_TOKENS.palette,
-            2
+        ? generateInlineStyles(
+            settings.customization,
+            2,
+            generateBaseCSSDocumentStyles()
           )
         : ''
     }${addIndentation(1)}</head>`;
     html.push(htmlHeadData);
     html.push(`${addIndentation(1)}<body>`);
-    html.push(`${addIndentation(2)}<main class="${classPrefix}body">`);
+    html.push(`${addIndentation(2)}<main class="${classPrefix}doc-body">`);
   }
 
   for (let i = 0; i < data.blocks.length; i++) {
@@ -722,7 +767,7 @@ export async function generateHTMLPage(
   }
 
   return html.join('  \n');
-}
+};
 
 /**
  * Transforms Page Data into a string of formatted content
@@ -732,16 +777,17 @@ export async function generateHTMLPage(
  * @param docMap - Used if the reference links settings is enabled
  * @returns
  */
-export async function generatePageExport(
+export let generatePageExport = async (
   data: PageData,
   format: ExportFileFormat,
   settings: PluginSettings,
   docMap: DocMapItem[] = []
-): Promise<string> {
+): Promise<string> => {
   let exportFunc: (
     data: PageData,
     settings: PluginSettings,
-    docMap: DocMapItem[]
+    docMap: DocMapItem[],
+    initialIndentation?
   ) => Promise<string>;
   let exportData = '';
   switch (format) {
@@ -763,19 +809,7 @@ export async function generatePageExport(
     console.error(`The data provided didn't have any content`);
   }
   return exportData;
-}
-
-export function generateDocMap(data: DocData): DocMapItem[] {
-  let pagesArr = [];
-  for (let i = 0; i < data.pages.length; i++) {
-    const page = data.pages[i];
-    pagesArr.push({
-      title: formatStringToFileName(page.title),
-      frameId: page.frameId,
-    });
-  }
-  return pagesArr;
-}
+};
 
 /**
  * Triggers a file download
@@ -788,4 +822,439 @@ export let downloadFile = (file: any, fileName: string, extension: string) => {
   link.href = URL.createObjectURL(file);
   link.download = `${fileName}.${extension}`;
   link.click();
+};
+
+/**
+ * Generates a documentation site and triggers a download
+ * @param data
+ * @param settings
+ */
+export let generateDocSite = async (
+  data: FigmaFileDocData,
+  settings: CustomizationSettings
+) => {
+  const zip = new JSZip();
+  let siteMetadata = generateFigmaFileMetaData(data);
+  let bundleName = siteMetadata.directoryName;
+  zip.file('theme.css', generateCSSVars(settings));
+  zip.file('nav_view.css', generateBaseCSSDocSiteStyles());
+  zip.file('doc_view.css', generateBaseCSSDocumentStyles());
+  zip.file(`${METADATA_FILENAME}.json`, JSON.stringify(siteMetadata));
+
+  for (const [fpi, figmaPage] of data.data.entries()) {
+    let figmaPageDir = zip.folder(siteMetadata.directory[fpi].directoryName);
+
+    //Generate Document dir
+    for (const [di, document] of figmaPage.data.entries()) {
+      let documentDir = figmaPageDir.folder(
+        siteMetadata.directory[fpi].directory[di].directoryName
+      );
+
+      for (const [pi, page] of document.pages.entries()) {
+        await generateDocSitePage(page, [pi, di, fpi], siteMetadata).then(
+          (markup) => {
+            documentDir.file(`${formatDirName(page.title)}.html`, markup);
+          }
+        );
+        console.log('gets here xd');
+      }
+    }
+  }
+
+  const zipContent = await zip.generateAsync({ type: 'blob' });
+  downloadFile(zipContent, bundleName, 'zip');
+
+  console.log(siteMetadata);
+};
+
+/**
+ * Generates an HTML page for the doc site
+ * @param pageData
+ * @param currentIndex
+ * @param docSiteMetadata
+ * @returns
+ */
+export let generateDocSitePage = async (
+  pageData: PageData,
+  currentIndex: number[] = [0, 0, 0],
+  docSiteMetadata: FigmaFileBundleMetaData
+) => {
+  let currentFigmaPageBundle = docSiteMetadata.directory[currentIndex[2]];
+  let currentDocument = currentFigmaPageBundle.directory[currentIndex[1]];
+  let currentPage = currentDocument.directory[currentIndex[0]];
+  let markup = [];
+  let settings = {
+    ...DEFAULT_SETTINGS,
+    export: {
+      ...DEFAULT_SETTINGS.export,
+      html: { bodyOnly: true, addStyling: false },
+    },
+  };
+
+  markup.push(`<!DOCTYPE html>`);
+  markup.push(`<html>`);
+  //Head
+  markup.push(`${addIndentation(1)}<head>`);
+  markup.push(
+    `${addIndentation(2)}<title>${docSiteMetadata.title} | ${
+      currentDocument.title
+    } | ${pageData.title}</title>`
+  );
+  markup.push(
+    `${addIndentation(
+      2
+    )}<link rel="preconnect" href="https://fonts.googleapis.com" />`
+  );
+  markup.push(
+    `${addIndentation(
+      2
+    )}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />`
+  );
+  markup.push(
+    `${addIndentation(
+      2
+    )}<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>`
+  );
+  markup.push(
+    `${addIndentation(
+      2
+    )}<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>`
+  );
+  markup.push(
+    `${addIndentation(
+      2
+    )}<link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"/>`
+  );
+  markup.push(
+    `${addIndentation(2)}<link href="./../../theme.css" rel="stylesheet" />`
+  );
+  markup.push(
+    `${addIndentation(2)}<link href="./../../nav_view.css" rel="stylesheet" />`
+  );
+  markup.push(
+    `${addIndentation(2)}<link href="./../../doc_view.css" rel="stylesheet" />`
+  );
+  markup.push(`${addIndentation(1)}</head>`);
+  //Body
+  markup.push(`${addIndentation(1)}<body>`);
+  //TopBar
+  markup.push(
+    `${addIndentation(2)}<header class="mdc-top-app-bar ed-top-bar">`
+  );
+  markup.push(`${addIndentation(3)}<div class="mdc-top-app-bar__row">`);
+  markup.push(
+    `${addIndentation(
+      4
+    )}<section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">`
+  );
+  markup.push(
+    `${addIndentation(5)}<span class="mdc-top-app-bar__title">${
+      docSiteMetadata.title
+    }</span>`
+  );
+  markup.push(`${addIndentation(4)}</section>`);
+  markup.push(`${addIndentation(3)}</div>`);
+  markup.push(`${addIndentation(2)}</header>`);
+  //Dpcument content
+  markup.push(`${addIndentation(2)}<div class="ed-page-content">`);
+  //Side nav
+  markup.push(generateDocSiteSideNav(docSiteMetadata, currentIndex, 3));
+  markup.push(`${addIndentation(3)}<main class="ed-body">`);
+  markup.push(
+    `${addIndentation(
+      4
+    )}<div class="ed-doc-header"><h1 class="ed-doc-header-content">${
+      currentDocument.title
+    }</h1></div>`
+  );
+
+  //Tabs
+  markup.push(`
+${
+  currentDocument.directory.length > 1
+    ? generateDocSitePageTabs(currentDocument, currentIndex[0], 4)
+    : ''
+}
+    `);
+
+  //Content
+  markup.push(`${addIndentation(4)}<div class ="ed-document-page-content">`);
+  await generateHTMLPage(pageData, settings, [], 5).then((res) =>
+    markup.push(res)
+  );
+  markup.push(`${addIndentation(4)}</div>`);
+  markup.push(`${addIndentation(3)}</main>`);
+  markup.push(`${addIndentation(2)}</div>`);
+  markup.push(`${addIndentation(1)}</body>`);
+  //Scripts
+  markup.push(
+    `${addIndentation(
+      1
+    )}<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>`
+  );
+  markup.push(
+    `${addIndentation(
+      1
+    )}<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>`
+  );
+  markup.push(`${addIndentation(1)}<script>
+    import { MDCList } from '@material/list';
+    import { MDCTopAppBar } from '@material/top-app-bar';
+    import { MDCTabBar } from '@material/tab-bar';
+
+    const list = MDCList.attachTo(
+      document.querySelector < HTMLElement > '.mdc-deprecated-list'
+    );
+    const tabBar = new MDCTabBar(document.querySelector('.mdc-tab-bar'));
+    list.wrapFocus = true;
+    const topAppBarElement = document.querySelector('.mdc-top-app-bar');
+    const topAppBar = new MDCTopAppBar(topAppBarElement);
+  </script>`);
+  markup.push(`</html>`);
+
+  return markup.join('  \n');
+};
+
+/**
+ * Generates an HTML makrup containing the side nav of the docsite
+ * @param metadata 
+ * @param activeIndex 
+ * @param initialIdentation 
+ * @returns 
+ */
+let generateDocSiteSideNav = (
+  metadata: FigmaFileBundleMetaData,
+  activeIndex = [0, 0],
+  initialIdentation = 0
+) => {
+  let markup = [];
+
+  markup.push(`${addIndentation(initialIdentation)}<aside class="mdc-drawer">`);
+  markup.push(
+    `${addIndentation(initialIdentation + 1)}<div class="mdc-drawer__content">`
+  );
+  markup.push(
+    `${addIndentation(initialIdentation + 2)}<nav class="mdc-deprecated-list">`
+  );
+
+  for (const [fpi, figmaPageBundle] of metadata.directory.entries()) {
+    let doSections = metadata.directory.length > 1;
+    if (doSections) {
+      markup.push(
+        `${addIndentation(
+          initialIdentation + 3
+        )}<h6 class="mdc-deprecated-list-group__subheader">${
+          figmaPageBundle.title
+        }</h6>`
+      );
+    }
+
+    for (const [di, doc] of figmaPageBundle.directory.entries()) {
+      let reference = getPathInFigmaFile(
+        doc.directory[0].frameId,
+        metadata,
+        activeIndex
+      );
+      markup.push(
+        `${addIndentation(
+          initialIdentation + 3
+        )}<a class="mdc-deprecated-list-item mdc-deprecated-list-item${
+          fpi === activeIndex[2] && di === activeIndex[1] ? `--activated` : ''
+        }" href=${
+          reference.path
+        } aria-current="page"><span class="mdc-deprecated-list-item__ripple"></span><span class="mdc-deprecated-list-item__text">${
+          doc.title
+        }</span></a>`
+      );
+    }
+
+    if (doSections && fpi < metadata.directory.length - 1) {
+      markup.push(
+        `${addIndentation(
+          initialIdentation + 3
+        )}<hr class="mdc-deprecated-list-divider" />`
+      );
+    }
+  }
+
+  markup.push(`${addIndentation(initialIdentation + 2)}</nav>`);
+  markup.push(`${addIndentation(initialIdentation + 1)}</div>`);
+  markup.push(`${addIndentation(initialIdentation)}</aside>`);
+
+  return markup.join('  \n');
+};
+
+/**
+ * Generates the markup for tabs in a docsite page
+ * @param documentMetadata
+ * @param activeIndex
+ * @param initialIdentation
+ * @returns
+ */
+let generateDocSitePageTabs = (
+  documentMetadata: DocumentBundleMetaData,
+  activeIndex: number = 0,
+  initialIdentation = 0
+) => {
+  let markup = [];
+  markup.push(
+    `${addIndentation(initialIdentation)}<div class="ed-tabs-wrapper">`
+  );
+  markup.push(
+    `${addIndentation(
+      initialIdentation + 1
+    )}<div class="mdc-tab-bar" role="tablist">`
+  );
+  markup.push(
+    `${addIndentation(initialIdentation + 2)}<div class="mdc-tab-scroller">`
+  );
+  markup.push(
+    `${addIndentation(
+      initialIdentation + 3
+    )}<div class="mdc-tab-scroller__scroll-area">`
+  );
+  markup.push(
+    `${addIndentation(
+      initialIdentation + 4
+    )}<div class="mdc-tab-scroller__scroll-content">`
+  );
+
+  for (const [i, page] of documentMetadata.directory.entries()) {
+    let isActive = i === activeIndex;
+    let reference = getPathInDocument(page.frameId, documentMetadata);
+    markup.push(
+      `${addIndentation(initialIdentation + 5)}<a class="mdc-tab ${
+        isActive ? 'mdc-tab--active' : ''
+      }" role="tab" aria-selected= ${
+        isActive ? '"true"' : '"false"'
+      } tabindex="0" href=${
+        reference.path
+      }><span class="mdc-tab__content"><span class="mdc-tab__text-label">${
+        page.title
+      }</span></span><span class="mdc-tab-indicator ${
+        isActive ? 'mdc-tab-indicator--active' : ''
+      }"><span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span></span><span class="mdc-tab__ripple"></span><div class="mdc-tab__focus-ring"></div></a>`
+    );
+  }
+  markup.push(`${addIndentation(initialIdentation + 4)}</div>`);
+  markup.push(`${addIndentation(initialIdentation + 3)}</div>`);
+  markup.push(`${addIndentation(initialIdentation + 2)}</div>`);
+  markup.push(`${addIndentation(initialIdentation + 1)}</div>`);
+  markup.push(`${addIndentation(initialIdentation)}</div>`);
+
+  return markup.join('  \n');
+};
+
+/**
+ * Generates metadata from page data
+ * @param data
+ * @param currentFileNames
+ * @param format
+ * @returns
+ */
+let generatePageMetaData = (
+  data: PageData,
+  currentFileNames: string[],
+  format: ExportFileFormat = 'html'
+): PageBundleMetaData => {
+  let pageMetadata = clone(EMPTY_PAGE_METADATA);
+  pageMetadata.title = data.title;
+  pageMetadata.frameId = data.frameId;
+  pageMetadata.fileName = `${formatDirName(
+    data.title,
+    currentFileNames
+  )}.${format}`;
+  return pageMetadata;
+};
+
+/**
+ * Generates metadata from  doc data
+ * @param data
+ * @param currentDirNames
+ * @param format
+ * @returns
+ */
+let generateDocumentMetadata = (
+  data: DocData,
+  currentDirNames: string[],
+  format: ExportFileFormat = 'html'
+): DocumentBundleMetaData => {
+  let documentMetadata = clone(EMPTY_DOCUMENT_METADATA);
+  documentMetadata.title = data.title;
+  documentMetadata.sectionId = data.sectionId;
+  documentMetadata.lastEdited = data.lastEdited;
+  documentMetadata.directoryName = formatDirName(data.title, currentDirNames);
+
+  let currentDocumentFileNames = [];
+  for (const pageData of data.pages) {
+    documentMetadata.directory.push(
+      generatePageMetaData(pageData, currentDocumentFileNames, format)
+    );
+  }
+
+  return documentMetadata;
+};
+
+/**
+ * Generates metadata from a figma page doc data
+ * @param data
+ * @param currentDirNames
+ * @param format
+ * @param timeStamp
+ * @returns
+ */
+let generateFigmaPageMetadata = (
+  data: FigmaPageDocData,
+  currentDirNames: string[],
+  format: ExportFileFormat = 'html',
+  timeStamp?: string
+): FigmaPageBundleMetaData => {
+  let figmaPageMetadata: FigmaPageBundleMetaData = clone(
+    EMPTY_FIGMA_PAGE_BUNDLE_METADATA
+  );
+  figmaPageMetadata.title = data.title;
+  figmaPageMetadata.pageId = data.pageId;
+  figmaPageMetadata.directoryName = formatDirName(data.title, currentDirNames);
+  figmaPageMetadata.generatedAt = timeStamp;
+  let currentFigmaPageDirNames = [];
+  for (const documentData of data.data) {
+    figmaPageMetadata.directory.push(
+      generateDocumentMetadata(documentData, currentFigmaPageDirNames, format)
+    );
+  }
+  return figmaPageMetadata;
+};
+
+/**
+ * Generates metadata from a figma file doc data
+ * @param data
+ * @param format
+ * @param timeStamp
+ * @returns
+ */
+let generateFigmaFileMetaData = (
+  data: FigmaFileDocData,
+  format: ExportFileFormat = 'html',
+  timeStamp: string = Date.now().toString()
+): FigmaFileBundleMetaData => {
+  let metadata: FigmaFileBundleMetaData = clone(
+    EMPTY_FIGMA_FILE_BUNDLE_METADATA
+  );
+  metadata.title = data.title;
+  metadata.directoryName = formatDirName(data.title);
+  metadata.generatedAt = timeStamp;
+  let figmaFileDirNames = [];
+
+  for (const figmaPageData of data.data) {
+    metadata.directory.push(
+      generateFigmaPageMetadata(
+        figmaPageData,
+        figmaFileDirNames,
+        format,
+        timeStamp
+      )
+    );
+  }
+
+  return metadata;
 };

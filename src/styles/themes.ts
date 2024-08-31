@@ -42,14 +42,39 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: BASE_STYLE_TOKENS.palette.primary,
-      contrastText: BASE_STYLE_TOKENS.palette.onPrimary,
+      main: BASE_STYLE_TOKENS.palette_dark.primary,
+      contrastText: BASE_STYLE_TOKENS.palette_dark.onPrimary,
     },
-    component: BASE_STYLE_TOKENS.palette.component,
-    link: '#7EB4E1',
+    component: BASE_STYLE_TOKENS.palette_dark.component,
+    link: BASE_STYLE_TOKENS.palette_dark.primary,
+    text: {
+      primary: BASE_STYLE_TOKENS.palette_dark.onBackground.high,
+      secondary: BASE_STYLE_TOKENS.palette_dark.onBackground.mid,
+    },
     background: {
-      default: '#2C2C2C',
-      paper: '#383838',
+      default: BASE_STYLE_TOKENS.palette_dark.background.default,
+      paper: BASE_STYLE_TOKENS.palette_dark.surface,
+    },
+    divider: BASE_STYLE_TOKENS.palette_dark.divider.simple,
+    success: {
+      light: BASE_STYLE_TOKENS.palette_dark.status.success.muted,
+      main: BASE_STYLE_TOKENS.palette_dark.status.success.default,
+      contrastText: BASE_STYLE_TOKENS.palette_dark.status.success.content,
+    },
+    info: {
+      light: BASE_STYLE_TOKENS.palette_dark.status.info.muted,
+      main: BASE_STYLE_TOKENS.palette_dark.status.info.default,
+      contrastText: BASE_STYLE_TOKENS.palette_dark.status.info.content,
+    },
+    warning: {
+      light: BASE_STYLE_TOKENS.palette_dark.status.warning.muted,
+      main: BASE_STYLE_TOKENS.palette_dark.status.warning.default,
+      contrastText: BASE_STYLE_TOKENS.palette_dark.status.warning.content,
+    },
+    error: {
+      light: BASE_STYLE_TOKENS.palette_dark.status.error.muted,
+      main: BASE_STYLE_TOKENS.palette_dark.status.error.default,
+      contrastText: BASE_STYLE_TOKENS.palette_dark.status.error.content,
     },
   } as CustomPaletteOptions,
   ...baseTheme,

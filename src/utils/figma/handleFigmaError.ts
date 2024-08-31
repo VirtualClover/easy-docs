@@ -7,5 +7,9 @@ export let handleFigmaError = (
 ) => {
   let errorMessage = `${message}.(${code})`;
   figma.notify(errorMessage, { error: true });
-    console.error(errorMessage,event);
+  console.error(errorMessage, 'The details of the error can be found below');
+  console.error(event);
+  if (superBreaking) {
+    figma.closePlugin();
+  }
 };

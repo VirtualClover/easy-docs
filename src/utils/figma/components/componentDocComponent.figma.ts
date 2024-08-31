@@ -20,17 +20,18 @@ import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
 } from '../../general/urlHandlers';
+import { getComponentData, setComponentData } from '../getComponentData';
 
 import _ from 'lodash';
 import { clone } from '../../general/clone';
 import { decidedAsciiForNodeType } from '../../general/decidedAsciiForNodeType';
+import { generateComponentDocsSection } from './initComponents';
 import { generateDisplayFrameInstance } from './displayFrameComponent.figma';
 import { generateDividerInstance } from './dividerComponent.figma';
 import { generateHeaderInstance } from './headerComponent.figma';
 import { generateParagraphInstance } from './paragraphComponent.figma';
 import { generatePointerInstance } from './pointerComponent.figma';
 import { generateTableInstance } from './tableComponent.figma';
-import { getComponentData } from '../getComponentData';
 import { getPluginSettings } from '../getPluginSettings';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
@@ -397,6 +398,9 @@ async function generateOuterWrapper(
   componentVersion: number,
   brokenLinkCaption: string = ''
 ) {
+  figma.notify('Generating component documentation ✍', {
+    timeout: 1500,
+  });
   //console.log(parentComponent);
   let returnedFrame: FrameNode;
   //Outer wrapper
@@ -630,6 +634,29 @@ async function generateOuterWrapper(
       JSON.stringify(componentSharedData)
     );
 
+    await figma
+      .getNodeByIdAsync(componentData.componentDocSection ?? '')
+      .then(async (node) => {
+        if (node && node.type == 'SECTION') {
+          node.appendChild(outerWrapper);
+        } else {
+          await figma
+            .getNodeByIdAsync(componentData.components.componentsPage.id)
+            .then(async (page) => {
+              if (page && page.type == 'PAGE') {
+                let componentDocSection = generateComponentDocsSection();
+                componentDocSection.appendChild(outerWrapper);
+                componentDocSection.appendChild(specsFrameWrapper);
+                await page.loadAsync();
+                page.appendChild(componentDocSection);
+                componentDocSection.x = 500;
+                componentData.componentDocSection = componentDocSection.id;
+                setComponentData(componentData);
+              }
+            });
+        }
+      });
+
     returnedFrame = outerWrapper.clone();
 
     //console.log('parent componwt written in shared plugin data');
@@ -841,7 +868,6 @@ export async function getComponentsToDoc(
         break;
     }
   } else {
-
     nodeToInspect = componentFallback;
   }
 
@@ -970,6 +996,8 @@ export async function generateBlockDataFromComponentDoc(
 
   let frameDetails = getDetailsFromFigmaURL(url, 'decode');
 
+  console.log('gets hre x5');
+  
   // Get master component from frame data
   if (instNode.parent && instNode.parent.type == 'FRAME') {
     let storedData = instNode.parent.getSharedPluginData(
@@ -978,6 +1006,7 @@ export async function generateBlockDataFromComponentDoc(
     );
     //console.log('stored data');
     //console.log(storedData);
+console.log('gets here x6');
 
     if (storedData) {
       parsedData = JSON.parse(storedData);
@@ -1007,10 +1036,13 @@ export async function generateBlockDataFromComponentDoc(
           } else {
             parentFrame = instNode.parent.parent as FrameNode;
           }
+          console.log('gets here x7');
+          
           parentFrame.insertChild(indexInFrame, n);
           n.layoutSizingHorizontal = 'FILL';
           let dehydratedNode = parentFrame.children[indexInFrame + 1];
           dehydratedNode.remove();
+          console.log('gets here x8');
           blockData.figmaNodeId = n.id;
         });
       }

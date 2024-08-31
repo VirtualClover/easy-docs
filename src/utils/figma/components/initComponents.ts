@@ -14,6 +14,19 @@ import { createPointerComponent } from './pointerComponent.figma';
 import { createQuoteComponent } from './quoteComponent.figma';
 import { createTableCellComponent } from './tableComponent.figma';
 import { handleFigmaError } from '../handleFigmaError';
+import { setComponentData } from '../getComponentData';
+
+/**
+ * Generates a frame to store component doc frames
+ * @returns 
+ */
+export let generateComponentDocsSection = () => {
+  //Component documentation frames
+  let componentDocSection = figma.createSection();
+  componentDocSection.name = '[EASY DOCS DOC FRAMES]';
+  return componentDocSection;
+}
+
 
 /**
  * Generates the main components in a Figma file
@@ -50,14 +63,18 @@ export async function initComponents(
     }
     currentComponentPage.remove();
   }
+  //Easy docs components page
   let page = figma.createPage();
-  page.name = 'Easy Docs components';
+  page.name = 'Easy Docs Components';
   let frame = figma.createFrame();
   frame.name = '[EASY DOCS COMPONENTS]';
   frame.layoutMode = 'VERTICAL';
   frame.counterAxisSizingMode = 'AUTO';
   frame.primaryAxisSizingMode = 'AUTO';
   frame.itemSpacing = 90;
+  let componentDocSection = generateComponentDocsSection();
+
+
   await Promise.all([
     createHeaderComponent(frame),
     createParagraphComponent(frame),
@@ -101,12 +118,9 @@ export async function initComponents(
       componentData.components.componentDoc = componentDoc;
       componentData.components.pointer = pointer;
       componentData.components.componentsPage.id = page.id;
+      componentData.componentDocSection =  componentDocSection.id; 
       componentData.lastGenerated = Date.now();
-      figma.root.setSharedPluginData(
-        FIGMA_NAMESPACE,
-        FIGMA_COMPONENT_DATA_KEY,
-        JSON.stringify(componentData)
-      );
+      setComponentData(componentData);
     })
     .catch((e) =>
       handleFigmaError(
@@ -115,6 +129,9 @@ export async function initComponents(
         e
       )
     );
+
   await page.loadAsync();
   page.appendChild(frame);
+  page.appendChild(componentDocSection);
+  componentDocSection.x = 500;
 }

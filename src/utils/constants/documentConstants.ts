@@ -106,6 +106,7 @@ export const BASE_COMPONENT_DATA = {
       contentProp: '',
     },
   },
+  componentDocSection: '',
   lastGenerated: 0,
 };
 
@@ -174,6 +175,7 @@ export const EMPTY_DOC_OBJECT: DocData = {
 
 export interface FigmaPageDocData  {
   title: string;
+  pageId: string;
   data: DocData[];
 };
 
@@ -181,6 +183,51 @@ export interface FigmaFileDocData {
   title: string;
   data: FigmaPageDocData[];
 };
+
+
+
+//Meta data
+
+
+export const EMPTY_PAGE_METADATA = {
+  title: '',
+  frameId: '',
+  lastEdited: '',
+  fileName: '',
+};
+
+export type PageBundleMetaData = typeof EMPTY_PAGE_METADATA;
+
+export const EMPTY_DOCUMENT_METADATA = {
+  title: '',
+  sectionId: '',
+  directoryName: '',
+  lastEdited: '', //Contrary to the page and file bundle meta data types this one has a last edited property, since the others are only used when generating export bundles and not in actual document edition
+  directory: [] as PageBundleMetaData[]
+};
+
+export type DocumentBundleMetaData = typeof EMPTY_DOCUMENT_METADATA;
+
+
+export const EMPTY_FIGMA_PAGE_BUNDLE_METADATA = {
+  title: '',
+  generatedAt: '',
+  pageId: '',
+  directoryName: '',
+  directory: [] as DocumentBundleMetaData[]
+};
+
+export type FigmaPageBundleMetaData = typeof EMPTY_FIGMA_PAGE_BUNDLE_METADATA;
+
+
+export const EMPTY_FIGMA_FILE_BUNDLE_METADATA = {
+  title: '',
+  generatedAt: '',
+  directoryName: '',
+  directory: [] as FigmaPageBundleMetaData[],
+};
+
+export type FigmaFileBundleMetaData = typeof EMPTY_FIGMA_FILE_BUNDLE_METADATA;
 
 
 /**

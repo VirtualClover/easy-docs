@@ -89,7 +89,7 @@ export let scanWholePageForDocuments = async (
       }
     }
   }
-  return { title: page.name, data: documents };
+  return { title: page.name, data: documents, pageId:page.id };
 };
 
 /**

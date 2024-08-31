@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import {
   Box,
   FormControl,
+  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
@@ -14,13 +15,17 @@ import {
 } from '@mui/material';
 import {
   DocData,
+  DocumentBundleMetaData,
   ExportFileFormat,
+  FigmaFileBundleMetaData,
   FigmaFileDocData,
+  FigmaPageBundleMetaData,
   FigmaPageDocData,
+  PageBundleMetaData,
 } from '../../utils/constants';
 import {
   downloadFile,
-  generateDocMap,
+  generateDocSite,
   generatePageExport,
 } from '../../utils/docs/exportUtils';
 
@@ -37,9 +42,9 @@ import { formatStringToFileName } from '../../utils/general/formatStringToFileNa
 
 export const ExportView = (): JSX.Element => {
   const pluginContext = React.useContext(PluginDataContext);
-  const [format, setFormat] = React.useState(pluginContext.lastFormatUsed);
   const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(false);
+  const [docSiteSelected, setDocSiteSelected] = React.useState(false);
   //Freezing data so it doesnt mutate if something's changes in figma
   const [mountedData, setMountedData] = React.useState(
     pluginContext.currentDocData
@@ -49,10 +54,73 @@ export const ExportView = (): JSX.Element => {
   );
   const [previewData, setPreviewdata] = React.useState('');
   const [previewFileName, setPreviewFileName] = React.useState(
-    `file.${format}`
+    `file.${pluginContext.lastFormatUsed}`
   );
-  const [docMap, setDocMap] = React.useState(generateDocMap(mountedData));
   const [scanInProgess, setScanInProgress] = React.useState(false);
+  let exportActions = [
+    {
+      label: 'Download current page',
+      onClick: () =>
+        downloadPage(
+          previewData,
+          previewFileName,
+          pluginContext.lastFormatUsed
+        ),
+    },
+    {
+      label: 'Download whole document',
+      onClick: () => {
+        setLoading(true);
+        generateDocumentExport(mountedData, pluginContext.lastFormatUsed).then(
+          () => {
+            setLoading(false);
+          }
+        );
+      },
+    },
+    {
+      label: 'Download all documents in Figma page',
+      onClick: () => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'scan-whole-page-for-docs',
+            },
+          },
+          '*'
+        );
+        setScanInProgress(true);
+      },
+    },
+    {
+      label: 'Download all documents in Figma file',
+      onClick: () => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'scan-whole-file-for-docs',
+            },
+          },
+          '*'
+        );
+        setScanInProgress(true);
+      },
+    },
+    {
+      label: 'Generate doc site',
+      onClick: () => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'scan-whole-file-for-doc-site',
+            },
+          },
+          '*'
+        );
+        setScanInProgress(true);
+      },
+    },
+  ];
 
   /**
    * Check if the current folder name has been used in the directory (using a stirng array as a directory list), if it has been used, the function appends a number(loops however many times necessaryif the number appended also has been used); if it has not been used the it returns the name and pushes the name into the array
@@ -92,27 +160,6 @@ export const ExportView = (): JSX.Element => {
     setLoading(false);
   };
 
-  interface DocumentBundleMetaData {
-    title: string;
-    directoryName: string;
-    generatedAt: number;
-    directory: string[];
-  }
-
-  interface FigmaPageBundleMetaData {
-    title: string;
-    generatedAt: number;
-    directoryName: string;
-    directory: DocumentBundleMetaData[];
-  }
-
-  interface FigmaFileBundleMetaData {
-    title: string;
-    generatedAt: number;
-    directoryName: string;
-    directory: FigmaPageBundleMetaData[];
-  }
-
   /**
    * Bundles all of the pages contained within a document, generates a zip and downloads it; if a zipDirectory param is provided, the function will only  add the files to it, else, it will trigger a file download
    * @param data
@@ -134,22 +181,26 @@ export const ExportView = (): JSX.Element => {
     let metaData: DocumentBundleMetaData = {
       title: data.title,
       directoryName: bundleName,
-      generatedAt: Date.now(),
+      sectionId: data.sectionId,
+      lastEdited: data.lastEdited,
       directory: [],
     };
     for (const page of data.pages) {
-      await generatePageExport(
-        page,
-        format,
-        pluginContext.settings,
-        docMap
-      ).then((data) => {
-        let fileName = `${checkIfFolderNameOk(
-          fileNames,
-          formatStringToFileName(page.title)
-        )}.${format}`;
-        metaData.directory.push(fileName), zip.file(fileName, data);
-      });
+      await generatePageExport(page, format, pluginContext.settings, []).then(
+        (data) => {
+          let fileName = `${checkIfFolderNameOk(
+            fileNames,
+            formatStringToFileName(page.title)
+          )}.${format}`;
+          let pageMetaData: PageBundleMetaData = {
+            title: page.title,
+            frameId: page.frameId,
+            lastEdited: page.time ? page.time.toString() : '',
+            fileName,
+          };
+          metaData.directory.push(pageMetaData), zip.file(fileName, data);
+        }
+      );
     }
 
     if (!zipDirectory) {
@@ -181,8 +232,9 @@ export const ExportView = (): JSX.Element => {
     const zip = zipDirectory ? zipDirectory.folder(bundleName) : new JSZip();
     let pageBundleMetaData: FigmaPageBundleMetaData = {
       title: data.title,
+      pageId: data.pageId,
       directoryName: bundleName,
-      generatedAt: Date.now(),
+      generatedAt: Date.now().toString(),
       directory: [],
     };
     let documentDirectoryNamesUsed = [];
@@ -223,7 +275,7 @@ export const ExportView = (): JSX.Element => {
     let fileBundleMetaData: FigmaFileBundleMetaData = {
       title: data.title,
       directoryName: finalZipName,
-      generatedAt: Date.now(),
+      generatedAt: Date.now().toString(),
       directory: [],
     };
 
@@ -247,19 +299,28 @@ export const ExportView = (): JSX.Element => {
     setLoading(true);
     generatePageExport(
       mountedData.pages[mountedActiveTab],
-      format,
+      pluginContext.lastFormatUsed,
       pluginContext.settings,
-      docMap
+      []
     ).then((data) => {
       setPreviewdata(data);
       setLoading(false);
       setPreviewFileName(
-        `${formatStringToFileName(
-          mountedData.pages[mountedActiveTab].title
-        )}.${format}`
+        `${formatStringToFileName(mountedData.pages[mountedActiveTab].title)}.${
+          pluginContext.lastFormatUsed
+        }`
       );
     });
-  }, [format]);
+  }, [pluginContext.lastFormatUsed]);
+
+  React.useEffect(() => {
+    if (pluginContext.lastExportActionUsed == exportActions.length - 1) {
+      pluginContext.setLastFormatUsed('html');
+      setDocSiteSelected(true);
+    } else {
+      setDocSiteSelected(false);
+    }
+  }, [pluginContext.lastExportActionUsed]);
 
   /**
    * Check if the Plugin API sent a meesage data, it can recieve a bundle of documents within the current Figma page or a bundle of pages within a Figma file
@@ -274,7 +335,7 @@ export const ExportView = (): JSX.Element => {
               setLoading(true);
               generatePageBundleExport(
                 event.data.pluginMessage.data,
-                format
+                pluginContext.lastFormatUsed
               ).then(() => {
                 setLoading(false);
                 setScanInProgress(false);
@@ -285,7 +346,18 @@ export const ExportView = (): JSX.Element => {
               setLoading(true);
               generateFileBundleExport(
                 event.data.pluginMessage.data,
-                format
+                pluginContext.lastFormatUsed
+              ).then(() => {
+                setLoading(false);
+                setScanInProgress(false);
+              });
+              break;
+
+            case 'docs-in-file-for-doc-site':
+              setLoading(true);
+              generateDocSite(
+                event.data.pluginMessage.data,
+                pluginContext.settings.customization
               ).then(() => {
                 setLoading(false);
                 setScanInProgress(false);
@@ -312,11 +384,13 @@ export const ExportView = (): JSX.Element => {
           <InputLabel id="format-select">Choose a format</InputLabel>
           <Select
             labelId="format-select"
-            value={format}
+            value={pluginContext.lastFormatUsed}
             label="Choose a format"
-            disabled={loading}
+            disabled={loading || docSiteSelected}
             onChange={(e) => {
-              setFormat(e.target.value as ExportFileFormat);
+              pluginContext.setLastFormatUsed(
+                e.target.value as ExportFileFormat
+              );
               pluginContext.setLastFormatUsed(
                 e.target.value as ExportFileFormat
               );
@@ -326,6 +400,11 @@ export const ExportView = (): JSX.Element => {
             <MenuItem value={'html'}>HTML</MenuItem>
             <MenuItem value={'json'}>JSON</MenuItem>
           </Select>
+          {docSiteSelected && (
+            <FormHelperText>
+              The documentation site can only be generated in HTML.
+            </FormHelperText>
+          )}
         </FormControl>
       </Box>
       <Box
@@ -358,58 +437,17 @@ export const ExportView = (): JSX.Element => {
           </CopyToClipboard>
         </Box>
       </Box>
-      <CodeBlock code={previewData} language={format} loading={loading} />
+      <CodeBlock
+        code={previewData}
+        language={pluginContext.lastFormatUsed}
+        loading={loading}
+      />
       <Stack
         direction="row-reverse"
         sx={{ position: 'relative', bottom: 0, mt: 32 }}
         gap={8}
       >
-        <ExportButton
-          disabled={loading}
-          actions={[
-            {
-              label: 'Download current page',
-              onClick: () => downloadPage(previewData, previewFileName, format),
-            },
-            {
-              label: 'Download whole document',
-              onClick: () => {
-                setLoading(true);
-                generateDocumentExport(mountedData, format).then(() => {
-                  setLoading(false);
-                });
-              },
-            },
-            {
-              label: 'Download all documents in Figma page',
-              onClick: () => {
-                parent.postMessage(
-                  {
-                    pluginMessage: {
-                      type: 'scan-whole-page-for-docs',
-                    },
-                  },
-                  '*'
-                );
-                setScanInProgress(true);
-              },
-            },
-            {
-              label: 'Download all documents in Figma file',
-              onClick: () => {
-                parent.postMessage(
-                  {
-                    pluginMessage: {
-                      type: 'scan-whole-file-for-docs',
-                    },
-                  },
-                  '*'
-                );
-                setScanInProgress(true);
-              },
-            },
-          ]}
-        />
+        <ExportButton disabled={loading} actions={exportActions} />
         <Snackbar
           open={open}
           autoHideDuration={1000}
