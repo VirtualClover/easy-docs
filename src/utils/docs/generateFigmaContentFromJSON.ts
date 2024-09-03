@@ -66,8 +66,7 @@ export async function generateFigmaContentFromJSON(
                 .then(() => resizeSection(parentSection))
                 .catch((e) =>
                   handleFigmaError(
-                    `There was an error generating the frame data`,
-                    'ED-F0007',
+                    'F7',
                     e
                   )
                 );
@@ -76,13 +75,13 @@ export async function generateFigmaContentFromJSON(
           .catch((e) => console.error(e));
       } else {
         frame = createPageFrame(parentSection, page.title, settings);
+        frame.name = `New Page${Date.now().toString()}`; // This is here so the data doesn't match so figma can send the updated data with the frame id, otherwise when you create a page the frame id doesnt gets added to the page data sould be a better solution tbh
         selectNode(frame);
         await generateFrameDataFromJSON(page, frame, componentVersion)
-          .then(() => resizeSection(parentSection))
+          .then(() => {resizeSection(parentSection)})
           .catch((e) =>
             handleFigmaError(
-              `There was an error generating the frame data`,
-              'ED-F0008',
+             'F8',
               e
             )
           );
@@ -145,8 +144,7 @@ async function generateFrameDataFromJSON(
             .then(() => figmaNode.remove())
             .catch((e) =>
               handleFigmaError(
-                `There was an error generating an instance`,
-                'ED-F0009',
+                'F9',
                 e
               )
             );
@@ -162,8 +160,7 @@ async function generateFrameDataFromJSON(
         componentVersion
       ).catch((e) =>
         handleFigmaError(
-          `There was an error generating an instance`,
-          'ED-F0010',
+          'F10',
           e
         )
       );
@@ -196,8 +193,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Header instance`,
-            'ED-F0011',
+            'F11',
             e
           )
         );
@@ -211,8 +207,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Paragraph instance`,
-            'ED-F0012',
+            'F12',
             e
           )
         );
@@ -226,8 +221,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Quote instance`,
-            'ED-F0013',
+            'F13',
             e
           )
         );
@@ -241,8 +235,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Display Frame instance`,
-            'ED-F0014',
+            'F14',
             e
           )
         );
@@ -256,8 +249,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Dos and dont's instance`,
-            'ED-F0015',
+            'F15',
             e
           )
         );
@@ -271,8 +263,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a List instance`,
-            'ED-F0016',
+            'F16',
             e
           )
         );
@@ -286,8 +277,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Table instance`,
-            'ED-F0017',
+            'F17',
             e
           )
         );
@@ -301,8 +291,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating an Alert instance`,
-            'ED-F0018',
+            'F18',
             e
           )
         );
@@ -316,8 +305,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Code block instance`,
-            'ED-F0019',
+            'F19',
             e
           )
         );
@@ -331,8 +319,7 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Divider instance`,
-            'ED-F0020',
+            'F20',
             e
           )
         );
@@ -341,16 +328,12 @@ async function generateBlockInstanceFromJSON(
       await generateComponentDocInstance(block.data, componentVersion)
         .then((n) => {
           if (n) {
-            console.log('node doc');
-            console.log(n);
-
             node = n;
           }
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error generating a Component Doc instance`,
-            'ED-F0021',
+            'F21',
             e
           )
         );

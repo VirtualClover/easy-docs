@@ -24,6 +24,8 @@ export const Editor = () => {
   const [skeleton, setSkeleton] = React.useState(true);
 
   const pluginContext = React.useContext(PluginDataContext);
+  //Freeze the section when the editor is mounted so if the section changes we delete the data, stop any chnages to send and remount
+  //const [sectionId,mountedSectionId] =
 
   React.useEffect(() => {
     const interval = setInterval(() => {

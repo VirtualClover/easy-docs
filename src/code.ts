@@ -60,7 +60,7 @@ figma.ui.onmessage = (msg) => {
     //Initializes the plugin
     if (msg.type === 'load-data') {
       pluginInit().catch((e) =>
-        handleFigmaError(`The plugin couldn't load correclty`, 'ED-F0001', e)
+        handleFigmaError('F1', e)
       );
     }
 
@@ -72,6 +72,7 @@ figma.ui.onmessage = (msg) => {
     //Creates a new document
     if (msg.type === 'create-new-doc') {
       stopUpdates = true;
+      
       let section: SectionNode;
       createNewDoc(createNewDocJSON())
         .then((s) => {
@@ -89,8 +90,7 @@ figma.ui.onmessage = (msg) => {
         })
         .catch((e) =>
           handleFigmaError(
-            `There was an error creating a new document`,
-            'ED-F0005',
+            'f5',
             e
           )
         );
@@ -99,7 +99,10 @@ figma.ui.onmessage = (msg) => {
     //Push updates from Figma to the Editor
     if (msg.type === 'node-update') {
       if (!stopUpdates && cachedMsg == null) {
+        stopUpdates = true;
+        console.log('generate data');
         pushFigmaUpdates(lastFetchDoc).then((res) => {
+          console.log('finished generate data');
           if (res.type === 'new-node-data') {
             lastFetchDoc = res.data;
             console.log('push figma updates');
@@ -109,6 +112,7 @@ figma.ui.onmessage = (msg) => {
           if (res.type === 'no-node') {
             cachedMsg == null;
           }
+          stopUpdates = false;
           figma.ui.postMessage(res);
         });
       }
@@ -142,13 +146,13 @@ figma.ui.onmessage = (msg) => {
             section = node;
             //context.lastFetchDoc = data;
             if (section && section.type === 'SECTION') {
-              //console.log('generate');
               section.locked = true;
               generateFigmaContentFromJSON(
                 data,
                 section,
                 msgToGenerate.editedFrames
               ).then(async (section) => {
+                
                 //context.stopUpdates = false;
                 if (isCached && cachedMsg == msgToGenerate) {
                   cachedMsg = null;

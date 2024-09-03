@@ -34,7 +34,11 @@ function a11yProps(index: number) {
 
 export const EditorView = () => {
   const [tabs, setTabs] = React.useState([]);
+  const [key, setKey] = React.useState(1); // Use to trigger a reload for the editor and tabs component
   const pluginContext = React.useContext(PluginDataContext);
+  const [mountedSectionId, setMountedSectionId] = React.useState(
+    pluginContext.currentDocData.sectionId
+  );
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     if (newActiveTab < tabs.length) {
@@ -56,6 +60,14 @@ export const EditorView = () => {
     /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
   };
+
+  //This is here so if the user selects another documetn section, the editor and the tabs will forcefully reload with the new data
+  React.useEffect(() => {
+    if (pluginContext.currentDocData.sectionId != mountedSectionId) {
+      setKey(key == 1 ? 2 : 1);
+      setMountedSectionId(pluginContext.currentDocData.sectionId);
+    }
+  }, [pluginContext.currentDocData]);
 
   React.useEffect(() => {
     setTabs([]);
@@ -87,7 +99,7 @@ export const EditorView = () => {
 
   return (
     <ViewContainer>
-      <AppBar elevation={0} color="transparent" sx={{ top: 49 }}>
+      <AppBar elevation={0} color="transparent" sx={{ top: 49 }} key={key}>
         <Stack direction="row">
           <Tabs
             value={
@@ -95,7 +107,7 @@ export const EditorView = () => {
                 ? pluginContext.activeTab
                 : 0
             }
-            variant={'scrollable'} // If we remove this ternary the Tabs component bugs out
+            variant={'scrollable'}
             scrollButtons={'auto'}
             onChange={handleChange}
             aria-label="Pages on the document"
@@ -107,7 +119,10 @@ export const EditorView = () => {
               <IconButton
                 sx={{ margin: 'auto 0' }}
                 onClick={() => handlePageCreation()}
-                disabled={pluginContext.loadingState != 'NONE' || pluginContext.outdatedComponents}
+                disabled={
+                  pluginContext.loadingState != 'NONE' ||
+                  pluginContext.outdatedComponents
+                }
               >
                 <Add />
               </IconButton>
@@ -129,7 +144,7 @@ export const EditorView = () => {
               padding: '16px 16px 0 16px',
             }}
           >
-            <Editor />
+            <Editor key={key} />
           </Box>
           <Snackbar
             open={pluginContext.incomingFigmaChanges}

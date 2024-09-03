@@ -27,6 +27,6 @@ export async function createNewDoc(
   await generateFigmaContentFromJSON(
     data,
     parentSection,
-  ).catch((e) => handleFigmaError(`There was an error creating a new document`, 'ED-F0006',e));
+  ).catch((e) => handleFigmaError('F6',e));
   return parentSection;
 }

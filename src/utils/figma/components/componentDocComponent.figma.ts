@@ -33,6 +33,7 @@ import { generateParagraphInstance } from './paragraphComponent.figma';
 import { generatePointerInstance } from './pointerComponent.figma';
 import { generateTableInstance } from './tableComponent.figma';
 import { getPluginSettings } from '../getPluginSettings';
+import { handleFigmaError } from '../handleFigmaError';
 import { nodeSupportsChildren } from '../nodeSupportsChildren';
 import { setNodeFills } from '../setNodeFills';
 
@@ -659,8 +660,8 @@ async function generateOuterWrapper(
 
     returnedFrame = outerWrapper.clone();
 
-    //console.log('parent componwt written in shared plugin data');
-    //console.log(componentSharedData.mainComponentId);
+    console.log('parent componwt written in shared plugin data');
+    console.log(componentSharedData.mainComponentId);
 
     figma.root.setSharedPluginData(
       FIGMA_NAMESPACE,
@@ -764,6 +765,11 @@ let componentDocIntegrityCheck = async (
         FIGMA_NAMESPACE,
         `${FIGMA_COMPONENT_DOCS_KEY}:${parentComponent.id}`
       );
+
+      console.log('efdid');
+      console.log(existingDocFrameId);
+      
+      
 
       if (existingDocFrameId) {
         await componentDocFrameIntegrityCheck(existingDocFrameId).then(
@@ -907,13 +913,20 @@ export async function generateComponentDocInstance(
   let integrityCheckData: IntegrityCheckResponse | null =
     preIntegrityCheckData ?? null;
 
+    console.log(integrityCheckData);
+    
+
   if (!integrityCheckData) {
     await componentDocIntegrityCheck(
       data.variants[0].displayFrame.id,
       data.mainComponentId
     ).then(async (res) => {
       integrityCheckData = res;
-    });
+    }).catch((e) =>
+      handleFigmaError(
+        'F42',
+        e
+      ));
   }
 
   if (integrityCheckData.docIsComplete) {
@@ -924,18 +937,30 @@ export async function generateComponentDocInstance(
       if (node) {
         node.remove();
       }
-    });
+    }).catch((e) =>
+      handleFigmaError(
+        'F43',
+        e
+      ));
     await figma.getNodeByIdAsync(data.documentationFrame.id).then((node) => {
       if (node) {
         node.remove();
       }
-    });
+    }).catch((e) =>
+      handleFigmaError(
+        'F44',
+        e
+      ));
 
     await figma
       .getNodeByIdAsync(componentData.components.componentDoc.id)
       .then((node) => {
         specsComponent = node;
-      });
+      }).catch((e) =>
+        handleFigmaError(
+          'F45',
+          e
+        ));
     if (specsComponent.type == 'COMPONENT') {
       let instance = specsComponent.createInstance();
 
@@ -957,7 +982,11 @@ export async function generateComponentDocInstance(
         data.fileId,
         componentVersion,
         `The component referenced was deleted`
-      ).then((node) => (specsFrame = node));
+      ).then((node) => (specsFrame = node)).catch((e) =>
+        handleFigmaError(
+          'F46',
+          e
+        ));
 
       figma.ui.postMessage({
         type: 'finished-generating-component-doc',
@@ -995,8 +1024,6 @@ export async function generateBlockDataFromComponentDoc(
   let parsedData: ComponentSharedData = clone(blockData.data);
 
   let frameDetails = getDetailsFromFigmaURL(url, 'decode');
-
-  console.log('gets hre x5');
   
   // Get master component from frame data
   if (instNode.parent && instNode.parent.type == 'FRAME') {
@@ -1006,7 +1033,6 @@ export async function generateBlockDataFromComponentDoc(
     );
     //console.log('stored data');
     //console.log(storedData);
-console.log('gets here x6');
 
     if (storedData) {
       parsedData = JSON.parse(storedData);
@@ -1033,20 +1059,31 @@ console.log('gets here x6');
           let nodeToRemove: InstanceNode;
           if (isHydratedInstance) {
             parentFrame = instNode.parent as FrameNode;
+
+            console.log('parent frame');
+            console.log(parentFrame);
+            
           } else {
             parentFrame = instNode.parent.parent as FrameNode;
+            console.log('parent parent frame');
+            console.log(parentFrame);
           }
-          console.log('gets here x7');
-          
           parentFrame.insertChild(indexInFrame, n);
           n.layoutSizingHorizontal = 'FILL';
           let dehydratedNode = parentFrame.children[indexInFrame + 1];
           dehydratedNode.remove();
-          console.log('gets here x8');
           blockData.figmaNodeId = n.id;
-        });
+        }).catch((e) =>
+          handleFigmaError(
+            'F40',
+            e
+          ));
       }
-    });
+    }).catch((e) =>
+      handleFigmaError(
+        'F41',
+        e
+      ));
   }
 
   return blockData;

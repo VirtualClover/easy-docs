@@ -5,6 +5,7 @@ import {
 } from '../constants';
 
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
+import { getComponentData } from './getComponentData';
 import { getCurrentSectionFromChildNode } from './getCurrentSectionFromChildNode';
 
 /**
@@ -19,10 +20,11 @@ export let scanCurrentSelectionForDocs = async (
   frame: FrameNode | null;
   selectedFrame: number;
 }> => {
+let componentData = getComponentData();
   let selection = figma.currentPage.selection[0];
   let parentSection: SectionNode = null;
   let parentFrame: FrameNode = null;
-  if (selection) {
+  if (selection && figma.currentPage.id != componentData.components.componentsPage.id) {
     switch (selection.type) {
       case 'SECTION':
         parentSection = selection;

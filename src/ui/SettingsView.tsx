@@ -192,7 +192,7 @@ let ExportsView = () => {
 
   return (
     <ExportsViewContainer>
-      <SettingsSection sectionName="General Settings">
+      <SettingsSection sectionName="General Export Settings">
         <FormGroup>
           <FormControlLabel
             labelPlacement="start"

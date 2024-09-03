@@ -32,8 +32,7 @@ export async function pluginInit() {
             ) {
               initComponents(componentData, false).catch((e) =>
                 handleFigmaError(
-                  `There was an error generating the components`,
-                  'ED-F0002',
+                 'F2',
                   e
                 )
               );

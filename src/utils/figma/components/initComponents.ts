@@ -124,8 +124,7 @@ export async function initComponents(
     })
     .catch((e) =>
       handleFigmaError(
-        `There was an error generating the components`,
-        'ED-F0003',
+        'F3',
         e
       )
     );

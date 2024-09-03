@@ -10,6 +10,10 @@ export function formatPageData(page: PageData) {
     i++;
   }
   if (i == page.blocks.length) {
+    console.log('no titles');
+    console.log(page);
+    
+    
     page.title = 'Untitled page';
     return;
   }
