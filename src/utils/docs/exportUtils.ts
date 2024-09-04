@@ -1009,19 +1009,23 @@ ${
     )}<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>`
   );
   markup.push(`${addIndentation(1)}<script>
-    import { MDCList } from '@material/list';
-    import { MDCTopAppBar } from '@material/top-app-bar';
-    import { MDCTabBar } from '@material/tab-bar';
+    window.onload = function(){
+    mdc.tabBar.MDCTabBar(document.querySelector<HTMLElement>('.mdc-tab-bar'));
+    mdc.tabScroller.MDCTabScroller(document.querySelector<HTMLElement>('.mdc-tab-scroller'));
+    }
 
-    const list = MDCList.attachTo(
-      document.querySelector < HTMLElement > '.mdc-deprecated-list'
-    );
-    const tabBar = new MDCTabBar(document.querySelector('.mdc-tab-bar'));
+  </script>`);
+  markup.push(`</html>`);
+
+  /*
+      const tabBar = new MDCTabBar(document.querySelector('.mdc-tab-bar'));
     list.wrapFocus = true;
     const topAppBarElement = document.querySelector('.mdc-top-app-bar');
     const topAppBar = new MDCTopAppBar(topAppBarElement);
-  </script>`);
-  markup.push(`</html>`);
+  
+  
+  
+  */
 
   return markup.join('  \n');
 };
