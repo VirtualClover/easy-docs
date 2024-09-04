@@ -1,12 +1,12 @@
-import {
-  DocData,
-  FigmaFileDocData,
-  FigmaPageDocData,
-} from '../constants';
+import { DocData, FigmaFileDocData, FigmaPageDocData } from '../constants';
 
 import { generateJSONFromFigmaContent } from '../docs/generateJSONFromFigmaContent';
 import { getComponentData } from './getComponentData';
 import { getCurrentSectionFromChildNode } from './getCurrentSectionFromChildNode';
+
+let elementIsHidden = (name: string) => {
+  return name.match(/^(\.|\_).*$/);
+};
 
 /**
  * Scans the current selection for documents
@@ -20,11 +20,14 @@ export let scanCurrentSelectionForDocs = async (
   frame: FrameNode | null;
   selectedFrame: number;
 }> => {
-let componentData = getComponentData();
+  let componentData = getComponentData();
   let selection = figma.currentPage.selection[0];
   let parentSection: SectionNode = null;
   let parentFrame: FrameNode = null;
-  if (selection && figma.currentPage.id != componentData.components.componentsPage.id) {
+  if (
+    selection &&
+    figma.currentPage.id != componentData.components.componentsPage.id
+  ) {
     switch (selection.type) {
       case 'SECTION':
         parentSection = selection;
@@ -79,7 +82,7 @@ export let scanWholePageForDocuments = async (
 ): Promise<FigmaPageDocData> => {
   let documents: DocData[] = [];
   for (const child of page.children) {
-    if (child.type === 'SECTION') {
+    if (child.type === 'SECTION' && !elementIsHidden(child.name)) {
       if (child.children.length) {
         let generatedDoc: DocData;
         await generateJSONFromFigmaContent(child).then((res) => {
@@ -91,7 +94,7 @@ export let scanWholePageForDocuments = async (
       }
     }
   }
-  return { title: page.name, data: documents, pageId:page.id };
+  return { title: page.name, data: documents, pageId: page.id };
 };
 
 /**
@@ -103,9 +106,14 @@ export let scanWholeFileForDocuments = async (
   file: DocumentNode
 ): Promise<FigmaFileDocData> => {
   let fileData: FigmaFileDocData = { title: file.name, data: [] };
+  let componentData = getComponentData();
   await figma.loadAllPagesAsync().then(async () => {
     for (const page of file.children) {
-      if (page.children.length) {
+      if (
+        page.children.length &&
+        page.id != componentData.components.componentsPage.id &&
+        !elementIsHidden(page.name)
+      ) {
         await scanWholePageForDocuments(page).then((data) => {
           if (data.data.length) {
             fileData.data.push(data);

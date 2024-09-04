@@ -68,19 +68,24 @@ let generateIFrameStyle = (
 ) =>
   `border: ${borderWidth}px solid ${borderColor}; border-radius:${borderRadius}px`;
 
-  let getPathBasedOnScope = (scope: ExportScope = 'figmaPage',frameId:string,currentIndex:number[], metadata) => {
-    switch(scope) {
-      case 'doc':
-        return getPathInDocument(frameId,metadata).path;
-        break;
-        case 'figmaPage':
-        return getPathInFigmaPage(frameId,metadata,currentIndex).path;
-        break;
-        case 'figmaFile':
-        return getPathInFigmaFile(frameId,metadata,currentIndex).path;
-        break;
-    }
-  };
+let getPathBasedOnScope = (
+  scope: ExportScope = 'figmaPage',
+  frameId: string,
+  currentIndex: number[],
+  metadata
+) => {
+  switch (scope) {
+    case 'doc':
+      return getPathInDocument(frameId, metadata).path;
+      break;
+    case 'figmaPage':
+      return getPathInFigmaPage(frameId, metadata, currentIndex).path;
+      break;
+    case 'figmaFile':
+      return getPathInFigmaFile(frameId, metadata, currentIndex).path;
+      break;
+  }
+};
 
 let generateIFrame = (
   iframeSrc: string,
@@ -238,54 +243,57 @@ let generateMDComponentDoc = (
   displayFrameSrcType: FigmaURLType
 ): string => {
   let mdArray: string[] = [];
-  //desc
-  mdArray.push(data.description);
-  //Variants
-  for (const variant of data.variants) {
-    mdArray.push(
-      `##### ${generateHeaderContentForVariant(
-        variant.variantName,
-        data.variants.length > 1
-      )}`
-    );
-    let src = generateFigmaURL(
-      data.fileId,
-      variant.displayFrame.id,
-      displayFrameSrcType
-    );
-    mdArray.push(
-      `${generateIFrame(
-        src,
-        generateDisplayFrameCaptionForAnatomyFrame(
-          data.mainComponentName,
-          variant.variantName
-        ),
-        settings.export.md.linkIframes
-      )}\n`
-    );
-    for (const [i, layer] of variant.layers.entries()) {
+
+  if (data.variants.length && data.variants[0].displayFrame.id) {
+    //desc
+    mdArray.push(data.description);
+    //Variants
+    for (const variant of data.variants) {
       mdArray.push(
-        `###### ${i + 1}. ${decidedAsciiForNodeType(layer.layerType)}${
-          layer.layerName
-        }`
+        `##### ${generateHeaderContentForVariant(
+          variant.variantName,
+          data.variants.length > 1
+        )}`
       );
-      mdArray.push(`${generateLayerDescription(layer)}  \n`);
-      if (layer.properties) {
+      let src = generateFigmaURL(
+        data.fileId,
+        variant.displayFrame.id,
+        displayFrameSrcType
+      );
+      mdArray.push(
+        `${generateIFrame(
+          src,
+          generateDisplayFrameCaptionForAnatomyFrame(
+            data.mainComponentName,
+            variant.variantName
+          ),
+          settings.export.md.linkIframes
+        )}\n`
+      );
+      for (const [i, layer] of variant.layers.entries()) {
         mdArray.push(
-          generateMDTable(
-            {
-              withHeadings: true,
-              content: [
-                ['Property', 'Value', 'Source'],
-                ...convertPropObjToArr(layer.properties),
-              ],
-            },
-            []
-          ) + '  \n'
+          `###### ${i + 1}. ${decidedAsciiForNodeType(layer.layerType)}${
+            layer.layerName
+          }`
         );
+        mdArray.push(`${generateLayerDescription(layer)}  \n`);
+        if (layer.properties) {
+          mdArray.push(
+            generateMDTable(
+              {
+                withHeadings: true,
+                content: [
+                  ['Property', 'Value', 'Source'],
+                  ...convertPropObjToArr(layer.properties),
+                ],
+              },
+              []
+            ) + '  \n'
+          );
+        }
       }
+      mdArray.push('\n---\n');
     }
-    mdArray.push('\n---\n');
   }
   return mdArray.join('\n');
 };
@@ -471,96 +479,99 @@ let generateHTMLComponentDoc = (
 ): string => {
   let html: string[] = [];
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
-  html.push(
-    `${addIndentation(
-      initialIndentation
-    )}<div class="${classPrefix}component-doc">`
-  );
-  html.push(
-    `${addIndentation(
-      initialIndentation + 1
-    )}<p class="${classPrefix}component-doc-desc ${classPrefix}p">${
-      data.description
-    }</p>`
-  );
-
-  for (const variant of data.variants) {
+  if (data.variants.length && data.variants[0].displayFrame.id) {
+    html.push(
+      `${addIndentation(
+        initialIndentation
+      )}<div class="${classPrefix}component-doc">`
+    );
+    //Description
     html.push(
       `${addIndentation(
         initialIndentation + 1
-      )}<div class="${classPrefix}component-doc-variant-wrapper">`
+      )}<p class="${classPrefix}component-doc-desc ${classPrefix}p">${
+        data.description
+      }</p>`
     );
 
-    html.push(
-      `${addIndentation(
-        initialIndentation + 2
-      )}<h5 class="${classPrefix}h5">${generateHeaderContentForVariant(
-        variant.variantName,
-        data.variants.length > 1
-      )}</h5>`
-    );
-    html.push(
-      `${generateIFrame(
-        generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed'),
-        generateDisplayFrameCaptionForAnatomyFrame(
-          data.mainComponentName,
-          variant.variantName
-        ),
-        false,
-        initialIndentation + 2
-      )}`
-    );
+    for (const variant of data.variants) {
+      html.push(
+        `${addIndentation(
+          initialIndentation + 1
+        )}<div class="${classPrefix}component-doc-variant-wrapper">`
+      );
 
-    for (const [i, layer] of variant.layers.entries()) {
       html.push(
         `${addIndentation(
           initialIndentation + 2
-        )}<div class="${classPrefix}component-doc-layer-anatomy-wrapper">`
+        )}<h5 class="${classPrefix}h5">${generateHeaderContentForVariant(
+          variant.variantName,
+          data.variants.length > 1
+        )}</h5>`
       );
-
       html.push(
-        `${addIndentation(
-          initialIndentation + 3
-        )}<h6 class="${classPrefix}h6">${i + 1}. ${decidedAsciiForNodeType(
-          layer.layerType
-        )}${layer.layerName}</h6>`
+        `${generateIFrame(
+          generateFigmaURL(data.fileId, variant.displayFrame.id, 'embed'),
+          generateDisplayFrameCaptionForAnatomyFrame(
+            data.mainComponentName,
+            variant.variantName
+          ),
+          false,
+          initialIndentation + 2
+        )}`
       );
 
-      html.push(
-        `${addIndentation(
-          initialIndentation + 3
-        )}<p class="${classPrefix}p">${generateLayerDescription(layer)}
-        </p>`
-      );
-
-      if (layer.properties) {
+      for (const [i, layer] of variant.layers.entries()) {
         html.push(
-          `${generateHTMLTable(
-            {
-              withHeadings: true,
-              content: [
-                ['Property', 'Value', 'Source'],
-                ...convertPropObjToArr(layer.properties),
-              ],
-            },
-            initialIndentation + 3
-          )}`
+          `${addIndentation(
+            initialIndentation + 2
+          )}<div class="${classPrefix}component-doc-layer-anatomy-wrapper">`
         );
+
+        html.push(
+          `${addIndentation(
+            initialIndentation + 3
+          )}<h6 class="${classPrefix}h6">${i + 1}. ${decidedAsciiForNodeType(
+            layer.layerType
+          )}${layer.layerName}</h6>`
+        );
+
+        html.push(
+          `${addIndentation(
+            initialIndentation + 3
+          )}<p class="${classPrefix}p">${generateLayerDescription(layer)}
+        </p>`
+        );
+
+        if (layer.properties) {
+          html.push(
+            `${generateHTMLTable(
+              {
+                withHeadings: true,
+                content: [
+                  ['Property', 'Value', 'Source'],
+                  ...convertPropObjToArr(layer.properties),
+                ],
+              },
+              initialIndentation + 3
+            )}`
+          );
+        }
+
+        html.push(`${addIndentation(initialIndentation + 2)}</div>`);
       }
 
-      html.push(`${addIndentation(initialIndentation + 2)}</div>`);
+      html.push(
+        `${addIndentation(
+          initialIndentation + 1
+        )}<div class="${classPrefix}divider"><hr /></div>`
+      );
+
+      html.push(`${addIndentation(initialIndentation + 1)}</div>`);
     }
 
-    html.push(
-      `${addIndentation(
-        initialIndentation + 1
-      )}<div class="${classPrefix}divider"><hr /></div>`
-    );
-
-    html.push(`${addIndentation(initialIndentation + 1)}</div>`);
+    html.push(`${addIndentation(initialIndentation)}</div>`);
   }
-
-  html.push(`${addIndentation(initialIndentation)}</div>`);
   return html.join('\n');
 };
 
@@ -1017,10 +1028,10 @@ ${
 
 /**
  * Generates an HTML makrup containing the side nav of the docsite
- * @param metadata 
- * @param activeIndex 
- * @param initialIdentation 
- * @returns 
+ * @param metadata
+ * @param activeIndex
+ * @param initialIdentation
+ * @returns
  */
 let generateDocSiteSideNav = (
   metadata: FigmaFileBundleMetaData,
