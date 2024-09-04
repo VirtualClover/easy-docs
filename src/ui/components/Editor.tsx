@@ -75,7 +75,7 @@ export const Editor = () => {
   //We do intervals so the editor is not constantly saving and reconciliating data
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (!stopUpdates) {
+      if (!stopUpdates && !pluginContext.sheetOpen) {
         setStopUpdates(true);
         //console.log('interval');
         //Get the current data from the editor
@@ -146,6 +146,7 @@ export const Editor = () => {
     pluginContext.currentDocData,
     pluginContext.activeTab,
     pluginContext.incomingFigmaChanges,
+    pluginContext.sheetOpen,
     stopUpdates,
   ]);
 
@@ -163,11 +164,12 @@ export const Editor = () => {
       pluginContext.incomingFigmaChanges,
       pluginContext.buildingComponentDoc,
       isRenderingData,
+      pluginContext.sheetOpen
     ];
 
   return (
     <>
-      {loading && (
+      {loading && !pluginContext.sheetOpen && (
         <Box
           sx={{
             position: 'absolute',

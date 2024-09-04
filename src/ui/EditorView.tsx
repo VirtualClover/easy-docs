@@ -183,13 +183,15 @@ export const EditorView = () => {
           >
             <Editor key={key} />
           </Box>
-          <Snackbar
-            open={pluginContext.incomingFigmaChanges}
-            autoHideDuration={1000}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            message={'Loading the latest Figma changes'}
-            action={circularLoader}
-          />{' '}
+          {!pluginContext.sheetOpen && (
+            <Snackbar
+              open={pluginContext.incomingFigmaChanges}
+              autoHideDuration={1000}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              message={'Loading the latest Figma changes'}
+              action={circularLoader}
+            />
+          )}
         </>
       ) : (
         <OutDatedComponentsView />
