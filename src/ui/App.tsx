@@ -87,6 +87,7 @@ function App({ initialPluginData }: ComponentProps) {
     setView(decideView(navigation.currentView));
   }, [navigation.currentView]);
 
+  // If the user has selected a section, set the active tab to the first page of the document
   React.useEffect(() => {
     if (!currentDocData.pages[activeTab]) {
       setActiveTab(0);

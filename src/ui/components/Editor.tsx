@@ -19,26 +19,70 @@ const ReactEditorJS = createReactEditorJS();
 
 export const Editor = () => {
   const editorCore = React.useRef(null);
-  const [stopUpdates, setStopUpdates] = React.useState(false);
-  const [firstRender, setFirstRender] = React.useState(true);
-  const [skeleton, setSkeleton] = React.useState(true);
-
   const pluginContext = React.useContext(PluginDataContext);
-  //Freeze the section when the editor is mounted so if the section changes we delete the data, stop any chnages to send and remount
-  //const [sectionId,mountedSectionId] =
+  const [stopUpdates, setStopUpdates] = React.useState(false);
+  const [isRenderingData, setIsRenderingData] = React.useState(true);
+  const [componentIsMounted, setComponentIsMounted] = React.useState(true);
+  const [loading, setLoading] = React.useState(true);
 
+  /**
+   * Hnadles the mount the editor
+   */
+  const handleInitialize = React.useCallback((instance) => {
+    console.log('Initialized');
+    console.log(componentIsMounted);
+    //console.log(pluginContext.currentDocData);
+    //setSkeleton(true);
+    editorCore.current = instance;
+    if (componentIsMounted) {
+      setComponentIsMounted(false);
+    }
+  }, []);
+
+  /**
+   * Handles a new batch of data delivered to the editor
+   */
+  const handleUpdateData = React.useCallback(async (data: OutputData) => {
+    //console.log('renders');
+    setIsRenderingData(true);
+    await editorCore.current
+      .render(data)
+      .then(() => {
+        setIsRenderingData(false);
+        pluginContext.setIncomingFigmaChanges(false);
+        //console.log('set figma changes on false');
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  }, []);
+
+  /**
+   * Saves the data from the editor and returns said data
+   * @returns 
+   */
+  const handleSaveEditor = async () => {
+    let newData: PageData = await editorCore.current.save(); //Page data
+    return newData;
+  };
+
+  //Save editor data and decide if it should push it to figma or, if there's new figma changes, then the editor renders the new data
+  //We do intervals so the editor is not constantly saving and reconciliating data
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (!stopUpdates) {
         setStopUpdates(true);
         //console.log('interval');
+        //Get the current data from the editor
         handleSaveEditor().then((data) => {
           /*console.log(
             'plugin context for reconciliation with new saved editor data:'
           );
           console.log(pluginContext.currentDocData);*/
 
+          //Checks if the data is not empty
           if (data.blocks.length) {
+            //If it's not empty, does a reconciliation with the current stored data on the plugin
             let reconciliation = reconcilePageData(
               {
                 ...data,
@@ -48,23 +92,24 @@ export const Editor = () => {
               },
               pluginContext.currentDocData.pages[pluginContext.activeTab],
               true,
-              {new:'editor', current: pluginContext.currentDocData.author.changesMadeIn}
+              {
+                new: 'editor',
+                current: pluginContext.currentDocData.author.changesMadeIn,
+              }
             );
 
+            //If there are changes between the current stored data from the plugin and the editor, most likely means there's new changes, either in the editor or from figma
             if (reconciliation.changesNumber) {
+              //If the plugin tells there's incoming figma changes, the mount that data into the editor
               if (pluginContext.incomingFigmaChanges) {
                 handleUpdateData(
                   pluginContext.currentDocData.pages[pluginContext.activeTab]
                 );
               } else {
+
+                //If there's no figma incoming changes, that means the editor made those changes so let's send those changes to figma!
                 let pageData = reconciliation.data as PageData;
                 formatPageData(pageData);
-                /*console.log('Pre reconciliation current editor data');
-                console.log(data);
-                console.log('Pre reconciliation CURRENT CONTEXT DATA');
-                console.log(pluginContext.currentDocData);
-                console.log('Recon data');
-                console.log(reconciliation);*/
                 let tempDoc: DocData = clone(pluginContext.currentDocData);
                 tempDoc.pages[pluginContext.activeTab] = pageData;
                 tempDoc.author = EMPTY_AUTHOR_DATA;
@@ -76,15 +121,10 @@ export const Editor = () => {
           } else {
             //New figma changes
             if (!pluginContext.currentDocData.pages[pluginContext.activeTab]) {
-              /*console.log(
-                ' if no blocks length. render when active tab does not exist in doc'
-              );*/
+              //FAILSAFE If there's not data loaded, and the current active tab index is does not exists in the current document, return to the 0 index, meaning the first tab
               selectNewPageFromEditor(0, pluginContext);
             } else {
-              /*console.log(
-                'if no blocks length. render when active tab exists in doc'
-              );*/
-
+              // FAILSAFE If there's not data loaded, and the current active tab index exists in the current document, load said tab
               handleUpdateData(
                 pluginContext.currentDocData.pages[pluginContext.activeTab]
               );
@@ -104,58 +144,25 @@ export const Editor = () => {
     stopUpdates,
   ]);
 
-  const handleInitialize = React.useCallback((instance) => {
-    //console.log('Initialized');
-    //console.log(pluginContext.currentDocData);
-    setSkeleton(true);
-    editorCore.current = instance;
-    if (firstRender) {
-      setFirstRender(false);
-    }
-  }, []);
-
-  const handleUpdateData = React.useCallback(async (data: OutputData) => {
-    //console.log('renders');
-    await editorCore.current
-      .render(data)
-      .then(() => {
-        //console.log('set false on render');
-        setSkeleton(false);
-        pluginContext.setIncomingFigmaChanges(false);
-        //console.log('set figma changes on false');
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  }, []);
-
-  const handleSaveEditor = async () => {
-    let newData: PageData = await editorCore.current.save(); //Page data
-    return newData;
-  };
-
-  //Change tabs
+  //Determine Loading
   React.useEffect(() => {
-    if (!firstRender) {
-      setSkeleton(true);
-      setStopUpdates(true);
-      //console.log(`axtive tab on editor render: ${pluginContext.activeTab}`);
-      //console.log('change of tabs. render when active tab exists in doc');
-      handleUpdateData(
-        pluginContext.currentDocData.pages[pluginContext.activeTab]
-      ).then(() => {
-        setStopUpdates(false);
-        pluginContext.setLoadingState('NONE');
-        //console.log('set false');
-      });
-    }
-  }, [pluginContext.activeTab]);
+    setLoading(
+      componentIsMounted ||
+        pluginContext.incomingFigmaChanges ||
+        pluginContext.buildingComponentDoc ||
+        isRenderingData
+    );
+  }),
+    [
+      componentIsMounted,
+      pluginContext.incomingFigmaChanges,
+      pluginContext.buildingComponentDoc,
+      isRenderingData,
+    ];
 
   return (
     <>
-      {(pluginContext.incomingFigmaChanges || pluginContext.buildingComponentDoc ||
-        skeleton ||
-        pluginContext.loadingState != 'NONE') && (
+      {loading && (
         <Box
           sx={{
             position: 'absolute',
@@ -164,7 +171,7 @@ export const Editor = () => {
             zIndex: 1300,
             bgcolor: 'background.default',
             left: 0,
-            top:50,
+            top: 50,
             pt: 32,
             pl: 16,
           }}

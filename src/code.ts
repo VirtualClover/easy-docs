@@ -100,9 +100,9 @@ figma.ui.onmessage = (msg) => {
     if (msg.type === 'node-update') {
       if (!stopUpdates && cachedMsg == null) {
         stopUpdates = true;
-        console.log('generate data');
+        //console.log('generate data');
         pushFigmaUpdates(lastFetchDoc).then((res) => {
-          console.log('finished generate data');
+          //console.log('finished generate data');
           if (res.type === 'new-node-data') {
             lastFetchDoc = res.data;
             console.log('push figma updates');

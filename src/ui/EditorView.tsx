@@ -39,6 +39,9 @@ export const EditorView = () => {
   const [mountedSectionId, setMountedSectionId] = React.useState(
     pluginContext.currentDocData.sectionId
   );
+  const [mountedActiveTab, setMountedActiveTab] = React.useState(
+    pluginContext.activeTab
+  );
 
   const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     if (newActiveTab < tabs.length) {
@@ -57,17 +60,20 @@ export const EditorView = () => {
     let tempDoc = pluginContext.currentDocData;
     let newPage = createNewPageJSON(tempDoc.pages.length + 1);
     tempDoc.pages.push(newPage);
-    /*console.log('Page creation');*/
     pushNewDataToFigma(pluginContext, tempDoc);
   };
 
   //This is here so if the user selects another documetn section, the editor and the tabs will forcefully reload with the new data
   React.useEffect(() => {
-    if (pluginContext.currentDocData.sectionId != mountedSectionId) {
+    if (
+      pluginContext.currentDocData.sectionId != mountedSectionId ||
+      mountedActiveTab != pluginContext.activeTab
+    ) {
       setKey(key == 1 ? 2 : 1);
       setMountedSectionId(pluginContext.currentDocData.sectionId);
+      setMountedActiveTab(pluginContext.activeTab);
     }
-  }, [pluginContext.currentDocData]);
+  }, [pluginContext.currentDocData, pluginContext.activeTab]);
 
   React.useEffect(() => {
     setTabs([]);
