@@ -9,7 +9,6 @@ export const selectNewPageFromEditor = (
   pageIndex: number,
   pluginContext: PluginData
 ) => {
-  pluginContext.setLoadingState('MINOR');
   if (
     pluginContext.currentDocData.pages &&
     pluginContext.currentDocData.pages[pageIndex] &&

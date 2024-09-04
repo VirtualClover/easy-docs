@@ -45,7 +45,7 @@ function App({ initialPluginData }: ComponentProps) {
   );
   const [loadingState, setLoadingState] = React.useState(
     initialPluginData.loadingState
-  );
+  ); // Todo remove loading states
   const [settings, setSettings] = React.useState(initialPluginData.settings);
   const [incomingFigmaChanges, setIncomingFigmaChanges] = React.useState(
     initialPluginData.incomingFigmaChanges

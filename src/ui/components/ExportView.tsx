@@ -422,7 +422,16 @@ export const ExportView = (): JSX.Element => {
           <Typography variant="caption">{previewFileName}</Typography>
         </Box>
         <Box>
-          <CopyToClipboard text={previewData} onCopy={() => setOpen(true)}>
+          <CopyToClipboard
+            text={previewData}
+            options={{
+              format:
+                pluginContext.lastFormatUsed == 'html'
+                  ? 'text/html'
+                  : 'text/plain',
+            }}
+            onCopy={() => setOpen(true)}
+          >
             <Tooltip title="Copy preview to clipboard">
               <span>
                 <IconButton

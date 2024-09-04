@@ -46,7 +46,6 @@ const SettingsButton = () => {
     );
   }, [
     pluginContext.incomingFigmaChanges,
-    pluginContext.loadingState,
     pluginContext.outdatedComponents,
     pluginContext.sheetOpen,
   ]);
