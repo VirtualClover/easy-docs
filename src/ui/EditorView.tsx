@@ -25,12 +25,17 @@ import { decodeStringForFigma } from '../utils/general/cleanseTextData';
 import { pushNewDataToFigma } from '../utils/editor/pushNewDataToFigma';
 import { selectNewPageFromEditor } from '../utils/editor/selectNewPageFromEditor';
 
-function a11yProps(index: number) {
+/**
+ * Generates the A11Props for the tabs
+ * @param index
+ * @returns
+ */
+let generateA11yProps = (index: number) => {
   return {
     id: `menu-tab-${index}`,
     'aria-controls': `menu-tabpanel-${index}`,
   };
-}
+};
 
 export const EditorView = () => {
   const [tabs, setTabs] = React.useState([]);
@@ -42,39 +47,51 @@ export const EditorView = () => {
   const [mountedActiveTab, setMountedActiveTab] = React.useState(
     pluginContext.activeTab
   );
+  const [creatingNewPage, setCreatingNewPage] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
-  const handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
+  /**
+   * Handles the change of the active tab
+   * @param event
+   * @param newActiveTab
+   */
+  let handleChange = (event: React.SyntheticEvent, newActiveTab: number) => {
     if (newActiveTab < tabs.length) {
-      //pluginContext.setActiveTab(newActiveTab);
       selectNewPageFromEditor(newActiveTab, pluginContext);
     } else {
-      //pluginContext.setActiveTab(0);
+      // FAILSAFE If the given index is not found on the current document, the reset it to 0
       selectNewPageFromEditor(0, pluginContext);
     }
 
     //console.log(newActiveTab);
   };
 
-  const handlePageCreation = () => {
-    pluginContext.setLoadingState('MINOR');
+  /**
+   * Creates a new page in the document and tells figma to add it
+   */
+  let handlePageCreation = () => {
+    //pluginContext.setLoadingState('MINOR');
+    setCreatingNewPage(true);
     let tempDoc = pluginContext.currentDocData;
     let newPage = createNewPageJSON(tempDoc.pages.length + 1);
     tempDoc.pages.push(newPage);
     pushNewDataToFigma(pluginContext, tempDoc);
   };
 
-  //This is here so if the user selects another documetn section, the editor and the tabs will forcefully reload with the new data
+  //This is here so if the user selects another document section or tab/frame, the editor and the tabs will forcefully remount with the new data
   React.useEffect(() => {
     if (
       pluginContext.currentDocData.sectionId != mountedSectionId ||
       mountedActiveTab != pluginContext.activeTab
     ) {
       setKey(key == 1 ? 2 : 1);
+      setCreatingNewPage(false);
       setMountedSectionId(pluginContext.currentDocData.sectionId);
       setMountedActiveTab(pluginContext.activeTab);
     }
   }, [pluginContext.currentDocData, pluginContext.activeTab]);
 
+  //Remounts the tabs with new data
   React.useEffect(() => {
     setTabs([]);
     let tempTabs = [];
@@ -92,7 +109,7 @@ export const EditorView = () => {
           label={decodeStringForFigma(
             pluginContext.currentDocData.pages[i].title
           )}
-          {...a11yProps(i)}
+          {...generateA11yProps(i)}
           key={i}
         />
       );
@@ -100,6 +117,23 @@ export const EditorView = () => {
 
     setTabs(tempTabs);
   }, [pluginContext.incomingFigmaChanges, pluginContext.incomingEditorChanges]);
+
+  //Set loading
+  React.useEffect(() => {
+    setLoading(
+      pluginContext.incomingFigmaChanges ||
+        creatingNewPage ||
+        pluginContext.outdatedComponents ||
+        pluginContext.buildingComponentDoc ||
+        pluginContext.sheetOpen
+    );
+  }, [
+    pluginContext.incomingFigmaChanges,
+    creatingNewPage,
+    pluginContext.buildingComponentDoc,
+    pluginContext.outdatedComponents,
+    pluginContext.sheetOpen,
+  ]);
 
   const circularLoader = <CircularProgress size={16} />;
 
@@ -125,10 +159,7 @@ export const EditorView = () => {
               <IconButton
                 sx={{ margin: 'auto 0' }}
                 onClick={() => handlePageCreation()}
-                disabled={
-                  pluginContext.loadingState != 'NONE' ||
-                  pluginContext.outdatedComponents
-                }
+                disabled={loading}
               >
                 <Add />
               </IconButton>

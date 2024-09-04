@@ -10,8 +10,12 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { ArrowBack, SettingsOutlined } from '@mui/icons-material';
-import { DocData, PluginData, UNTITLED_DOC_PLACEHOLDER } from '../../utils/constants';
+import { ArrowBack, Edit, SettingsOutlined } from '@mui/icons-material';
+import {
+  DocData,
+  PluginData,
+  UNTITLED_DOC_PLACEHOLDER,
+} from '../../utils/constants';
 import {
   decodeStringForFigma,
   encodeStringForHTML,
@@ -23,18 +27,36 @@ import React from 'react';
 import { navigate } from '../../utils/editor/navigate';
 import { pushNewDataToFigma } from '../../utils/editor/pushNewDataToFigma';
 
-interface BarProps {
-  pluginContext: PluginData;
-}
-
+/**
+ * The button that takes you to the settings
+ * @returns
+ */
 const SettingsButton = () => {
   const pluginContext = React.useContext(PluginDataContext);
+
+  const [loading, setLoading] = React.useState(false);
+
+  //Determine loading
+  React.useEffect(() => {
+    setLoading(
+      pluginContext.incomingFigmaChanges ||
+        pluginContext.buildingComponentDoc ||
+        pluginContext.outdatedComponents ||
+        pluginContext.sheetOpen
+    );
+  }, [
+    pluginContext.incomingFigmaChanges,
+    pluginContext.loadingState,
+    pluginContext.outdatedComponents,
+    pluginContext.sheetOpen,
+  ]);
+
   return (
     <Tooltip title="Settings">
       <span>
         <IconButton
           onClick={() => navigate('SETTINGS', pluginContext)}
-          disabled={pluginContext.loadingState != 'NONE'}
+          disabled={loading}
         >
           <SettingsOutlined />
         </IconButton>
@@ -43,8 +65,11 @@ const SettingsButton = () => {
   );
 };
 
+/**
+ * The top bar of the inspect view
+ * @returns
+ */
 const InspectBar = () => {
-  const pluginContext = React.useContext(PluginDataContext);
   return (
     <>
       <Typography variant="h4" component="div" sx={{ flexGrow: 1, ml: 16 }}>
@@ -54,11 +79,19 @@ const InspectBar = () => {
     </>
   );
 };
+/**
+ * The top bar of the editor view
+ * @returns
+ */
 const EditorBar = () => {
   const [editDocTitle, setEditDocTitle] = React.useState(false);
-  const [editIconVisible, setEditIconVisible] = React.useState(false);
   const pluginContext = React.useContext(PluginDataContext);
 
+  /**
+   * Handles the change of the document title
+   * @param pluginContext
+   * @param title
+   */
   function handleInputChange(pluginContext: PluginData, title: string) {
     let tempDoc: DocData = {
       ...pluginContext.currentDocData,
@@ -68,18 +101,22 @@ const EditorBar = () => {
     setEditDocTitle(false);
   }
 
-  const [disableActions, setDisableActions] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
+  //Determine loading
   React.useEffect(() => {
-    if (
+    setLoading(
       pluginContext.incomingFigmaChanges ||
-      pluginContext.loadingState != 'NONE'
-    ) {
-      setDisableActions(true);
-    } else {
-      setDisableActions(false);
-    }
-  }, [pluginContext.incomingFigmaChanges, pluginContext.loadingState]);
+        pluginContext.buildingComponentDoc ||
+        pluginContext.outdatedComponents ||
+        pluginContext.sheetOpen
+    );
+  }, [
+    pluginContext.incomingFigmaChanges,
+    pluginContext.buildingComponentDoc,
+    pluginContext.outdatedComponents,
+    pluginContext.sheetOpen,
+  ]);
 
   return (
     <Box
@@ -90,44 +127,47 @@ const EditorBar = () => {
         alignItems: 'center',
       }}
     >
-      <Tooltip
-        title={!pluginContext.outdatedComponents ? 'Double click to edit!' : ''}
+      <Typography
+        variant="h4"
+        component="div"
+        noWrap
+        sx={{
+          opacity: loading ? 0.5 : 1,
+          ml: 16,
+          '&:hover': {
+            cursor: !pluginContext.outdatedComponents ? 'pointer' : 'default',
+          },
+          maxWidth: '80%',
+        }}
+        onDoubleClick={() => {
+          if (!loading) {
+            setEditDocTitle(true);
+          }
+        }}
       >
-        <Typography
-          variant="h4"
-          component="div"
-          noWrap
-          sx={{
-            opacity: disableActions ? 0.5 : 1,
-            ml: 16,
-            '&:hover': {
-              cursor: !pluginContext.outdatedComponents ? 'pointer' : 'default',
-            },
-            maxWidth: '80%',
-          }}
-          onDoubleClick={() => {
-            if (!disableActions) {
-              setEditDocTitle(true);
-            }
-          }}
-          onMouseEnter={() => setEditIconVisible(true)}
-          onMouseLeave={() => setEditIconVisible(false)}
-        >
-          {decodeStringForFigma(
-            editDocTitle ? '' : pluginContext.currentDocData.title
-          )}
-          {/* <IconButton
-          onClick={() => setEditDocTitle(true)}
-          sx={{ visibility: `${editIconVisible ? 'visible' : 'hidden'}` }}
-        >
-          <Edit />
-      </IconButton>*/}
-        </Typography>
-      </Tooltip>
+        <Tooltip title={!loading ? 'Double click to edit!' : ''}>
+          <span>
+            {decodeStringForFigma(
+              editDocTitle ? '' : pluginContext.currentDocData.title
+            )}
+          </span>
+        </Tooltip>
+        <Tooltip title={!loading ? 'Edit document title' : ''}>
+          <span>
+            <IconButton
+              onClick={() => setEditDocTitle(true)}
+              sx={{ display: `${!editDocTitle ? 'inline-block' : 'none'}` }}
+              disabled={loading}
+            >
+              <Edit />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Typography>
       {editDocTitle && (
         <Input
           autoFocus
-          disabled={disableActions}
+          disabled={loading}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleInputChange(
@@ -156,7 +196,7 @@ const EditorBar = () => {
         <Stack direction={'row'} gap={8}>
           <Button
             variant="outlined"
-            disabled={disableActions}
+            disabled={loading}
             size="small"
             onClick={() => {
               pluginContext.setSheetZIndex(0);
@@ -174,6 +214,10 @@ const EditorBar = () => {
   );
 };
 
+/**
+ * The top bar of the settings view
+ * @returns
+ */
 const SettingsBar = () => {
   const pluginContext = React.useContext(PluginDataContext);
   return (
@@ -198,7 +242,7 @@ const SettingsBar = () => {
   );
 };
 
-function decideBarContent(pluginContext: PluginData) {
+let decideBarContent = (pluginContext: PluginData) => {
   switch (pluginContext.navigation.currentView) {
     case 'INSPECT':
       return <InspectBar />;
@@ -213,8 +257,12 @@ function decideBarContent(pluginContext: PluginData) {
       return <InspectBar />;
       break;
   }
-}
+};
 
+/**
+ * The top bar of the plugin
+ * @returns 
+ */
 export const PluginTopBar = () => {
   const pluginContext = React.useContext(PluginDataContext);
 
@@ -222,7 +270,6 @@ export const PluginTopBar = () => {
 
   React.useEffect(() => {
     setBarContent(decideBarContent(pluginContext));
-    //console.log(pluginContext.currentDocData);
   }, [
     pluginContext.navigation.currentView,
     pluginContext.currentDocData.title,
@@ -235,28 +282,3 @@ export const PluginTopBar = () => {
     </AppBar>
   );
 };
-
-/*
-
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              //console.log(pluginContext);
-              let markdown = exportMarkdown(
-                pluginContext.currentDocData.pages[pluginContext.activeTab]
-              );
-              pluginContext.setSheetOpen(true);
-              pluginContext.setSheetContent(() => (
-                <ExportView markdown={markdown} />
-              ));
-              //console.log(markdown);
-            }}
-          >
-            Export
-          </Button>
-
-
-
-
-*/

@@ -17,6 +17,11 @@ import { selectNewPageFromEditor } from '../../utils/editor/selectNewPageFromEdi
 
 const ReactEditorJS = createReactEditorJS();
 
+/**
+ * The text editor component, to know more about EditorJS go to:
+ * https://editorjs.io/
+ * @returns 
+ */
 export const Editor = () => {
   const editorCore = React.useRef(null);
   const pluginContext = React.useContext(PluginDataContext);
@@ -26,7 +31,7 @@ export const Editor = () => {
   const [loading, setLoading] = React.useState(true);
 
   /**
-   * Hnadles the mount the editor
+   * Handles the mount the editor
    */
   const handleInitialize = React.useCallback((instance) => {
     console.log('Initialized');
