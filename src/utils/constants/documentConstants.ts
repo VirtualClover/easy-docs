@@ -6,7 +6,7 @@ import { OutputData } from '@editorjs/editorjs';
  */
 export type ChangesPlatform = 'figma' | 'editor';
 
-export const UNTITLED_DOC_PLACEHOLDER = 'Untitled Doc'; 
+export const UNTITLED_DOC_PLACEHOLDER = 'Untitled Doc';
 
 export type StringFormats = 'figma' | 'html';
 
@@ -173,21 +173,18 @@ export const EMPTY_DOC_OBJECT: DocData = {
   lastEdited: Date.now().toString(),
 };
 
-export interface FigmaPageDocData  {
+export interface FigmaPageDocData {
   title: string;
   pageId: string;
   data: DocData[];
-};
+}
 
 export interface FigmaFileDocData {
   title: string;
   data: FigmaPageDocData[];
-};
-
-
+}
 
 //Meta data
-
 
 export const EMPTY_PAGE_METADATA = {
   title: '',
@@ -203,22 +200,20 @@ export const EMPTY_DOCUMENT_METADATA = {
   sectionId: '',
   directoryName: '',
   lastEdited: '', //Contrary to the page and file bundle meta data types this one has a last edited property, since the others are only used when generating export bundles and not in actual document edition
-  directory: [] as PageBundleMetaData[]
+  directory: [] as PageBundleMetaData[],
 };
 
 export type DocumentBundleMetaData = typeof EMPTY_DOCUMENT_METADATA;
-
 
 export const EMPTY_FIGMA_PAGE_BUNDLE_METADATA = {
   title: '',
   generatedAt: '',
   pageId: '',
   directoryName: '',
-  directory: [] as DocumentBundleMetaData[]
+  directory: [] as DocumentBundleMetaData[],
 };
 
 export type FigmaPageBundleMetaData = typeof EMPTY_FIGMA_PAGE_BUNDLE_METADATA;
-
 
 export const EMPTY_FIGMA_FILE_BUNDLE_METADATA = {
   title: '',
@@ -229,6 +224,13 @@ export const EMPTY_FIGMA_FILE_BUNDLE_METADATA = {
 
 export type FigmaFileBundleMetaData = typeof EMPTY_FIGMA_FILE_BUNDLE_METADATA;
 
+export type AnyMetaData =
+  | FigmaFileBundleMetaData
+  | FigmaPageBundleMetaData
+  | DocumentBundleMetaData
+  | PageBundleMetaData;
+
+  export type BundleType = 'figmaFile' | 'figmaPage' | 'document' | 'page';
 
 /**
  * The data a document reconciliation returns

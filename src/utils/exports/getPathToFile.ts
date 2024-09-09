@@ -1,4 +1,6 @@
 import {
+  AnyMetaData,
+  BundleType,
   DocumentBundleMetaData,
   FigmaFileBundleMetaData,
   FigmaPageBundleMetaData,
@@ -63,17 +65,53 @@ export let getPathInFigmaPage = (
 };
 
 export let getPathInDocument = (
-  frameId = '',
+  frameId,
   metadata: DocumentBundleMetaData
 ): DocumentIndexReference => {
-  let index = metadata.directory.findIndex(
-    (element) => element.frameId == frameId
-  );
-  if (index != -1) {
-    return {
-      index,
-      path: `${metadata.directory[index].fileName}`,
-    };
+  if (metadata.directory) {
+    let index = metadata.directory.findIndex(
+      (element) => element.frameId == frameId
+    );
+    if (index != -1) {
+      return {
+        index,
+        path: `${metadata.directory[index].fileName}`,
+      };
+    }
   }
+  return null;
+};
+
+export let getPathFromMetaData = (
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  frameId: string,
+  currentIndex
+) => {
+  if (metadata && bundleType != 'page' && frameId != '') {
+    switch (bundleType) {
+      case 'figmaFile':
+        return getPathInFigmaFile(
+          frameId,
+          metadata as FigmaFileBundleMetaData,
+          currentIndex
+        );
+        break;
+      case 'figmaPage':
+        return getPathInFigmaPage(
+          frameId,
+          metadata as FigmaPageBundleMetaData,
+          currentIndex
+        );
+        break;
+      case 'document':
+        return getPathInDocument(frameId, metadata as DocumentBundleMetaData);
+        break;
+      default:
+        return null;
+        break;
+    }
+  }
+
   return null;
 };

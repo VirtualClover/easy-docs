@@ -1,4 +1,6 @@
 import {
+  AnyMetaData,
+  BundleType,
   ComponentDocBlockData,
   CustomizationSettings,
   DocumentBundleMetaData,
@@ -46,8 +48,10 @@ import {
 import {
   generateFigmaURL,
   getDetailsFromFigmaURL,
+  validateFigmaURL,
 } from '../general/urlHandlers';
 import {
+  getPathFromMetaData,
   getPathInDocument,
   getPathInFigmaFile,
   getPathInFigmaPage,
@@ -72,7 +76,8 @@ let getPathBasedOnScope = (
   scope: ExportScope = 'figmaPage',
   frameId: string,
   currentIndex: number[],
-  metadata
+  metadata,
+  bundleType: 'figmaFile' | 'figmaPage' | 'document' | 'page' = 'page'
 ) => {
   switch (scope) {
     case 'doc':
@@ -118,10 +123,20 @@ let generateIFrame = (
   }${addIndentation(identation)}</figure>`;
 };
 
-let generateMDTableRow = (rowData: string[], docMap: DocMapItem[]): string => {
+let generateMDTableRow = (
+  rowData: string[],
+  metadata: AnyMetaData,
+  bundleType,
+  currentIndex: number[]
+): string => {
   let mdRow = [];
   for (let i = 0; i < rowData.length; i++) {
-    const cell = convertFlavoredText(rowData[i], docMap);
+    const cell = convertFlavoredTextMD(
+      rowData[i],
+      metadata,
+      bundleType,
+      currentIndex
+    );
     mdRow.push(`${i == 0 ? '|' : ' '}${cell}|`);
   }
 
@@ -134,7 +149,12 @@ let generateMDTableRow = (rowData: string[], docMap: DocMapItem[]): string => {
  * @param docMap - Used if the reference links settings is enabled
  * @returns A string of markdwon flavored text
  */
-let convertFlavoredText = (text: string, docMap: DocMapItem[] = []): string => {
+let convertFlavoredTextMD = (
+  text: string,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
+): string => {
   let globalOffset = 0;
   let regularMatches = [
     ...text.matchAll(/(?<!<(b|i)>)<a[^>]*>([^<]+)<\/a>(?!<\/(b|i)>)/g),
@@ -157,13 +177,26 @@ let convertFlavoredText = (text: string, docMap: DocMapItem[] = []): string => {
   if (matches.length) {
     matches.forEach((item) => {
       let url = getURLFromAnchor(item.match[0], 'html');
-      if (docMap.length && url.href.match(/\?ed-ref=1/)) {
-        let urlDetails = getDetailsFromFigmaURL(url.href, 'decode');
-        let mapItem = docMap.find((item) => item.frameId == urlDetails.frameId);
+      let isFigmaUrl = validateFigmaURL(url.href, 'share');
+      let isFrameId = url.href.match(/[0-9]*:[0-9]*/);
+      if (isFigmaUrl || isFrameId) {
+        console.log('----');
+
+        console.log(metadata);
+        let frameId;
+        if (isFigmaUrl) {
+          frameId = getDetailsFromFigmaURL(url.href, 'decode').frameId;
+        }
+        let path = getPathFromMetaData(
+          metadata,
+          bundleType,
+          frameId ?? url.href,
+          currentIndex
+        );
+        console.log(path);
         console.log(url);
-        console.log(urlDetails);
-        if (urlDetails.frameId && mapItem) {
-          url.href = `/${mapItem.title}`;
+        if (path) {
+          url.href = path.path;
         }
       }
 
@@ -207,12 +240,57 @@ let convertFlavoredText = (text: string, docMap: DocMapItem[] = []): string => {
   return text;
 };
 
-let generateMDTable = (data, docMap: DocMapItem[]): string => {
+let convertFlavoredTextHTML = (
+  text: string,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
+) => {
+
+  let getPath = (href: string) => {
+    let isFigmaUrl = validateFigmaURL(href, 'share');
+    let isFrameId = href.match(/[0-9]*:[0-9]*/);
+    if (isFigmaUrl || isFrameId) {
+      let frameId;
+      if (isFigmaUrl) {
+        frameId = getDetailsFromFigmaURL(href, 'decode').frameId;
+      }
+      let path = getPathFromMetaData(
+        metadata,
+        bundleType,
+        frameId ?? href,
+        currentIndex
+      );
+      if (path) {
+        href = path.path;
+      }
+    }
+
+    return href;
+  };
+
+  let newText = text.replace(
+    /\<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\>/g,
+    (matched, capture1, capture2, index, input) => {
+      return '<a href="' + getPath(capture2) + '">';
+    }
+  );
+  console.log(newText);
+
+  return newText;
+};
+
+let generateMDTable = (
+  data,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
+): string => {
   let md = [];
   let content: string[][] = data.content;
   for (let i = 0; i < content.length; i++) {
     let rowData = content[i];
-    md.push(generateMDTableRow(rowData, docMap));
+    md.push(generateMDTableRow(rowData, metadata, bundleType, currentIndex));
     if (i == 0) {
       md.push('|' + '---|'.repeat(rowData.length));
     }
@@ -221,15 +299,34 @@ let generateMDTable = (data, docMap: DocMapItem[]): string => {
   return md.join('\n');
 };
 
-let generateMDList = (data, docMap: DocMapItem[]): string => {
+let generateMDList = (
+  data,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
+): string => {
   let items = [];
   if (data.items.length) {
     for (let i = 0; i < data.items.length; i++) {
       const listItem = data.items[i];
       if (data.style == 'unordered') {
-        items.push(`* ${convertFlavoredText(listItem, docMap)}`);
+        items.push(
+          `* ${convertFlavoredTextMD(
+            listItem,
+            metadata,
+            bundleType,
+            currentIndex
+          )}`
+        );
       } else {
-        items.push(`${i + 1}. ${convertFlavoredText(listItem, docMap)}`);
+        items.push(
+          `${i + 1}. ${convertFlavoredTextMD(
+            listItem,
+            metadata,
+            bundleType,
+            currentIndex
+          )}`
+        );
       }
     }
   }
@@ -240,7 +337,10 @@ let generateMDList = (data, docMap: DocMapItem[]): string => {
 let generateMDComponentDoc = (
   data: ComponentDocBlockData,
   settings: PluginSettings,
-  displayFrameSrcType: FigmaURLType
+  displayFrameSrcType: FigmaURLType,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
 ): string => {
   let mdArray: string[] = [];
 
@@ -287,7 +387,9 @@ let generateMDComponentDoc = (
                   ...convertPropObjToArr(layer.properties),
                 ],
               },
-              []
+              metadata,
+              bundleType,
+              currentIndex
             ) + '  \n'
           );
         }
@@ -306,7 +408,9 @@ let generateMDComponentDoc = (
 export let generateMarkdownPage = async (
   data: PageData,
   settings: PluginSettings,
-  docMap: DocMapItem[] = []
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex = [0, 0, 0]
 ): Promise<string> => {
   //console.log(data);
 
@@ -323,13 +427,23 @@ export let generateMarkdownPage = async (
         markdown.push(`${'#'.repeat(block.data.level)} ${block.data.text}`);
         break;
       case 'paragraph':
-        markdown.push(`${convertFlavoredText(block.data.text, docMap)}`);
+        markdown.push(
+          `${convertFlavoredTextMD(
+            block.data.text,
+            metadata,
+            bundleType,
+            currentIndex
+          )}`
+        );
         break;
       case 'quote':
         markdown.push(
-          `> ${convertFlavoredText(block.data.text, docMap)}${
-            block.data.caption ? `  \n> ${block.data.caption}` : ``
-          }  \n`
+          `> ${convertFlavoredTextMD(
+            block.data.text,
+            metadata,
+            bundleType,
+            currentIndex
+          )}${block.data.caption ? `  \n> ${block.data.caption}` : ``}  \n`
         );
         break;
       case 'displayFrame':
@@ -381,11 +495,15 @@ export let generateMarkdownPage = async (
         }
         break;
       case 'list':
-        markdown.push(generateMDList(block.data, docMap));
+        markdown.push(
+          generateMDList(block.data, metadata, bundleType, currentIndex)
+        );
         break;
       case 'table':
         if (block.data.content.length) {
-          markdown.push(generateMDTable(block.data, docMap));
+          markdown.push(
+            generateMDTable(block.data, metadata, bundleType, currentIndex)
+          );
         }
         break;
       case 'alert':
@@ -403,7 +521,14 @@ export let generateMarkdownPage = async (
         break;
       case 'componentDoc':
         markdown.push(
-          generateMDComponentDoc(block.data, settings, displayFrameSrcType)
+          generateMDComponentDoc(
+            block.data,
+            settings,
+            displayFrameSrcType,
+            metadata,
+            bundleType,
+            currentIndex
+          )
         );
         break;
       default:
@@ -421,8 +546,7 @@ export let generateMarkdownPage = async (
  */
 export let generateJSONPage = async (
   data: PageData,
-  settings: PluginSettings,
-  docMap: DocMapItem[] = []
+  settings: PluginSettings
 ): Promise<string> => {
   return JSON.stringify(data, null, 2);
 };
@@ -596,7 +720,9 @@ let indentCodeBlock = (data: string, indentationLevel = 0): string => {
 export let generateHTMLPage = async (
   data: PageData,
   settings: PluginSettings,
-  docMap: DocMapItem[] = [],
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[],
   initialIndentation: number = 0
 ): Promise<string> => {
   //console.log(data);
@@ -639,9 +765,14 @@ export let generateHTMLPage = async (
         break;
       case 'paragraph':
         html.push(
-          `${addIndentation(bodyIdentation)}<p class="${classPrefix}p">${
-            block.data.text
-          }</p>`
+          `${addIndentation(
+            bodyIdentation
+          )}<p class="${classPrefix}p">${convertFlavoredTextHTML(
+            block.data.text,
+            metadata,
+            bundleType,
+            currentIndex
+          )}</p>`
         );
         break;
       case 'quote':
@@ -792,12 +923,16 @@ export let generatePageExport = async (
   data: PageData,
   format: ExportFileFormat,
   settings: PluginSettings,
-  docMap: DocMapItem[] = []
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
 ): Promise<string> => {
   let exportFunc: (
     data: PageData,
     settings: PluginSettings,
-    docMap: DocMapItem[],
+    metadata: AnyMetaData,
+    bundleType: BundleType,
+    currentIndex: number[],
     initialIndentation?
   ) => Promise<string>;
   let exportData = '';
@@ -813,7 +948,7 @@ export let generatePageExport = async (
   }
 
   if (data && data.blocks) {
-    await exportFunc(data, settings, docMap).then(
+    await exportFunc(data, settings, metadata, bundleType, currentIndex).then(
       (string) => (exportData = string)
     );
   } else {
@@ -867,7 +1002,6 @@ export let generateDocSite = async (
             documentDir.file(`${formatDirName(page.title)}.html`, markup);
           }
         );
-        console.log('gets here xd');
       }
     }
   }
@@ -990,9 +1124,14 @@ ${
 
   //Content
   markup.push(`${addIndentation(4)}<div class ="ed-document-page-content">`);
-  await generateHTMLPage(pageData, settings, [], 5).then((res) =>
-    markup.push(res)
-  );
+  await generateHTMLPage(
+    pageData,
+    settings,
+    docSiteMetadata,
+    'figmaFile',
+    currentIndex,
+    5
+  ).then((res) => markup.push(res));
   markup.push(`${addIndentation(4)}</div>`);
   markup.push(`${addIndentation(3)}</main>`);
   markup.push(`${addIndentation(2)}</div>`);
@@ -1167,7 +1306,7 @@ let generateDocSitePageTabs = (
  * @param format
  * @returns
  */
-let generatePageMetaData = (
+export let generatePageMetaData = (
   data: PageData,
   currentFileNames: string[],
   format: ExportFileFormat = 'html'
@@ -1189,7 +1328,7 @@ let generatePageMetaData = (
  * @param format
  * @returns
  */
-let generateDocumentMetadata = (
+export let generateDocumentMetadata = (
   data: DocData,
   currentDirNames: string[],
   format: ExportFileFormat = 'html'
@@ -1218,7 +1357,7 @@ let generateDocumentMetadata = (
  * @param timeStamp
  * @returns
  */
-let generateFigmaPageMetadata = (
+export let generateFigmaPageMetadata = (
   data: FigmaPageDocData,
   currentDirNames: string[],
   format: ExportFileFormat = 'html',
@@ -1247,7 +1386,7 @@ let generateFigmaPageMetadata = (
  * @param timeStamp
  * @returns
  */
-let generateFigmaFileMetaData = (
+export let generateFigmaFileMetaData = (
   data: FigmaFileDocData,
   format: ExportFileFormat = 'html',
   timeStamp: string = Date.now().toString()
@@ -1272,4 +1411,28 @@ let generateFigmaFileMetaData = (
   }
 
   return metadata;
+};
+
+export let generateMetaData = (
+  data,
+  bundleType: BundleType = 'page',
+  currentDirs = [],
+  format: ExportFileFormat = 'html'
+): AnyMetaData => {
+  switch (bundleType) {
+    case 'document':
+      return generateDocumentMetadata(data, currentDirs, format);
+      break;
+    case 'figmaFile':
+      return generateFigmaFileMetaData(data, format);
+      break;
+    case 'figmaPage':
+      return generateFigmaPageMetadata(data, currentDirs, format);
+      break;
+    case 'page':
+      return generatePageMetaData(data, currentDirs, format);
+      break;
+    default:
+      return;
+  }
 };

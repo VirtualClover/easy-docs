@@ -1,6 +1,18 @@
 import * as _ from 'lodash';
 
 import {
+  AnyMetaData,
+  BundleType,
+  DocData,
+  DocumentBundleMetaData,
+  EMPTY_PAGE_METADATA,
+  ExportFileFormat,
+  FigmaFileBundleMetaData,
+  FigmaFileDocData,
+  FigmaPageBundleMetaData,
+  FigmaPageDocData,
+} from '../../utils/constants';
+import {
   Box,
   FormControl,
   FormHelperText,
@@ -14,18 +26,11 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  DocData,
-  DocumentBundleMetaData,
-  ExportFileFormat,
-  FigmaFileBundleMetaData,
-  FigmaFileDocData,
-  FigmaPageBundleMetaData,
-  FigmaPageDocData,
-  PageBundleMetaData,
-} from '../../utils/constants';
-import {
   downloadFile,
   generateDocSite,
+  generateDocumentMetadata,
+  generateFigmaFileMetaData,
+  generateFigmaPageMetadata,
   generatePageExport,
 } from '../../utils/docs/exportUtils';
 
@@ -123,27 +128,6 @@ export const ExportView = (): JSX.Element => {
   ];
 
   /**
-   * Check if the current folder name has been used in the directory (using a stirng array as a directory list), if it has been used, the function appends a number(loops however many times necessaryif the number appended also has been used); if it has not been used the it returns the name and pushes the name into the array
-   * @param folderNamesUsed
-   * @param folderName
-   * @returns The foldername iterated or not
-   */
-  let checkIfFolderNameOk = (
-    folderNamesUsed: string[],
-    folderName: string
-  ): string => {
-    if (folderNamesUsed) {
-      let tries = 1;
-      while (folderNamesUsed.includes(folderName)) {
-        folderName = folderName + `_${tries}`;
-        tries++;
-      }
-    }
-    folderNamesUsed.push(folderName);
-    return folderName;
-  };
-
-  /**
    * Donwloads the current selected page as a file depending on the format
    * @param data
    * @param fileName
@@ -169,47 +153,44 @@ export const ExportView = (): JSX.Element => {
   let generateDocumentExport = async (
     data: DocData,
     format: ExportFileFormat,
-    zipDirectory?: JSZip,
-    directoryNamesUsed: string[] = []
+    bundleType: BundleType = 'document',
+    preLoadedMetadata?: any,
+    currentIndex: number[] = [0, 0],
+    zipDirectory?: JSZip
   ) => {
-    let bundleName = checkIfFolderNameOk(
-      directoryNamesUsed,
-      formatStringToFileName(data.title)
-    );
+    let metadata: DocumentBundleMetaData;
+    if (preLoadedMetadata) {
+      metadata = bundleType == 'figmaFile'
+        ? preLoadedMetadata.directory[currentIndex[1]].directory[
+            currentIndex[0]
+          ]
+        : preLoadedMetadata.directory[currentIndex[0]];
+    } else {
+      metadata = generateDocumentMetadata(data, [], format);
+    }
+    let bundleName = metadata.directoryName;
     const zip = zipDirectory ? zipDirectory.folder(bundleName) : new JSZip();
-    let fileNames = [];
-    let metaData: DocumentBundleMetaData = {
-      title: data.title,
-      directoryName: bundleName,
-      sectionId: data.sectionId,
-      lastEdited: data.lastEdited,
-      directory: [],
-    };
-    for (const page of data.pages) {
-      await generatePageExport(page, format, pluginContext.settings, []).then(
-        (data) => {
-          let fileName = `${checkIfFolderNameOk(
-            fileNames,
-            formatStringToFileName(page.title)
-          )}.${format}`;
-          let pageMetaData: PageBundleMetaData = {
-            title: page.title,
-            frameId: page.frameId,
-            lastEdited: page.time ? page.time.toString() : '',
-            fileName,
-          };
-          metaData.directory.push(pageMetaData), zip.file(fileName, data);
-        }
-      );
+
+    for (const [i, page] of data.pages.entries()) {
+      await generatePageExport(
+        page,
+        format,
+        pluginContext.settings,
+        preLoadedMetadata ?? metadata,
+        bundleType,
+        [i, ...currentIndex]
+      ).then((data) => {
+        let fileName = metadata.directory[i].fileName;
+        zip.file(fileName, data);
+      });
     }
 
     if (!zipDirectory) {
       //Generate metadata file
-      zip.file(METADATA_FILENAME, JSON.stringify(metaData));
+      zip.file(METADATA_FILENAME, JSON.stringify(metadata));
       const zipContent = await zip.generateAsync({ type: 'blob' });
       downloadFile(zipContent, bundleName, 'zip');
     }
-    return metaData;
   };
 
   /**
@@ -219,45 +200,46 @@ export const ExportView = (): JSX.Element => {
    * @param zipDirectory
    * @returns
    */
-  let generatePageBundleExport = async (
+  let generateFigmaPageBundleExport = async (
     data: FigmaPageDocData,
     format: ExportFileFormat,
-    zipDirectory?: JSZip,
-    directoryNamesUsed: string[] = []
+    bundleType: BundleType = 'figmaPage',
+    preloadedMetaData?: FigmaFileBundleMetaData,
+    currentFigmaPageIndex: number = 0,
+    zipDirectory?: JSZip
   ) => {
-    let bundleName = checkIfFolderNameOk(
-      directoryNamesUsed,
-      formatStringToFileName(data.title)
-    );
+    let metadata: FigmaPageBundleMetaData;
+    if (preloadedMetaData){
+      metadata = preloadedMetaData.directory[currentFigmaPageIndex];
+    }
+    else {
+      metadata = generateFigmaPageMetadata(
+        data,
+        [],
+        format,
+        Date.now().toString()
+      );
+    }
+    let bundleName = metadata.directoryName;
     const zip = zipDirectory ? zipDirectory.folder(bundleName) : new JSZip();
-    let pageBundleMetaData: FigmaPageBundleMetaData = {
-      title: data.title,
-      pageId: data.pageId,
-      directoryName: bundleName,
-      generatedAt: Date.now().toString(),
-      directory: [],
-    };
-    let documentDirectoryNamesUsed = [];
 
-    for (const document of data.data) {
+    for (const [i, document] of data.data.entries()) {
       await generateDocumentExport(
         document,
         format,
-        zip,
-        documentDirectoryNamesUsed
-      ).then((metaData) => {
-        pageBundleMetaData.directory.push(metaData);
-      });
+        bundleType,
+        preloadedMetaData ?? metadata,
+        [i, currentFigmaPageIndex],
+        zip
+      );
     }
 
     if (!zipDirectory) {
       //Generate metadata file
-      zip.file(METADATA_FILENAME, JSON.stringify(pageBundleMetaData));
+      zip.file(METADATA_FILENAME, JSON.stringify(metadata));
       const zipContent = await zip.generateAsync({ type: 'blob' });
       downloadFile(zipContent, bundleName, 'zip');
     }
-
-    return pageBundleMetaData;
   };
 
   /**
@@ -265,32 +247,30 @@ export const ExportView = (): JSX.Element => {
    * @param data
    * @param format
    */
-  let generateFileBundleExport = async (
+  let generateFigmaFileBundleExport = async (
     data: FigmaFileDocData,
     format: ExportFileFormat
   ) => {
     const zip = new JSZip();
-    let pageDirectoryNames = [];
-    let finalZipName = formatStringToFileName(data.title);
-    let fileBundleMetaData: FigmaFileBundleMetaData = {
-      title: data.title,
-      directoryName: finalZipName,
-      generatedAt: Date.now().toString(),
-      directory: [],
-    };
+    let metadata = generateFigmaFileMetaData(
+      data,
+      format,
+      Date.now().toString()
+    );
+    let finalZipName = metadata.directoryName;
 
-    for (const page of data.data) {
-      await generatePageBundleExport(
+    for (const [i, page] of data.data.entries()) {
+      await generateFigmaPageBundleExport(
         page,
         format,
-        zip,
-        pageDirectoryNames
-      ).then((metaData) => {
-        fileBundleMetaData.directory.push(metaData);
-      });
+        'figmaPage',
+        metadata,
+        i,
+        zip
+      );
     }
     //Generate metadata file
-    zip.file(METADATA_FILENAME, JSON.stringify(fileBundleMetaData));
+    zip.file(METADATA_FILENAME, JSON.stringify(metadata));
     const zipContent = await zip.generateAsync({ type: 'blob' });
     downloadFile(zipContent, finalZipName, 'zip');
   };
@@ -301,7 +281,9 @@ export const ExportView = (): JSX.Element => {
       mountedData.pages[mountedActiveTab],
       pluginContext.lastFormatUsed,
       pluginContext.settings,
-      []
+      EMPTY_PAGE_METADATA,
+      'page',
+      [0, 0, 0]
     ).then((data) => {
       setPreviewdata(data);
       setLoading(false);
@@ -333,7 +315,7 @@ export const ExportView = (): JSX.Element => {
           switch (event.data.pluginMessage.type) {
             case 'docs-in-page':
               setLoading(true);
-              generatePageBundleExport(
+              generateFigmaPageBundleExport(
                 event.data.pluginMessage.data,
                 pluginContext.lastFormatUsed
               ).then(() => {
@@ -344,7 +326,7 @@ export const ExportView = (): JSX.Element => {
 
             case 'docs-in-file':
               setLoading(true);
-              generateFileBundleExport(
+              generateFigmaFileBundleExport(
                 event.data.pluginMessage.data,
                 pluginContext.lastFormatUsed
               ).then(() => {
