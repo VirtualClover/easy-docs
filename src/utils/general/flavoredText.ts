@@ -176,7 +176,6 @@ export let setFlavoredTextOnEncodedString = (
   let globalOffset = 0;
   for (let i = 0; i < flavoredStyles.length; i++) {
     let style = flavoredStyles[i];
-    //console.log(style);
     let currentStart = style.start + globalOffset;
     let currentEnd = style.end + globalOffset;
     let openingTags = '';
@@ -185,7 +184,6 @@ export let setFlavoredTextOnEncodedString = (
       openingTags = openingTags + '[[[b]]]';
       closeTags = '[[[/b]]]' + closeTags;
       globalOffset += 15;
-      //console.log('bold');
     }
     if (style.fontName.style == 'Italic') {
       //console.log('italic');
@@ -194,12 +192,9 @@ export let setFlavoredTextOnEncodedString = (
       globalOffset += 15;
     }
     if (style.hyperlink) {
-      //console.log(textContent.slice(0, currentStart));
       openingTags = openingTags + `[[[a href="${style.hyperlink.value}"]]]`;
       closeTags = '[[[/a]]]' + closeTags;
       globalOffset += 23 + style.hyperlink.value.length;
-      //console.log('link');
-      //console.log(encodeStringForHTML(textContent));
     }
 
     textContent =

@@ -55,14 +55,14 @@ import {
   getPathInDocument,
   getPathInFigmaFile,
   getPathInFigmaPage,
-} from '../exports/getPathToFile';
+} from './getPathToFile';
 
 import JSZip from 'jszip';
 import { addIndentation } from '../general/addIndentation';
 import { clone } from '../general/clone';
 import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
 import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
-import { formatDirName } from '../exports/formatDirName';
+import { formatDirName } from './formatDirName';
 import { getURLFromAnchor } from '../general/flavoredText';
 import { validateFigmaNodeId } from '../general/validateFigmaNodeId';
 

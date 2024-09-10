@@ -32,7 +32,7 @@ import {
   generateFigmaFileMetaData,
   generateFigmaPageMetadata,
   generatePageExport,
-} from '../../utils/docs/exportUtils';
+} from '../../utils/exports/exportUtils';
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { CodeBlock } from './CodeBlock';

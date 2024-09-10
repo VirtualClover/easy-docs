@@ -29,9 +29,7 @@ figma.skipInvisibleInstanceChildren = true;
 let cachedMsg = null;
 let stopUpdates = false;
 let lastFetchDoc = EMPTY_DOC_OBJECT;
-// Calls to "parent.postMessage" from within the HTML page will trigger this
-// callback. The callback will be passed the "pluginMessage" property of the
-// posted message.
+
 figma.ui.onmessage = (msg) => {
   if (msg.type) {
     // If statements instead of a switch let's me control the order of events more easily, for example, when there is a cached data that needs to be generated
@@ -100,9 +98,7 @@ figma.ui.onmessage = (msg) => {
     if (msg.type === 'node-update') {
       if (!stopUpdates && cachedMsg == null) {
         stopUpdates = true;
-        //console.log('generate data');
         pushFigmaUpdates(lastFetchDoc).then((res) => {
-          //console.log('finished generate data');
           if (res.type === 'new-node-data') {
             lastFetchDoc = res.data;
             console.log('push figma updates');

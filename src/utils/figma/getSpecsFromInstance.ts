@@ -9,9 +9,7 @@ import _ from 'lodash';
 import { clone } from '../general/clone';
 import { nodeCanHaveSpecs } from './nodeCanHaveSpecs';
 import { remapObjKey } from '../general/remapObjKey';
-import { rgbToHex } from '../general/addIndentation';
-
-//TODO ADD OPACITY
+import { rgbToHex } from '../general/rgbToHex';
 
 export let generateSpecsFromNode = async (
   node: SceneNode,
@@ -163,11 +161,8 @@ export let generateSpecsFromNode = async (
         }
       }
 
-      //console.log(ogValues);
-
       let nodeVars = node.boundVariables;
       if (nodeVars) {
-        //console.log(node.boundVariables);
         for (var key in nodeVars) {
           let currentVar = nodeVars[key].length
             ? nodeVars[key][0]
