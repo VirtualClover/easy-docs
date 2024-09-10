@@ -105,6 +105,7 @@ export let generateBaseCSSDocumentStyles = () => {
   styles.push(
     `th {font-weight: 700; color: var(--ed-theme-on-background-high); background-color: var(--ed-theme-background-tonal-high); text-align:left;}`
   );
+  styles.push(`.ed-p {word-break: auto-phrase;};`);
   styles.push(
     `.ed-quote {background: var(--ed-theme-surface); margin: 16px 0; padding: 8px 8px 8px 16px; border-left: 12px solid var(--ed-theme-divider-simple); border-radius: 8px;}`
   );
@@ -155,13 +156,16 @@ export let generateBaseCSSDocSiteStyles = () => {
   styles.push(`body {
     font-family: var(--ed-theme-font-family);
     color: var(--ed-theme-on-background-mid);
-    background-color: var(--ed-theme-background);
+    background-color: var(--ed-theme-background-default);
     padding: 0;
     margin: 0;
     height: 100vh;
     display: flex;
     flex-direction: column;
   }`);
+
+  styles.push(`a:link{color: var(--ed-theme-on-background-link);}`);
+  styles.push(`a:visited{color: var(--ed-theme-on-background-link);}`);
 
   styles.push(`.ed-page-content {
     display: flex;
@@ -259,7 +263,8 @@ export let generateInlineStyles = (
   );
   styles.push(`${addIndentation(identation)}<style>`);
   styles.push(generateCSSVars(settings, true));
-  styles.push(generateBaseCSSDocSiteStyles());
+  styles.push(generateBaseCSSDocumentStyles());
+  styles.push(`.ed-doc-body{max-width: 800px;margin: 0 auto;}`)
   styles.push('</style> \n');
 
   return styles.join('');

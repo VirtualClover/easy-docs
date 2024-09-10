@@ -50,7 +50,7 @@ export const ExportView = (): JSX.Element => {
   const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(false);
   const [docSiteSelected, setDocSiteSelected] = React.useState(false);
-  //Freezing data so it doesnt mutate if something's changes in figma
+  //Freezing data so it doesnt mutate if something changes in figma
   const [mountedData, setMountedData] = React.useState(
     pluginContext.currentDocData
   );

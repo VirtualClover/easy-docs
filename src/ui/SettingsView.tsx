@@ -192,31 +192,6 @@ let ExportsView = () => {
 
   return (
     <ExportsViewContainer>
-      <SettingsSection sectionName="General Export Settings">
-        <FormGroup>
-          <FormControlLabel
-            labelPlacement="start"
-            control={
-              <FigmaSwitch
-                checked={tempSettingsObj.export.referenceLinks}
-                onChange={(e) => {
-                  tempSettingsObj.export.referenceLinks =
-                    !tempSettingsObj.export.referenceLinks;
-                  updateSettingsObj();
-                  console.log(tempSettingsObj.export.referenceLinks);
-                }}
-                name="reference links"
-              />
-            }
-            label="[EXPERIMENTAL] Enable reference links"
-          />
-          <FormHelperText>
-            If a link reference another page frame in  Figma, the exported file
-            will try and reference the homogenus file instead of the figma
-            frame.
-          </FormHelperText>
-        </FormGroup>
-      </SettingsSection>
       <SettingsSection sectionName="Markdown Settings">
         <FormGroup>
           <FormControlLabel

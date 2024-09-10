@@ -9,7 +9,6 @@ import {
 
 import { BASE_STYLE_TOKENS } from '../../styles/base';
 import { ExportFileFormat } from './exportConstants';
-import { Palette } from '@mui/icons-material';
 
 const frameSettings = {
   minWidth: 1400,

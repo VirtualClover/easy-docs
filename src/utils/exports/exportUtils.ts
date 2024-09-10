@@ -997,7 +997,7 @@ export let generatePageExport = async (
 export let downloadFile = (file: any, fileName: string, extension: string) => {
   let link = document.createElement('a');
   link.href = URL.createObjectURL(file);
-  link.download = `${fileName}.${extension}`;
+  link.download = `${fileName}`;
   link.click();
 };
 
