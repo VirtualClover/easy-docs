@@ -1,4 +1,3 @@
-import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
 import {
   FIGMA_ENCODED_CHARS,
   StringFormats,
@@ -6,9 +5,15 @@ import {
   UpperCaseTextAligment,
 } from '../constants';
 
+import { getPluginSettings } from '../figma/getPluginSettings';
 import { setRangeNodeFills } from '../figma/setNodeFills';
 import { validateFigmaNodeId } from './validateFigmaNodeId';
 
+/**
+ * Matches flavored text in a Figma encoded string
+ * @param string 
+ * @returns 
+ */
 export let matchFlavoredText = (string: string) => {
   let anchorMatches = [
     ...string.matchAll(/\[\[\[(a)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(a)\]\]\]/gi),
@@ -19,13 +24,18 @@ export let matchFlavoredText = (string: string) => {
   let italicMatches = [
     ...string.matchAll(/\[\[\[(i)\b[^\]\]\]]*\]\]\](.*?)\[\[\[\/(i)\]\]\]/gi),
   ];
-  //console.log(matches);
 
   let matches = [...anchorMatches, ...boldMatches, ...italicMatches];
   matches.sort((a, b) => a.index - b.index);
   return matches;
 };
 
+/**
+ * Gets the url from an HTMLanchor element
+ * @param string 
+ * @param type 
+ * @returns 
+ */
 export let getURLFromAnchor = (
   string: string,
   type: StringFormats = 'figma'
@@ -45,27 +55,31 @@ export let getURLFromAnchor = (
   }
 };
 
-export let getFlavoredTextTags = (matchedString: string): string => {
-  return matchedString.match(/\<(.*?)(\>| )/i)[1];
-};
 
+/**
+ * Add flavored text to a text node in Figma
+ * @param string 
+ * @param node 
+ * @param textAlign 
+ */
 export let setFlavoredTextOnFigmaNode = async (
   string: string,
   node: TextNode | InstanceNode,
   textAlign: TextAlignment | false = false
 ) => {
   let flavoredMatches = matchFlavoredText(string);
-  console.log(flavoredMatches);
+  let pluginSettings = getPluginSettings();
+  let theme = pluginSettings.customization;
 
   if (flavoredMatches.length) {
     await Promise.all([
-      figma.loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Bold' }),
+      figma.loadFontAsync({ family: theme.fontFamily, style: 'Bold' }),
       figma.loadFontAsync({
-        family: DEFAULT_FONT_FAMILIES[0],
+        family: theme.fontFamily,
         style: 'Italic',
       }),
       figma.loadFontAsync({
-        family: DEFAULT_FONT_FAMILIES[0],
+        family: theme.fontFamily,
         style: 'Regular',
       }),
     ]).then(() => {
@@ -89,7 +103,7 @@ export let setFlavoredTextOnFigmaNode = async (
         switch (tag) {
           case 'b':
             textNode.setRangeFontName(start, end, {
-              family: DEFAULT_FONT_FAMILIES[0],
+              family: theme.fontFamily,
               style: 'Bold',
             });
             charDeletions.push({ start, end: start + currentStartOffset });
@@ -100,7 +114,7 @@ export let setFlavoredTextOnFigmaNode = async (
             break;
           case 'i':
             textNode.setRangeFontName(start, end, {
-              family: DEFAULT_FONT_FAMILIES[0],
+              family: theme.fontFamily,
               style: 'Italic',
             });
             charDeletions.push({ start, end: start + currentStartOffset });
@@ -122,7 +136,7 @@ export let setFlavoredTextOnFigmaNode = async (
               textNode,
               start,
               end,
-              BASE_STYLE_TOKENS.palette.onBackground.link
+              theme.palette.onBackground.link
             );
             charDeletions.push({ start, end: start + currentStartOffset });
             charDeletions.push({
@@ -158,6 +172,12 @@ export let setFlavoredTextOnFigmaNode = async (
   }
 };
 
+/**
+ * Add flavored text to an encondec string gathered from the text property of a characters node
+ * @param node 
+ * @param customTextContent 
+ * @returns 
+ */
 export let setFlavoredTextOnEncodedString = (
   node: TextNode | InstanceNode,
   customTextContent?: string
@@ -191,7 +211,6 @@ export let setFlavoredTextOnEncodedString = (
       globalOffset += 15;
     }
     if (style.fontName.style == 'Italic') {
-      //console.log('italic');
       openingTags =
         openingTags +
         `${FIGMA_ENCODED_CHARS.brackets.open}i${FIGMA_ENCODED_CHARS.brackets.close}`;
