@@ -1,24 +1,24 @@
 import { BlockData, DocData, PageData } from '../constants';
 import { FIGMA_LAST_EDITED_KEY, FIGMA_NAMESPACE } from '../constants';
 
-import { createPageFrame } from '../figma/createPageFrame';
+import { createPageFrame } from './createPageFrame';
 import { decodeStringForFigma } from '../general/cleanseTextData';
-import { generateAlertInstance } from '../figma/components/AlertComponent.figma';
-import { generateCodeInstance } from '../figma/components/codeComponent.figma';
-import { generateComponentDocInstance } from '../figma/components/componentDocComponent.figma';
-import { generateDisplayFrameInstance } from '../figma/components/displayFrameComponent.figma';
-import { generateDividerInstance } from '../figma/components/dividerComponent.figma';
-import { generateDosAndDontsInstance } from '../figma/components/dosAndDontsComponent.figma';
-import { generateHeaderInstance } from '../figma/components/headerComponent.figma';
-import { generateListInstance } from '../figma/components/listComponent.figma';
-import { generateParagraphInstance } from '../figma/components/paragraphComponent.figma';
-import { generateQuoteInstance } from '../figma/components/quoteComponent.figma';
-import { generateTableInstance } from '../figma/components/tableComponent.figma';
-import { getComponentData } from '../figma/getComponentData';
-import { getPluginSettings } from '../figma/getPluginSettings';
-import { handleFigmaError } from '../figma/handleFigmaError';
-import { resizeSection } from '../figma/resizeSection';
-import { selectNode } from '../figma/selectNode';
+import { generateAlertInstance } from './components/AlertComponent.figma';
+import { generateCodeInstance } from './components/codeComponent.figma';
+import { generateComponentDocInstance } from './components/componentDocComponent.figma';
+import { generateDisplayFrameInstance } from './components/displayFrameComponent.figma';
+import { generateDividerInstance } from './components/dividerComponent.figma';
+import { generateDosAndDontsInstance } from './components/dosAndDontsComponent.figma';
+import { generateHeaderInstance } from './components/headerComponent.figma';
+import { generateListInstance } from './components/listComponent.figma';
+import { generateParagraphInstance } from './components/paragraphComponent.figma';
+import { generateQuoteInstance } from './components/quoteComponent.figma';
+import { generateTableInstance } from './components/tableComponent.figma';
+import { getComponentData } from './getComponentData';
+import { getPluginSettings } from './getPluginSettings';
+import { handleFigmaError } from './handleFigmaError';
+import { resizeSection } from './resizeSection';
+import { selectNode } from './selectNode';
 
 /**
  * Generates Figma nodes based on doc data passed

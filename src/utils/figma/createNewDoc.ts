@@ -1,6 +1,5 @@
-import { DocData, PluginSettings } from '../constants';
-
-import { generateFigmaContentFromJSON } from '../docs/generateFigmaContentFromJSON';
+import { DocData } from '../constants';
+import { generateFigmaContentFromJSON } from './generateFigmaContentFromJSON';
 import { getPluginSettings } from './getPluginSettings';
 import { handleFigmaError } from './handleFigmaError';
 import { setNodeFills } from './setNodeFills';

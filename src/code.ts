@@ -4,8 +4,8 @@
 import { DocData, EMPTY_DOC_OBJECT } from './utils/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
-import { generateFigmaContentFromJSON } from './utils/docs/generateFigmaContentFromJSON';
-import { generateJSONFromFigmaContent } from './utils/docs/generateJSONFromFigmaContent';
+import { generateFigmaContentFromJSON } from './utils/figma/generateFigmaContentFromJSON';
+import { generateJSONFromFigmaContent } from './utils/figma/generateJSONFromFigmaContent';
 import { pluginInit } from './utils/figma/pluginInit';
 import { pushFigmaUpdates } from './utils/figma/pushFigmaUpdates';
 import { selectNode } from './utils/figma/selectNode';

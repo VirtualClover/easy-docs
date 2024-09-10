@@ -13,32 +13,32 @@ import {
 import {
   generateBlockDataFromComponentDoc,
   hydrateComponentDoc,
-} from '../figma/components/componentDocComponent.figma';
+} from './components/componentDocComponent.figma';
 import {
   generateBlockDataFromDisplayFrame,
   hydrateDisplayFrame,
-} from '../figma/components/displayFrameComponent.figma';
+} from './components/displayFrameComponent.figma';
 import {
   generateBlockDataFromDosAndDonts,
   hydrateDosAndDontsFrame,
-} from '../figma/components/dosAndDontsComponent.figma';
+} from './components/dosAndDontsComponent.figma';
 
 import { encodeStringForHTML } from '../general/cleanseTextData';
-import { formatPageData } from './formatPageData';
-import { generateBlockDataFromAlert } from '../figma/components/AlertComponent.figma';
-import { generateBlockDataFromCode } from '../figma/components/codeComponent.figma';
-import { generateBlockDataFromDivider } from '../figma/components/dividerComponent.figma';
-import { generateBlockDataFromHeader } from '../figma/components/headerComponent.figma';
-import { generateBlockDataFromList } from '../figma/components/listComponent.figma';
-import { generateBlockDataFromParagraph } from '../figma/components/paragraphComponent.figma';
-import { generateBlockDataFromQuote } from '../figma/components/quoteComponent.figma';
-import { generateBlockDataFromTable } from '../figma/components/tableComponent.figma';
-import { getMainCompIdFromInstance } from '../figma/getMainCompIdFromInstance';
-import { getPluginSettings } from '../figma/getPluginSettings';
-import { getUserDetailsInFigma } from '../figma/getUserDetailsFigma';
-import { handleFigmaError } from '../figma/handleFigmaError';
-import { scanForInstancesInsideAFrame } from '../figma/scans';
-import { styleFrame } from '../figma/styleFrame';
+import { formatPageData } from '../docs/formatPageData';
+import { generateBlockDataFromAlert } from './components/AlertComponent.figma';
+import { generateBlockDataFromCode } from './components/codeComponent.figma';
+import { generateBlockDataFromDivider } from './components/dividerComponent.figma';
+import { generateBlockDataFromHeader } from './components/headerComponent.figma';
+import { generateBlockDataFromList } from './components/listComponent.figma';
+import { generateBlockDataFromParagraph } from './components/paragraphComponent.figma';
+import { generateBlockDataFromQuote } from './components/quoteComponent.figma';
+import { generateBlockDataFromTable } from './components/tableComponent.figma';
+import { getMainCompIdFromInstance } from './getMainCompIdFromInstance';
+import { getPluginSettings } from './getPluginSettings';
+import { getUserDetailsInFigma } from './getUserDetailsFigma';
+import { handleFigmaError } from './handleFigmaError';
+import { scanForInstancesInsideAFrame } from './scans';
+import { styleFrame } from './styleFrame';
 
 /**
  * Generates a Document from a Figma Section
