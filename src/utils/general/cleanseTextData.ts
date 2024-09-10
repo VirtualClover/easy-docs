@@ -28,7 +28,6 @@ export function cleanseBlockData(data) {
  * @returns
  */
 export function cleanseString(string: string): string {
-  //console.log(string);
 
   let formattedString = string ? (string as string) : '';
   if (formattedString) {

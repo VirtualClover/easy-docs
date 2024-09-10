@@ -1,5 +1,6 @@
 import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
 import {
+  FIGMA_ENCODED_CHARS,
   StringFormats,
   TextAlignment,
   UpperCaseTextAligment,
@@ -181,19 +182,31 @@ export let setFlavoredTextOnEncodedString = (
     let openingTags = '';
     let closeTags = '';
     if (style.fontName.style == 'Bold') {
-      openingTags = openingTags + '[[[b]]]';
-      closeTags = '[[[/b]]]' + closeTags;
+      openingTags =
+        openingTags +
+        `${FIGMA_ENCODED_CHARS.brackets.open}b${FIGMA_ENCODED_CHARS.brackets.close}`;
+      closeTags =
+        `${FIGMA_ENCODED_CHARS.brackets.open}/b${FIGMA_ENCODED_CHARS.brackets.close}` +
+        closeTags;
       globalOffset += 15;
     }
     if (style.fontName.style == 'Italic') {
       //console.log('italic');
-      openingTags = openingTags + '[[[i]]]';
-      closeTags = '[[[/i]]]' + closeTags;
+      openingTags =
+        openingTags +
+        `${FIGMA_ENCODED_CHARS.brackets.open}i${FIGMA_ENCODED_CHARS.brackets.close}`;
+      closeTags =
+        `${FIGMA_ENCODED_CHARS.brackets.open}/i${FIGMA_ENCODED_CHARS.brackets.close}` +
+        closeTags;
       globalOffset += 15;
     }
     if (style.hyperlink) {
-      openingTags = openingTags + `[[[a href="${style.hyperlink.value}"]]]`;
-      closeTags = '[[[/a]]]' + closeTags;
+      openingTags =
+        openingTags +
+        `${FIGMA_ENCODED_CHARS.brackets.open}a href="${style.hyperlink.value}"${FIGMA_ENCODED_CHARS.brackets.close}`;
+      closeTags =
+        `${FIGMA_ENCODED_CHARS.brackets.open}/a${FIGMA_ENCODED_CHARS.brackets.close}` +
+        closeTags;
       globalOffset += 23 + style.hyperlink.value.length;
     }
 
