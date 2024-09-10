@@ -146,7 +146,6 @@ let generateMDTableRow = (
 /**
  * Converts flavored text found in the JSON to markdown flavored text
  * @param text - The text to convert
- * @param docMap - Used if the reference links settings is enabled
  * @returns A string of markdwon flavored text
  */
 let convertFlavoredTextMD = (
@@ -246,10 +245,9 @@ let convertFlavoredTextHTML = (
   bundleType: BundleType,
   currentIndex: number[]
 ) => {
-
   let getPath = (href: string) => {
     let isFigmaUrl = validateFigmaURL(href, 'share');
-    let isFrameId = href.match(/[0-9]*:[0-9]*/);
+    let isFrameId = href.match(/[0-9]{1,}:[0-9]{1,}/g);
     if (isFigmaUrl || isFrameId) {
       let frameId;
       if (isFigmaUrl) {
@@ -555,6 +553,9 @@ let generateHTMLTableRow = (
   rowData: string[],
   isHeader: boolean = false,
   initialIndentation: number = 0,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[],
   classPrefix: string = DEFAULT_SETTINGS.export.classNamePrefix
 ): string => {
   let htmlRow = [];
@@ -566,7 +567,12 @@ let generateHTMLTableRow = (
       htmlRow.push(
         `${addIndentation(initialIndentation + 2)}<${cellTag}${
           isHeader ? ` class="${classPrefix}table-header"` : ''
-        }>${cell}</${cellTag}>`
+        }>${convertFlavoredTextHTML(
+          cell,
+          metadata,
+          bundleType,
+          currentIndex
+        )}</${cellTag}>`
       );
     }
   }
@@ -574,7 +580,13 @@ let generateHTMLTableRow = (
   return htmlRow.join('\n');
 };
 
-let generateHTMLTable = (data, initialIndentation: number = 0) => {
+let generateHTMLTable = (
+  data,
+  initialIndentation: number = 0,
+  metadata: AnyMetaData,
+  bundleType: BundleType,
+  currentIndex: number[]
+) => {
   let html = [];
   let classPrefix = DEFAULT_SETTINGS.export.classNamePrefix;
   let content: string[][] = data.content;
@@ -588,7 +600,10 @@ let generateHTMLTable = (data, initialIndentation: number = 0) => {
         generateHTMLTableRow(
           rowData,
           i == 0 && data.withHeadings,
-          initialIndentation
+          initialIndentation,
+          metadata,
+          bundleType,
+          currentIndex
         )
       );
     }
@@ -677,7 +692,7 @@ let generateHTMLComponentDoc = (
                   ...convertPropObjToArr(layer.properties),
                 ],
               },
-              initialIndentation + 3
+              initialIndentation + 3,EMPTY_DOCUMENT_METADATA,'page',[0,0,0] // Not necessary to pass the meta data, since, in theory this table should contain hyperlinks
             )}`
           );
         }
@@ -781,9 +796,14 @@ export let generateHTMLPage = async (
             3
           )}<figure class="${classPrefix}quote">\n${addIndentation(
             4
-          )}<blockquote>\n${addIndentation(bodyIdentation + 2)}${
-            block.data.text
-          }\n${addIndentation(bodyIdentation + 3)}</blockquote>\n${
+          )}<blockquote>\n${addIndentation(
+            bodyIdentation + 2
+          )}${convertFlavoredTextHTML(
+            block.data.text,
+            metadata,
+            bundleType,
+            currentIndex
+          )}\n${addIndentation(bodyIdentation + 3)}</blockquote>\n${
             block.data.caption &&
             `${addIndentation(
               bodyIdentation + 3
@@ -851,13 +871,28 @@ export let generateHTMLPage = async (
         if (block.data.items.length) {
           for (let i = 0; i < block.data.items.length; i++) {
             const listItem = block.data.items[i];
-            html.push(`${addIndentation(4)}<li>${listItem}</li>`);
+            html.push(
+              `${addIndentation(4)}<li>${convertFlavoredTextHTML(
+                listItem,
+                metadata,
+                bundleType,
+                currentIndex
+              )}</li>`
+            );
           }
         }
         html.push(`${addIndentation(bodyIdentation)}</${tag}>`);
         break;
       case 'table':
-        html.push(generateHTMLTable(block.data, bodyIdentation));
+        html.push(
+          generateHTMLTable(
+            block.data,
+            bodyIdentation,
+            metadata,
+            bundleType,
+            currentIndex
+          )
+        );
         break;
       case 'alert':
         html.push(

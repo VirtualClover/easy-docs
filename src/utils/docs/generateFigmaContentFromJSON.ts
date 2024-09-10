@@ -30,7 +30,8 @@ import { selectNode } from '../figma/selectNode';
 export async function generateFigmaContentFromJSON(
   data: DocData,
   parentSection: SectionNode,
-  editedFrames: string[] = []
+  editedFrames: string[] = [],
+  reloadFrame: boolean = false
 ) {
   let pages = data.pages;
   let docTitle = decodeStringForFigma(data.title);
@@ -62,14 +63,14 @@ export async function generateFigmaContentFromJSON(
           .then(async (node) => {
             if (node.type === 'FRAME') {
               frame = node;
-              await generateFrameDataFromJSON(page, frame, componentVersion)
+              await generateFrameDataFromJSON(
+                page,
+                frame,
+                componentVersion,
+                reloadFrame
+              )
                 .then(() => resizeSection(parentSection))
-                .catch((e) =>
-                  handleFigmaError(
-                    'F7',
-                    e
-                  )
-                );
+                .catch((e) => handleFigmaError('F7', e));
             }
           })
           .catch((e) => console.error(e));
@@ -77,14 +78,16 @@ export async function generateFigmaContentFromJSON(
         frame = createPageFrame(parentSection, page.title, settings);
         frame.name = `New Page${Date.now().toString()}`; // This is here so the data doesn't match so figma can send the updated data with the frame id, otherwise when you create a page the frame id doesnt gets added to the page data sould be a better solution tbh
         selectNode(frame);
-        await generateFrameDataFromJSON(page, frame, componentVersion)
-          .then(() => {resizeSection(parentSection)})
-          .catch((e) =>
-            handleFigmaError(
-             'F8',
-              e
-            )
-          );
+        await generateFrameDataFromJSON(
+          page,
+          frame,
+          componentVersion,
+          reloadFrame
+        )
+          .then(() => {
+            resizeSection(parentSection);
+          })
+          .catch((e) => handleFigmaError('F8', e));
       }
     }
   }
@@ -101,9 +104,12 @@ export async function generateFigmaContentFromJSON(
 async function generateFrameDataFromJSON(
   data: PageData,
   frame: FrameNode,
-  componentVersion: number
+  componentVersion: number,
+  reloadFrame: boolean = false
 ) {
   selectNode(frame);
+  console.log('opacity set!');
+
   frame.opacity = 0.5;
   if (frame.layoutMode != 'VERTICAL') {
     frame.layoutMode = 'VERTICAL';
@@ -117,60 +123,39 @@ async function generateFrameDataFromJSON(
 
   for (let i = 0; i < totalLength; i++) {
     const block = blocks[i];
-    let indexInFrame = i;
-    let figmaNode = frame.children[indexInFrame];
-    if (figmaNode) {
-      if (i < blocks.length) {
-        let nodeLastEdited = figmaNode.getSharedPluginData(
-          FIGMA_NAMESPACE,
-          FIGMA_LAST_EDITED_KEY
-        )
-          ? parseInt(
-              figmaNode.getSharedPluginData(
-                FIGMA_NAMESPACE,
-                FIGMA_LAST_EDITED_KEY
-              ),
-              10
-            )
-          : 0;
-
-        if (nodeLastEdited != block.lastEdited) {
+    if (block) {
+      let indexInFrame = i;
+      let figmaNode = frame.children[indexInFrame];
+      if (figmaNode) {
+        if (i < blocks.length) {
           await generateBlockInstanceFromJSON(
             block,
             frame,
             indexInFrame,
-            componentVersion
+            componentVersion,
+            reloadFrame
           )
             .then(() => figmaNode.remove())
-            .catch((e) =>
-              handleFigmaError(
-                'F9',
-                e
-              )
-            );
+            .catch((e) => handleFigmaError('F9', e));
+        } else {
+          figmaNode.remove();
         }
       } else {
-        figmaNode.remove();
+        await generateBlockInstanceFromJSON(
+          block,
+          frame,
+          indexInFrame,
+          componentVersion,
+          reloadFrame
+        ).catch((e) => handleFigmaError('F10', e));
       }
-    } else {
-      await generateBlockInstanceFromJSON(
-        block,
-        frame,
-        indexInFrame,
-        componentVersion
-      ).catch((e) =>
-        handleFigmaError(
-          'F10',
-          e
-        )
-      );
     }
   }
   frame.opacity = 1;
 }
 
 /**
- * Generates an isntances from the plugin components depending on the type of block data it recieves
+ * Generates an instances from the plugin components depending on the type of block data it recieves
  * @param block -The block data
  * @param frame -The current page frame
  * @param indexInFrame -The index where the block is located in the page data
@@ -180,7 +165,8 @@ async function generateBlockInstanceFromJSON(
   block: BlockData,
   frame: FrameNode,
   indexInFrame: number,
-  componentVersion: number
+  componentVersion: number,
+  reloadFrame: boolean = false
 ) {
   let node: InstanceNode | FrameNode;
   switch (block.type) {
@@ -191,12 +177,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F11',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F11', e));
       break;
     case 'paragraph':
       await generateParagraphInstance(block.data, componentVersion)
@@ -205,12 +186,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F12',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F12', e));
       break;
     case 'quote':
       await generateQuoteInstance(block.data, componentVersion)
@@ -219,12 +195,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F13',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F13', e));
       break;
     case 'displayFrame':
       await generateDisplayFrameInstance(block.data, componentVersion)
@@ -233,12 +204,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F14',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F14', e));
       break;
     case 'dosAndDonts':
       await generateDosAndDontsInstance(block.data, componentVersion)
@@ -247,12 +213,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F15',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F15', e));
       break;
     case 'list':
       await generateListInstance(block.data, componentVersion)
@@ -261,12 +222,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F16',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F16', e));
       break;
     case 'table':
       await generateTableInstance(block.data, componentVersion)
@@ -275,12 +231,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F17',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F17', e));
       break;
     case 'alert':
       await generateAlertInstance(block.data, componentVersion)
@@ -289,12 +240,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F18',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F18', e));
       break;
     case 'code':
       await generateCodeInstance(block.data, componentVersion)
@@ -303,12 +249,7 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F19',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F19', e));
       break;
     case 'divider':
       await generateDividerInstance(componentVersion)
@@ -317,26 +258,16 @@ async function generateBlockInstanceFromJSON(
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F20',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F20', e));
       break;
     case 'componentDoc':
-      await generateComponentDocInstance(block.data, componentVersion)
+      await generateComponentDocInstance(block.data, componentVersion,null,reloadFrame)
         .then((n) => {
           if (n) {
             node = n;
           }
         })
-        .catch((e) =>
-          handleFigmaError(
-            'F21',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('F21', e));
       break;
     //node = generateParagraphInstance(block.data);
     default:

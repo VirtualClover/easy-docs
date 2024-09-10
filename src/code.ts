@@ -150,7 +150,8 @@ figma.ui.onmessage = (msg) => {
               generateFigmaContentFromJSON(
                 data,
                 section,
-                msgToGenerate.editedFrames
+                msgToGenerate.editedFrames,
+                msg.reloadFrame
               ).then(async (section) => {
                 
                 //context.stopUpdates = false;

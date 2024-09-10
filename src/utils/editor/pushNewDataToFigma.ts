@@ -11,7 +11,8 @@ import { formatDocData } from '../docs/formatDocData';
 export const pushNewDataToFigma = (
   pluginContext: PluginData,
   newData: DocData,
-  editedFrame?: string
+  editedFrame?: string,
+  reloadFrame: boolean = false,
 ) => {
   if (!pluginContext.incomingFigmaChanges) {
     formatDocData(newData, 'editor', pluginContext.currentUser);
@@ -28,6 +29,7 @@ export const pushNewDataToFigma = (
           type: 'update-selected-doc',
           data: newData,
           editedFrames: [editedFrame] ?? [],
+          reloadFrame
         },
       },
       '*'

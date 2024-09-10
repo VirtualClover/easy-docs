@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
+import { Add, Replay } from '@mui/icons-material';
 import {
   AppBar,
   CircularProgress,
@@ -12,7 +13,6 @@ import {
   Tooltip,
 } from '@mui/material';
 
-import { Add } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { Editor } from './components/Editor';
 import { OutDatedComponentsView } from './components/OutdatedComponentsView';
@@ -78,6 +78,15 @@ export const EditorView = () => {
     pushNewDataToFigma(pluginContext, tempDoc);
   };
 
+  let handleFrameReload = () => {
+    pushNewDataToFigma(
+      pluginContext,
+      pluginContext.currentDocData,
+      pluginContext.currentDocData.pages[pluginContext.activeTab].frameId,
+      true
+    );
+  };
+
   //This is here so if the user selects another document section or tab/frame, the editor and the tabs will forcefully remount with the new data
   React.useEffect(() => {
     if (
@@ -140,28 +149,41 @@ export const EditorView = () => {
   return (
     <ViewContainer>
       <AppBar elevation={0} color="transparent" sx={{ top: 49 }} key={key}>
-        <Stack direction="row">
-          <Tabs
-            value={
-              tabs.length > pluginContext.activeTab
-                ? pluginContext.activeTab
-                : 0
-            }
-            variant={'scrollable'}
-            scrollButtons={'auto'}
-            onChange={handleChange}
-            aria-label="Pages on the document"
-          >
-            {tabs}
-          </Tabs>
-          <Tooltip title={'Add a new page'}>
+        <Stack direction="row" justifyContent={'space-between'} sx={{ mr: 4 }}>
+          <Stack direction="row">
+            <Tabs
+              value={
+                tabs.length > pluginContext.activeTab
+                  ? pluginContext.activeTab
+                  : 0
+              }
+              variant={'scrollable'}
+              scrollButtons={'auto'}
+              onChange={handleChange}
+              aria-label="Pages on the document"
+            >
+              {tabs}
+            </Tabs>
+            <Tooltip title={'Add a new page'}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <IconButton
+                  sx={{ margin: 'auto 0' }}
+                  onClick={() => handlePageCreation()}
+                  disabled={loading}
+                >
+                  <Add />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
+          <Tooltip title={'Reload the current page'}>
             <span style={{ display: 'flex', alignItems: 'center' }}>
               <IconButton
+                onClick={() => handleFrameReload()}
                 sx={{ margin: 'auto 0' }}
-                onClick={() => handlePageCreation()}
                 disabled={loading}
               >
-                <Add />
+                <Replay />
               </IconButton>
             </span>
           </Tooltip>

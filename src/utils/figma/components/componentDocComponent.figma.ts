@@ -640,6 +640,7 @@ async function generateOuterWrapper(
       .then(async (node) => {
         if (node && node.type == 'SECTION') {
           node.appendChild(outerWrapper);
+          node.appendChild(specsFrameWrapper);
         } else {
           await figma
             .getNodeByIdAsync(componentData.components.componentsPage.id)
@@ -905,7 +906,8 @@ export async function getComponentsToDoc(
 export async function generateComponentDocInstance(
   data: ComponentDocBlockData,
   componentVersion: number,
-  preIntegrityCheckData?: IntegrityCheckResponse
+  preIntegrityCheckData?: IntegrityCheckResponse,
+  reloadFrame: boolean = false
 ): Promise<FrameNode> {
   let componentData: BaseComponentData = getComponentData();
   let specsComponent: BaseNode;
@@ -929,7 +931,7 @@ export async function generateComponentDocInstance(
       ));
   }
 
-  if (integrityCheckData.docIsComplete) {
+  if (integrityCheckData.docIsComplete && !reloadFrame) {
     return integrityCheckData.componentDocFrame.clone();
   } else {
     //If not, then we generate the component frame and delete de old ones

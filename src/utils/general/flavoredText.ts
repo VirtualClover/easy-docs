@@ -1,5 +1,9 @@
 import { BASE_STYLE_TOKENS, DEFAULT_FONT_FAMILIES } from '../../styles/base';
-import { StringFormats, TextAlignment, UpperCaseTextAligment } from '../constants';
+import {
+  StringFormats,
+  TextAlignment,
+  UpperCaseTextAligment,
+} from '../constants';
 
 import { setRangeNodeFills } from '../figma/setNodeFills';
 
@@ -32,7 +36,10 @@ export let getURLFromAnchor = (
   }
   if (type == 'html') {
     let matches = string.match(/\<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1\>/);
-    return { href: matches[2].replace(` target="_blank"`, ''), tag: matches[0] };
+    return {
+      href: matches[2].replace(` target="_blank"`, ''),
+      tag: matches[0],
+    };
   }
 };
 
@@ -46,7 +53,7 @@ export let setFlavoredTextOnFigmaNode = async (
   textAlign: TextAlignment | false = false
 ) => {
   let flavoredMatches = matchFlavoredText(string);
-  //console.log(flavoredMatches);
+  console.log(flavoredMatches);
 
   if (flavoredMatches.length) {
     await Promise.all([
@@ -122,8 +129,13 @@ export let setFlavoredTextOnFigmaNode = async (
             let tagMatch = getURLFromAnchor(match[0]);
             currentStartOffset = tagMatch.tag.length;
             currentTotalOffset = currentCloseOffset + currentStartOffset;
+            if (tagMatch.href.match(/[0-9]{1,}:[0-9]{1,}/g)) {
+              console.log('id match!');
+              
+              console.log(tagMatch);
+            }
             textNode.setRangeHyperlink(start, end, {
-              type: 'URL',
+              type: tagMatch.href.match(/[0-9]{1,}:[0-9]{1,}/g) ? 'NODE' : 'URL',
               value: tagMatch.href,
             });
             textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
