@@ -64,6 +64,7 @@ import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
 import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
 import { formatDirName } from '../exports/formatDirName';
 import { getURLFromAnchor } from '../general/flavoredText';
+import { validateFigmaNodeId } from '../general/validateFigmaNodeId';
 
 let generateIFrameStyle = (
   borderColor: string,
@@ -177,11 +178,9 @@ let convertFlavoredTextMD = (
     matches.forEach((item) => {
       let url = getURLFromAnchor(item.match[0], 'html');
       let isFigmaUrl = validateFigmaURL(url.href, 'share');
-      let isFrameId = url.href.match(/[0-9]*:[0-9]*/);
+      let isFrameId = validateFigmaNodeId(url.href);
       if (isFigmaUrl || isFrameId) {
-        console.log('----');
 
-        console.log(metadata);
         let frameId;
         if (isFigmaUrl) {
           frameId = getDetailsFromFigmaURL(url.href, 'decode').frameId;
@@ -192,8 +191,6 @@ let convertFlavoredTextMD = (
           frameId ?? url.href,
           currentIndex
         );
-        console.log(path);
-        console.log(url);
         if (path) {
           url.href = path.path;
         }
@@ -247,7 +244,7 @@ let convertFlavoredTextHTML = (
 ) => {
   let getPath = (href: string) => {
     let isFigmaUrl = validateFigmaURL(href, 'share');
-    let isFrameId = href.match(/[0-9]{1,}:[0-9]{1,}/g);
+    let isFrameId = validateFigmaNodeId(href);
     if (isFigmaUrl || isFrameId) {
       let frameId;
       if (isFigmaUrl) {
@@ -273,7 +270,6 @@ let convertFlavoredTextHTML = (
       return '<a href="' + getPath(capture2) + '">';
     }
   );
-  console.log(newText);
 
   return newText;
 };

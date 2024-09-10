@@ -133,10 +133,7 @@ async function generateOuterWrapper(
   displayFrame.paddingRight = 16;
   displayFrame.topLeftRadius = 16;
   displayFrame.topRightRadius = 16;
-  console.log('backcolor');
-  console.log(backgroundColor);
-  
-  
+
   setNodeFills(displayFrame, backgroundColor);
   outerWrapper.appendChild(displayFrame);
   displayFrame.layoutSizingHorizontal = 'FILL';
@@ -186,20 +183,22 @@ async function generateOuterWrapper(
 
   outerWrapper.appendChild(component);
   component.layoutSizingHorizontal = 'FILL';
-  //component.layoutSizingHorizontal = 'FILL';
   return outerWrapper;
 }
 
 export async function generateDisplayFrameInstance(
   data: DisplayFrameBlockData,
   componentVersion: number,
-  backgroundColor: string= '',
+  backgroundColor: string = '',
   maxHeight: number = 900
 ): Promise<FrameNode | null> {
   let settings = getPluginSettings();
   let componentData = getComponentData();
   let component: BaseNode;
-  let background = backgroundColor !='' ? backgroundColor : settings.customization.palette.status.neutral.default;
+  let background =
+    backgroundColor != ''
+      ? backgroundColor
+      : settings.customization.palette.status.neutral.default;
 
   await figma
     .getNodeByIdAsync(componentData.components.displayFrame.id)
@@ -246,11 +245,6 @@ export async function generateDisplayFrameInstance(
         nodeToDisplay = referenceNode;
       }
     }
-    console.log(settings.customization.palette.status.neutral.default);
-console.log('bgcolorbfouter');
-console.log(background);
-
-
 
     let outerWrapper = await generateOuterWrapper(
       instance,

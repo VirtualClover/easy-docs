@@ -113,8 +113,7 @@ function App({ initialPluginData }: ComponentProps) {
                     event.data.pluginMessage.overrideEditorChanges)
                 ) {
                   setIncomingFigmaChanges(true);
-                  //console.log('setting this data');
-                  //console.log(data);
+                  console.log('setting this data');
 
                   setCurrentDocData(data);
                   let selectedFrame = event.data.pluginMessage.selectedFrame;

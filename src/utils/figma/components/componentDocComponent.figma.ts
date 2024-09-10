@@ -568,10 +568,6 @@ async function generateOuterWrapper(
         outerWrapper.appendChild(node);
         node.layoutSizingHorizontal = 'FILL';
 
-        //generateHeaderInstance({level:5,text:`${}`})
-        //console.log('layers proc');
-        //console.log(variantSharedData);
-
         //Specs table
         if (variantSharedData.layers.length) {
           for (let i = 0; i < variantSharedData.layers.length; i++) {
@@ -661,9 +657,6 @@ async function generateOuterWrapper(
 
     returnedFrame = outerWrapper.clone();
 
-    console.log('parent componwt written in shared plugin data');
-    console.log(componentSharedData.mainComponentId);
-
     figma.root.setSharedPluginData(
       FIGMA_NAMESPACE,
       `${FIGMA_COMPONENT_DOCS_KEY}:${componentSharedData.mainComponentId}`,
@@ -688,19 +681,6 @@ async function generateOuterWrapper(
     });
   }
   specsComponent.layoutSizingHorizontal = 'FILL';
-
-  /*figma.root.setSharedPluginData(
-    FIGMA_NAMESPACE,
-    FIGMA_COMPONENT_DOCS_KEY,
-    JSON.stringify(componentSharedData)
-  );*/
-
-  /*
-  parent componentId
-  specs frame wrapper id
-  frames id contained in the wrapper
-  
-  */
 
   return returnedFrame;
 }
@@ -729,6 +709,12 @@ let componentDocFrameIntegrityCheck = async (documentationFrameId: string) => {
   return { frameIsComplete, frame, data };
 };
 
+/**
+ * Checks the integrity of the original component doc frame and the dislay frames
+ * @param initialDisplayFrameId 
+ * @param parentComponentIdFallback 
+ * @returns 
+ */
 let componentDocIntegrityCheck = async (
   initialDisplayFrameId: string,
   parentComponentIdFallback?: string
@@ -742,8 +728,6 @@ let componentDocIntegrityCheck = async (
   let parentComponent: ComponentNode | ComponentSetNode;
   let componentsToSpec: ComponentNode[] = [];
   let componentDocFrameData: ComponentSharedData | null;
-
-  //console.log('gets to check');
 
   await figma
     .getNodeByIdAsync(initialDisplayFrameId)
@@ -759,18 +743,10 @@ let componentDocIntegrityCheck = async (
 
     //If it does, check if that component already has a doc frame generated
     if (parentComponent) {
-      //console.log('parent component id');
-      //console.log(parentComponent.id);
-
       let existingDocFrameId = figma.root.getSharedPluginData(
         FIGMA_NAMESPACE,
         `${FIGMA_COMPONENT_DOCS_KEY}:${parentComponent.id}`
       );
-
-      console.log('efdid');
-      console.log(existingDocFrameId);
-      
-      
 
       if (existingDocFrameId) {
         await componentDocFrameIntegrityCheck(existingDocFrameId).then(
@@ -915,54 +891,46 @@ export async function generateComponentDocInstance(
   let integrityCheckData: IntegrityCheckResponse | null =
     preIntegrityCheckData ?? null;
 
-    console.log(integrityCheckData);
-    
+  console.log(integrityCheckData);
 
   if (!integrityCheckData) {
     await componentDocIntegrityCheck(
       data.variants[0].displayFrame.id,
       data.mainComponentId
-    ).then(async (res) => {
-      integrityCheckData = res;
-    }).catch((e) =>
-      handleFigmaError(
-        'F42',
-        e
-      ));
+    )
+      .then(async (res) => {
+        integrityCheckData = res;
+      })
+      .catch((e) => handleFigmaError('F42', e));
   }
 
   if (integrityCheckData.docIsComplete && !reloadFrame) {
     return integrityCheckData.componentDocFrame.clone();
   } else {
     //If not, then we generate the component frame and delete de old ones
-    await figma.getNodeByIdAsync(data.anatomyFramesWrapper.id).then((node) => {
-      if (node) {
-        node.remove();
-      }
-    }).catch((e) =>
-      handleFigmaError(
-        'F43',
-        e
-      ));
-    await figma.getNodeByIdAsync(data.documentationFrame.id).then((node) => {
-      if (node) {
-        node.remove();
-      }
-    }).catch((e) =>
-      handleFigmaError(
-        'F44',
-        e
-      ));
+    await figma
+      .getNodeByIdAsync(data.anatomyFramesWrapper.id)
+      .then((node) => {
+        if (node) {
+          node.remove();
+        }
+      })
+      .catch((e) => handleFigmaError('F43', e));
+    await figma
+      .getNodeByIdAsync(data.documentationFrame.id)
+      .then((node) => {
+        if (node) {
+          node.remove();
+        }
+      })
+      .catch((e) => handleFigmaError('F44', e));
 
     await figma
       .getNodeByIdAsync(componentData.components.componentDoc.id)
       .then((node) => {
         specsComponent = node;
-      }).catch((e) =>
-        handleFigmaError(
-          'F45',
-          e
-        ));
+      })
+      .catch((e) => handleFigmaError('F45', e));
     if (specsComponent.type == 'COMPONENT') {
       let instance = specsComponent.createInstance();
 
@@ -984,11 +952,9 @@ export async function generateComponentDocInstance(
         data.fileId,
         componentVersion,
         `The component referenced was deleted`
-      ).then((node) => (specsFrame = node)).catch((e) =>
-        handleFigmaError(
-          'F46',
-          e
-        ));
+      )
+        .then((node) => (specsFrame = node))
+        .catch((e) => handleFigmaError('F46', e));
 
       figma.ui.postMessage({
         type: 'finished-generating-component-doc',
@@ -1026,7 +992,7 @@ export async function generateBlockDataFromComponentDoc(
   let parsedData: ComponentSharedData = clone(blockData.data);
 
   let frameDetails = getDetailsFromFigmaURL(url, 'decode');
-  
+
   // Get master component from frame data
   if (instNode.parent && instNode.parent.type == 'FRAME') {
     let storedData = instNode.parent.getSharedPluginData(
@@ -1043,49 +1009,41 @@ export async function generateBlockDataFromComponentDoc(
   }
 
   if (frameDetails.fileId && frameDetails.frameId) {
-    await componentDocIntegrityCheck(
-      frameDetails.frameId,
-      componentIdFromData
-    ).then(async (res) => {
-      if (res.docIsComplete) {
-        blockData.data = parsedData;
-      } else {
-        parsedData.variants[0].displayFrame.id = frameDetails.frameId;
-        //Regenerate block
-        await generateComponentDocInstance(
-          parsedData,
-          componentData.lastGenerated,
-          res
-        ).then((n) => {
-          let parentFrame: FrameNode;
-          let nodeToRemove: InstanceNode;
-          if (isHydratedInstance) {
-            parentFrame = instNode.parent as FrameNode;
+    await componentDocIntegrityCheck(frameDetails.frameId, componentIdFromData)
+      .then(async (res) => {
+        if (res.docIsComplete) {
+          blockData.data = parsedData;
+        } else {
+          parsedData.variants[0].displayFrame.id = frameDetails.frameId;
+          //Regenerate block
+          await generateComponentDocInstance(
+            parsedData,
+            componentData.lastGenerated,
+            res
+          )
+            .then((n) => {
+              let parentFrame: FrameNode;
+              let nodeToRemove: InstanceNode;
+              if (isHydratedInstance) {
+                parentFrame = instNode.parent as FrameNode;
 
-            console.log('parent frame');
-            console.log(parentFrame);
-            
-          } else {
-            parentFrame = instNode.parent.parent as FrameNode;
-            console.log('parent parent frame');
-            console.log(parentFrame);
-          }
-          parentFrame.insertChild(indexInFrame, n);
-          n.layoutSizingHorizontal = 'FILL';
-          let dehydratedNode = parentFrame.children[indexInFrame + 1];
-          dehydratedNode.remove();
-          blockData.figmaNodeId = n.id;
-        }).catch((e) =>
-          handleFigmaError(
-            'F40',
-            e
-          ));
-      }
-    }).catch((e) =>
-      handleFigmaError(
-        'F41',
-        e
-      ));
+                console.log('parent frame');
+                console.log(parentFrame);
+              } else {
+                parentFrame = instNode.parent.parent as FrameNode;
+                console.log('parent parent frame');
+                console.log(parentFrame);
+              }
+              parentFrame.insertChild(indexInFrame, n);
+              n.layoutSizingHorizontal = 'FILL';
+              let dehydratedNode = parentFrame.children[indexInFrame + 1];
+              dehydratedNode.remove();
+              blockData.figmaNodeId = n.id;
+            })
+            .catch((e) => handleFigmaError('F40', e));
+        }
+      })
+      .catch((e) => handleFigmaError('F41', e));
   }
 
   return blockData;
@@ -1108,45 +1066,3 @@ export async function hydrateComponentDoc(
   ).then((data) => (block = data));
   return block;
 }
-
-/*
-
-          if (
-            orientation == 'right' &&
-            !pointerCoords.right.some(
-              (value) =>
-                value > layerCenter.vertical - 10 &&
-                value < layerCenter.vertical + 10
-            )
-          ) {
-          } else {
-            if (
-              pointerCoords.left.some(
-                (value) =>
-                  value > layerCenter.vertical - 10 &&
-                  value < layerCenter.vertical + 10
-              )
-            ) {
-              if (
-                !pointerCoords.top.some(
-                  (value) =>
-                    value > layerCenter.horiozntal - 10 &&
-                    value < layerCenter.horiozntal + 10
-                )
-              ) {
-                orientation = 'top';
-              } else {
-                if (
-                  !pointerCoords.bottom.some(
-                    (value) =>
-                      value > layerCenter.horiozntal - 10 &&
-                      value < layerCenter.horiozntal + 10
-                  )
-                ) {
-                  orientation = 'bottom';
-                }
-              }
-            }
-          }
-
-*/

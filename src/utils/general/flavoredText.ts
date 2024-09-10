@@ -6,6 +6,7 @@ import {
 } from '../constants';
 
 import { setRangeNodeFills } from '../figma/setNodeFills';
+import { validateFigmaNodeId } from './validateFigmaNodeId';
 
 export let matchFlavoredText = (string: string) => {
   let anchorMatches = [
@@ -78,19 +79,11 @@ export let setFlavoredTextOnFigmaNode = async (
       let globalOffset = 0;
       let charDeletions = [];
       flavoredMatches.forEach((match) => {
-        //console.log('start wo offset ' + match.index);
-        //console.log('start w offset ' + match.index);
         let start = match.index;
-        //console.log(string);
-        //console.log(match);
-        //console.log(match.index);
-        //console.log(start);
         let end = match.index + match[0].length;
         let currentStartOffset = 7;
         let currentCloseOffset = 8;
         let currentTotalOffset = currentCloseOffset + currentStartOffset;
-        //console.log('end wo offset ' + match.index + match[0].length);
-        //console.log('end w offset ' + end);
         let tag = match[1];
         switch (tag) {
           case 'b':
@@ -99,15 +92,10 @@ export let setFlavoredTextOnFigmaNode = async (
               style: 'Bold',
             });
             charDeletions.push({ start, end: start + currentStartOffset });
-            //textNode.deleteCharacters(start, start + currentStartOffset);
             charDeletions.push({
               start: end - currentCloseOffset,
               end: end,
             });
-            /*textNode.deleteCharacters(
-              end - currentTotalOffset,
-              end - currentStartOffset
-            );*/
             break;
           case 'i':
             textNode.setRangeFontName(start, end, {
@@ -115,27 +103,17 @@ export let setFlavoredTextOnFigmaNode = async (
               style: 'Italic',
             });
             charDeletions.push({ start, end: start + currentStartOffset });
-            //textNode.deleteCharacters(start, start + currentStartOffset);
             charDeletions.push({
               start: end - currentCloseOffset,
               end: end,
             });
-            /*textNode.deleteCharacters(
-              end - currentTotalOffset,
-              end - currentStartOffset
-            );*/
             break;
           case 'a':
             let tagMatch = getURLFromAnchor(match[0]);
             currentStartOffset = tagMatch.tag.length;
             currentTotalOffset = currentCloseOffset + currentStartOffset;
-            if (tagMatch.href.match(/[0-9]{1,}:[0-9]{1,}/g)) {
-              console.log('id match!');
-              
-              console.log(tagMatch);
-            }
             textNode.setRangeHyperlink(start, end, {
-              type: tagMatch.href.match(/[0-9]{1,}:[0-9]{1,}/g) ? 'NODE' : 'URL',
+              type: validateFigmaNodeId(tagMatch.href) ? 'NODE' : 'URL',
               value: tagMatch.href,
             });
             textNode.setRangeTextDecoration(start, end, 'UNDERLINE');
@@ -146,15 +124,10 @@ export let setFlavoredTextOnFigmaNode = async (
               BASE_STYLE_TOKENS.palette.onBackground.link
             );
             charDeletions.push({ start, end: start + currentStartOffset });
-            //textNode.deleteCharacters(start, start + currentStartOffset);
             charDeletions.push({
               start: end - currentCloseOffset,
               end: end,
             });
-            /*textNode.deleteCharacters(
-              end - currentTotalOffset,
-              end - currentStartOffset
-            );*/
             break;
           default:
             break;
