@@ -23,7 +23,6 @@ export let generateSpecsFromNode = async (
 ) => {
   if (nodeCanHaveSpecs(node)) {
     let anatomy: AnatomySpecs | null = null;
-
     if (!avoidInstances || (avoidInstances && node.type !== 'INSTANCE')) {
       // TODO Effects
       anatomy = clone(EMPTY_LAYER_PROPERTIES);
@@ -61,6 +60,7 @@ export let generateSpecsFromNode = async (
           anatomy.itemSpacing.value = node.itemSpacing;
         }
 
+
         //Corner radius
         if (node.cornerRadius != 0) {
           anatomy.topLeftRadius.value = node.topLeftRadius;
@@ -71,7 +71,7 @@ export let generateSpecsFromNode = async (
 
         // Stroke weight
         if (node.strokeWeight != 0) {
-          if (!isNaN(node.strokeRightWeight as number)) {
+          if (node.strokeWeight != figma.mixed && !isNaN(node.strokeWeight as number)) {
             anatomy.strokeWeight.value = node.strokeWeight as number;
           } else {
             anatomy.strokeTopWeight.value = node.strokeTopWeight;
@@ -93,6 +93,7 @@ export let generateSpecsFromNode = async (
 
       // Fill
       //console.log('node fills', node.fills);
+      
 
       if (
         node.fills &&
@@ -129,7 +130,6 @@ export let generateSpecsFromNode = async (
           });
         }
       }
-
       // Stroke
       if (node.strokes && node.strokes.length) {
         let baseStrokeColorValue = null;

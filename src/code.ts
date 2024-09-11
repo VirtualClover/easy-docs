@@ -34,6 +34,79 @@ figma.ui.onmessage = (msg) => {
   if (msg.type) {
     // If statements instead of a switch let's me control the order of events more easily, for example, when there is a cached data that needs to be generated
 
+    //Updates outdated components, or components that were generated directly from grabbing the from the assets panel on Figma
+    if (msg.type === 'update-outdated-components') {
+      stopUpdates = true;
+      slowUpdateOutdatedComponentBlocks().then(async () => {
+        figma.ui.postMessage({ type: 'close-outdated-overlay' });
+        stopUpdates = false;
+      });
+    }
+
+    //Updates outdated components, or components that were generated directly from grabbing the from the assets panel on Figma
+    if (msg.type === 'update-outdated-components-in-file') {
+      stopUpdates = true;
+      let file = figma.root;
+      figma.loadAllPagesAsync().then(async () => {
+        let sections = file.findAllWithCriteria({
+          types: ['SECTION'],
+        });
+        for (const section of sections) {
+          await slowUpdateOutdatedComponentBlocks(section);
+        }
+
+        figma.ui.postMessage({ type: 'close-outdated-overlay' });
+        stopUpdates = false;
+      });
+    }
+
+    //Scans the current Figma page for Documents
+    if (msg.type === 'scan-whole-page-for-docs') {
+      let page = figma.currentPage;
+      stopUpdates = true;
+      scanWholePageForDocuments(page).then((res) => {
+        console.log('send page docs');
+        setTimeout(() => {
+          figma.ui.postMessage({
+            type: 'docs-in-page',
+            data: res,
+          });
+          stopUpdates = false;
+        }, 500); // Added delays so if there are other messages been sent to the UI they can finsh
+      });
+    }
+
+    //Scans the current Figma file for documents
+    if (msg.type === 'scan-whole-file-for-docs') {
+      let file = figma.root;
+      scanWholeFileForDocuments(file).then((res) => {
+        console.log('send page docs');
+        stopUpdates = true;
+        setTimeout(() => {
+          figma.ui.postMessage({
+            type: 'docs-in-file',
+            data: res,
+          });
+          stopUpdates = false;
+        }, 500);
+      });
+    }
+
+    if (msg.type === 'scan-whole-file-for-doc-site') {
+      let file = figma.root;
+      scanWholeFileForDocuments(file).then((res) => {
+        console.log('send page docs');
+        stopUpdates = true;
+        setTimeout(() => {
+          figma.ui.postMessage({
+            type: 'docs-in-file-for-doc-site',
+            data: res,
+          });
+          stopUpdates = false;
+        }, 500);
+      });
+    }
+
     //Selects a node given an ID
     if (msg.type === 'select-node') {
       let id: SceneNode | any = { id: msg.id };
@@ -57,9 +130,7 @@ figma.ui.onmessage = (msg) => {
 
     //Initializes the plugin
     if (msg.type === 'load-data') {
-      pluginInit().catch((e) =>
-        handleFigmaError('F1', e)
-      );
+      pluginInit().catch((e) => handleFigmaError('F1', e));
     }
 
     //Saves the current settings in the file sotrage
@@ -70,7 +141,7 @@ figma.ui.onmessage = (msg) => {
     //Creates a new document
     if (msg.type === 'create-new-doc') {
       stopUpdates = true;
-      
+
       let section: SectionNode;
       createNewDoc(createNewDocJSON())
         .then((s) => {
@@ -86,12 +157,7 @@ figma.ui.onmessage = (msg) => {
             });
           });
         })
-        .catch((e) =>
-          handleFigmaError(
-            'f5',
-            e
-          )
-        );
+        .catch((e) => handleFigmaError('f5', e));
     }
 
     //Push updates from Figma to the Editor
@@ -149,7 +215,6 @@ figma.ui.onmessage = (msg) => {
                 msgToGenerate.editedFrames,
                 msg.reloadFrame
               ).then(async (section) => {
-                
                 //context.stopUpdates = false;
                 if (isCached && cachedMsg == msgToGenerate) {
                   cachedMsg = null;
@@ -165,47 +230,6 @@ figma.ui.onmessage = (msg) => {
           cachedMsg = msg;
         }
       }
-    }
-    //Updates outdated components, or components that were generated directly from grabbing the from the assets panel on Figma
-    if (msg.type === 'update-outdated-components') {
-      stopUpdates = true;
-      slowUpdateOutdatedComponentBlocks().then(async () => {
-        figma.ui.postMessage({ type: 'close-outdated-overlay' });
-        stopUpdates = false;
-      });
-    }
-
-    //Scans the current Figma page for Documents
-    if (msg.type === 'scan-whole-page-for-docs') {
-      let page = figma.currentPage;
-
-      scanWholePageForDocuments(page).then((res) => {
-        figma.ui.postMessage({
-          type: 'docs-in-page',
-          data: res,
-        });
-      });
-    }
-
-    //Scans the current Figma file for documents
-    if (msg.type === 'scan-whole-file-for-docs') {
-      let file = figma.root;
-      scanWholeFileForDocuments(file).then((res) =>
-        figma.ui.postMessage({
-          type: 'docs-in-file',
-          data: res,
-        })
-      );
-    }
-
-    if (msg.type === 'scan-whole-file-for-doc-site') {
-      let file = figma.root;
-      scanWholeFileForDocuments(file).then((res) =>
-        figma.ui.postMessage({
-          type: 'docs-in-file-for-doc-site',
-          data: res,
-        })
-      );
     }
     //scan-whole-file-for-doc-site
     //figma.closePlugin();

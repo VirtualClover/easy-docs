@@ -166,9 +166,10 @@ async function processComponentChildLayer(
   pointerCoords: PointerCoordsObj,
   avoidInstances: boolean = true
 ) {
+
   if (layer.absoluteRenderBounds && !layer.isMask && layer.type != 'GROUP') {
-    await generateSpecsFromNode(layer as FrameNode, avoidInstances).then(
-      async (res) => {
+    await generateSpecsFromNode(layer as FrameNode, avoidInstances)
+      .then(async (res) => {
         if (res) {
           variantSharedData.layers.push({
             layerName: res.nodeName,
@@ -337,8 +338,7 @@ async function processComponentChildLayer(
             specsFrame.appendChild(node);
           });
         }
-      }
-    );
+      })
   }
 
   if (
@@ -402,7 +402,6 @@ async function generateOuterWrapper(
   figma.notify('Generating component documentation ✍', {
     timeout: 1500,
   });
-  //console.log(parentComponent);
   let returnedFrame: FrameNode;
   //Outer wrapper
   let outerWrapper = figma.createFrame();
@@ -514,6 +513,7 @@ async function generateOuterWrapper(
 
       //Generate specs for other layers
       for (const child of componentInstance.children) {
+
         await processComponentChildLayer(
           variantSharedData,
           child as FrameNode,
@@ -711,9 +711,9 @@ let componentDocFrameIntegrityCheck = async (documentationFrameId: string) => {
 
 /**
  * Checks the integrity of the original component doc frame and the dislay frames
- * @param initialDisplayFrameId 
- * @param parentComponentIdFallback 
- * @returns 
+ * @param initialDisplayFrameId
+ * @param parentComponentIdFallback
+ * @returns
  */
 let componentDocIntegrityCheck = async (
   initialDisplayFrameId: string,
@@ -751,8 +751,6 @@ let componentDocIntegrityCheck = async (
       if (existingDocFrameId) {
         await componentDocFrameIntegrityCheck(existingDocFrameId).then(
           (res) => {
-            //console.log('res');
-            //console.log(res);
 
             isComponentFrameComplete = res.frameIsComplete;
             componentDocFrame = res.frame;
@@ -771,8 +769,6 @@ let componentDocIntegrityCheck = async (
             isDisplayFrameWrapperComplete = false;
           } else {
             displayFrameWrapper = node;
-            //console.log('variant');
-            //console.log(variants);
             for (const variant of variants) {
               let variantDisplayFrame = displayFrameWrapper.findChild(
                 (n) => n.id === variant.displayFrame.id
@@ -786,13 +782,10 @@ let componentDocIntegrityCheck = async (
         });
     }
   } else {
-    //console.log('gets here x2');
-    //console.log(parentComponentIdFallback);
 
     await figma
       .getNodeByIdAsync(parentComponentIdFallback)
       .then(async (node) => {
-        //console.log(node);
 
         if (
           node &&
@@ -890,8 +883,6 @@ export async function generateComponentDocInstance(
   let specsFrame: FrameNode;
   let integrityCheckData: IntegrityCheckResponse | null =
     preIntegrityCheckData ?? null;
-
-  console.log(integrityCheckData);
 
   if (!integrityCheckData) {
     await componentDocIntegrityCheck(
@@ -999,8 +990,6 @@ export async function generateBlockDataFromComponentDoc(
       FIGMA_NAMESPACE,
       FIGMA_COMPONENT_DOCS_KEY
     );
-    //console.log('stored data');
-    //console.log(storedData);
 
     if (storedData) {
       parsedData = JSON.parse(storedData);
@@ -1027,12 +1016,8 @@ export async function generateBlockDataFromComponentDoc(
               if (isHydratedInstance) {
                 parentFrame = instNode.parent as FrameNode;
 
-                console.log('parent frame');
-                console.log(parentFrame);
               } else {
                 parentFrame = instNode.parent.parent as FrameNode;
-                console.log('parent parent frame');
-                console.log(parentFrame);
               }
               parentFrame.insertChild(indexInFrame, n);
               n.layoutSizingHorizontal = 'FILL';

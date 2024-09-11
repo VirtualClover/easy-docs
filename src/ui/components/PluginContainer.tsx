@@ -51,7 +51,12 @@ export const PluginContainer = styled(Container, {
     color: theme.palette.link,
   },
 
-  '#editorjs': {
+  '.codex-editor': {
+    transition: 'all .5s ease-out',
+    zIndex: 1200,
+  },
+
+  '#editorjs:has(.ce-inline-toolbar) .codex-editor': {
     background: theme.palette.background.default,
   },
 
@@ -67,9 +72,6 @@ export const PluginContainer = styled(Container, {
     maxHeight: '500px',
   },
 
-  '.codex-editor': {
-    zIndex: 1200,
-  },
 
   '.codex-editor .custom-icon path': {
     stroke: 'transparent',

@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import { Button } from '@mui/material';
 import { OutdatedComponentsAnim } from '../../assets/animations/Animations';
-import React from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
@@ -31,6 +30,7 @@ export const OutDatedComponentsView = () => {
             (You can also do this process manually through Figma)
           </small>
         </Typography>
+        <Stack gap={8}>
         <Button
           variant="contained"
           onClick={() => {
@@ -40,8 +40,22 @@ export const OutDatedComponentsView = () => {
             );
           }}
         >
-          Yes, Update them!
+          Yes, Update all in this section!
         </Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              parent.postMessage(
+                {
+                  pluginMessage: { type: 'update-outdated-components-in-file' },
+                },
+                '*'
+              );
+            }}
+          >
+            Update all in file
+          </Button>
+        </Stack>
       </Stack>
     </>
   );

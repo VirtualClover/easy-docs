@@ -131,10 +131,10 @@ export const EditorView = () => {
   React.useEffect(() => {
     setLoading(
       pluginContext.incomingFigmaChanges ||
-        creatingNewPage ||
-        pluginContext.outdatedComponents ||
-        pluginContext.buildingComponentDoc ||
-        pluginContext.sheetOpen
+      creatingNewPage ||
+      pluginContext.outdatedComponents ||
+      pluginContext.buildingComponentDoc ||
+      pluginContext.sheetOpen
     );
   }, [
     pluginContext.incomingFigmaChanges,
@@ -150,43 +150,46 @@ export const EditorView = () => {
     <ViewContainer>
       <AppBar elevation={0} color="transparent" sx={{ top: 49 }} key={key}>
         <Stack direction="row" justifyContent={'space-between'} sx={{ mr: 4 }}>
-          <Stack direction="row">
-            <Tabs
-              value={
-                tabs.length > pluginContext.activeTab
-                  ? pluginContext.activeTab
-                  : 0
-              }
-              variant={'scrollable'}
-              scrollButtons={'auto'}
-              onChange={handleChange}
-              aria-label="Pages on the document"
-            >
-              {tabs}
-            </Tabs>
-            <Tooltip title={'Add a new page'}>
+          {!pluginContext.outdatedComponents && <>
+            <Stack direction="row">
+              <Tabs
+                value={
+                  tabs.length > pluginContext.activeTab
+                    ? pluginContext.activeTab
+                    : 0
+                }
+                variant={'scrollable'}
+                scrollButtons={'auto'}
+                onChange={handleChange}
+                aria-label="Pages on the document"
+              >
+                {tabs}
+              </Tabs>
+              <Tooltip title={'Add a new page'}>
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <IconButton
+                    sx={{ margin: 'auto 0' }}
+                    onClick={() => handlePageCreation()}
+                    disabled={loading}
+                  >
+                    <Add />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Stack>
+            <Tooltip title={'Reload the current page'}>
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <IconButton
+                  onClick={() => handleFrameReload()}
                   sx={{ margin: 'auto 0' }}
-                  onClick={() => handlePageCreation()}
                   disabled={loading}
                 >
-                  <Add />
+                  <Replay />
                 </IconButton>
               </span>
             </Tooltip>
-          </Stack>
-          <Tooltip title={'Reload the current page'}>
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              <IconButton
-                onClick={() => handleFrameReload()}
-                sx={{ margin: 'auto 0' }}
-                disabled={loading}
-              >
-                <Replay />
-              </IconButton>
-            </span>
-          </Tooltip>
+          </>
+          }
         </Stack>
         <Divider />
       </AppBar>

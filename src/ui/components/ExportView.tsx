@@ -86,6 +86,8 @@ export const ExportView = (): JSX.Element => {
     {
       label: 'Download all documents in Figma page',
       onClick: () => {
+        setScanInProgress(true);
+        setLoading(true);
         parent.postMessage(
           {
             pluginMessage: {
@@ -94,12 +96,13 @@ export const ExportView = (): JSX.Element => {
           },
           '*'
         );
-        setScanInProgress(true);
       },
     },
     {
       label: 'Download all documents in Figma file',
       onClick: () => {
+        setScanInProgress(true);
+        setLoading(true);
         parent.postMessage(
           {
             pluginMessage: {
@@ -108,12 +111,13 @@ export const ExportView = (): JSX.Element => {
           },
           '*'
         );
-        setScanInProgress(true);
       },
     },
     {
       label: 'Generate doc site',
       onClick: () => {
+        setScanInProgress(true);
+        setLoading(true);
         parent.postMessage(
           {
             pluginMessage: {
@@ -122,7 +126,6 @@ export const ExportView = (): JSX.Element => {
           },
           '*'
         );
-        setScanInProgress(true);
       },
     },
   ];
@@ -154,21 +157,18 @@ export const ExportView = (): JSX.Element => {
     data: DocData,
     format: ExportFileFormat,
     bundleType: BundleType = 'document',
-    preLoadedMetadata?: any,
+    parentMetadata?: any,
     currentIndex: number[] = [0, 0],
     zipDirectory?: JSZip
   ) => {
-    let metadata: DocumentBundleMetaData;
-    if (preLoadedMetadata) {
-      metadata = bundleType == 'figmaFile'
-        ? preLoadedMetadata.directory[currentIndex[1]].directory[
-            currentIndex[0]
-          ]
-        : preLoadedMetadata.directory[currentIndex[0]];
+    let currentDocumentMetadata: DocumentBundleMetaData;
+    if (parentMetadata) {
+      currentDocumentMetadata = bundleType === 'figmaFile' ? parentMetadata.directory[currentIndex[1]].directory[currentIndex[0]] : parentMetadata.directory[currentIndex[0]];
     } else {
-      metadata = generateDocumentMetadata(data, [], format);
+      currentDocumentMetadata = generateDocumentMetadata(data, [], format);
     }
-    let bundleName = metadata.directoryName;
+
+    let bundleName = currentDocumentMetadata.directoryName;
     const zip = zipDirectory ? zipDirectory.folder(bundleName) : new JSZip();
 
     for (const [i, page] of data.pages.entries()) {
@@ -176,18 +176,18 @@ export const ExportView = (): JSX.Element => {
         page,
         format,
         pluginContext.settings,
-        preLoadedMetadata ?? metadata,
+        parentMetadata ?? currentDocumentMetadata,
         bundleType,
         [i, ...currentIndex]
       ).then((data) => {
-        let fileName = metadata.directory[i].fileName;
+        let fileName = currentDocumentMetadata.directory[i].fileName;
         zip.file(fileName, data);
       });
     }
 
     if (!zipDirectory) {
       //Generate metadata file
-      zip.file(METADATA_FILENAME, JSON.stringify(metadata));
+      zip.file(METADATA_FILENAME, JSON.stringify(currentDocumentMetadata));
       const zipContent = await zip.generateAsync({ type: 'blob' });
       downloadFile(zipContent, bundleName, 'zip');
     }
@@ -204,31 +204,33 @@ export const ExportView = (): JSX.Element => {
     data: FigmaPageDocData,
     format: ExportFileFormat,
     bundleType: BundleType = 'figmaPage',
-    preloadedMetaData?: FigmaFileBundleMetaData,
+    parentMetadata?: FigmaFileBundleMetaData,
     currentFigmaPageIndex: number = 0,
     zipDirectory?: JSZip
   ) => {
-    let metadata: FigmaPageBundleMetaData;
-    if (preloadedMetaData){
-      metadata = preloadedMetaData.directory[currentFigmaPageIndex];
+    let currentPageMetadata: FigmaPageBundleMetaData;
+    if (parentMetadata) {
+      currentPageMetadata = parentMetadata.directory[currentFigmaPageIndex];
     }
     else {
-      metadata = generateFigmaPageMetadata(
+      currentPageMetadata = generateFigmaPageMetadata(
         data,
         [],
         format,
         Date.now().toString()
       );
     }
-    let bundleName = metadata.directoryName;
+    let bundleName = currentPageMetadata.directoryName;
+
     const zip = zipDirectory ? zipDirectory.folder(bundleName) : new JSZip();
 
     for (const [i, document] of data.data.entries()) {
+      console.log(parentMetadata);
       await generateDocumentExport(
         document,
         format,
         bundleType,
-        preloadedMetaData ?? metadata,
+        parentMetadata ?? currentPageMetadata,
         [i, currentFigmaPageIndex],
         zip
       );
@@ -236,7 +238,7 @@ export const ExportView = (): JSX.Element => {
 
     if (!zipDirectory) {
       //Generate metadata file
-      zip.file(METADATA_FILENAME, JSON.stringify(metadata));
+      zip.file(METADATA_FILENAME, JSON.stringify(currentPageMetadata));
       const zipContent = await zip.generateAsync({ type: 'blob' });
       downloadFile(zipContent, bundleName, 'zip');
     }
@@ -252,25 +254,25 @@ export const ExportView = (): JSX.Element => {
     format: ExportFileFormat
   ) => {
     const zip = new JSZip();
-    let metadata = generateFigmaFileMetaData(
+    let currentFileMetadata = generateFigmaFileMetaData(
       data,
       format,
       Date.now().toString()
     );
-    let finalZipName = metadata.directoryName;
+    let finalZipName = currentFileMetadata.directoryName;
 
     for (const [i, page] of data.data.entries()) {
       await generateFigmaPageBundleExport(
         page,
         format,
-        'figmaPage',
-        metadata,
+        'figmaFile',
+        currentFileMetadata,
         i,
         zip
       );
     }
     //Generate metadata file
-    zip.file(METADATA_FILENAME, JSON.stringify(metadata));
+    zip.file(METADATA_FILENAME, JSON.stringify(currentFileMetadata));
     const zipContent = await zip.generateAsync({ type: 'blob' });
     downloadFile(zipContent, finalZipName, 'zip');
   };
@@ -288,8 +290,7 @@ export const ExportView = (): JSX.Element => {
       setPreviewdata(data);
       setLoading(false);
       setPreviewFileName(
-        `${formatStringToFileName(mountedData.pages[mountedActiveTab].title)}.${
-          pluginContext.lastFormatUsed
+        `${formatStringToFileName(mountedData.pages[mountedActiveTab].title)}.${pluginContext.lastFormatUsed
         }`
       );
     });
@@ -308,13 +309,13 @@ export const ExportView = (): JSX.Element => {
    * Check if the Plugin API sent a meesage data, it can recieve a bundle of documents within the current Figma page or a bundle of pages within a Figma file
    */
   let recieveMessage = () => {
-    // Check if the scan was requested before doing anything
+    // Check if the scan was requested before doing anything  
     if (scanInProgess)
       onmessage = (event) => {
         if (event.data.pluginMessage && event.data.pluginMessage.type) {
+          console.log(event.data.pluginMessage);
           switch (event.data.pluginMessage.type) {
             case 'docs-in-page':
-              setLoading(true);
               generateFigmaPageBundleExport(
                 event.data.pluginMessage.data,
                 pluginContext.lastFormatUsed
@@ -325,7 +326,6 @@ export const ExportView = (): JSX.Element => {
               break;
 
             case 'docs-in-file':
-              setLoading(true);
               generateFigmaFileBundleExport(
                 event.data.pluginMessage.data,
                 pluginContext.lastFormatUsed
@@ -336,7 +336,6 @@ export const ExportView = (): JSX.Element => {
               break;
 
             case 'docs-in-file-for-doc-site':
-              setLoading(true);
               generateDocSite(
                 event.data.pluginMessage.data,
                 pluginContext.settings.customization
@@ -353,8 +352,16 @@ export const ExportView = (): JSX.Element => {
       };
   };
 
-  //This function loops to check if the Plugin API sent a meesage data
-  recieveMessage();
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      //This function loops to check if the Plugin API sent a meesage data
+      recieveMessage();
+    }, 1);
+
+    return () => clearInterval(interval);
+
+  }, [scanInProgess]);
+
 
   return (
     <>

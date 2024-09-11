@@ -33,7 +33,7 @@ export const InspectAnim = () => {
       />
       <RotatingImg
         src={sparks}
-        style={{ position: 'absolute', right: '-15%', top: '-10%' }}
+        style={{ position: 'absolute', right: '-15%', top: '-10%', animationDirection:'reverse' }}
       />
     </Box>
   );

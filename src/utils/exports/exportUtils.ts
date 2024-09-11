@@ -180,7 +180,6 @@ let convertFlavoredTextMD = (
       let isFigmaUrl = validateFigmaURL(url.href, 'share');
       let isFrameId = validateFigmaNodeId(url.href);
       if (isFigmaUrl || isFrameId) {
-
         let frameId;
         if (isFigmaUrl) {
           frameId = getDetailsFromFigmaURL(url.href, 'decode').frameId;
@@ -688,7 +687,10 @@ let generateHTMLComponentDoc = (
                   ...convertPropObjToArr(layer.properties),
                 ],
               },
-              initialIndentation + 3,EMPTY_DOCUMENT_METADATA,'page',[0,0,0] // Not necessary to pass the meta data, since, in theory this table should contain hyperlinks
+              initialIndentation + 3,
+              EMPTY_DOCUMENT_METADATA,
+              'page',
+              [0, 0, 0] // Not necessary to pass the meta data, since, in theory this table should contain hyperlinks
             )}`
           );
         }
@@ -1115,13 +1117,16 @@ export let generateDocSitePage = async (
   markup.push(`${addIndentation(1)}<body>`);
   //TopBar
   markup.push(
-    `${addIndentation(2)}<header class="mdc-top-app-bar ed-top-bar">`
+    `${addIndentation(2)}<header class="mdc-top-app-bar ed-top-bar" id ="app-bar">`
   );
   markup.push(`${addIndentation(3)}<div class="mdc-top-app-bar__row">`);
   markup.push(
     `${addIndentation(
       4
     )}<section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">`
+  );
+  markup.push(
+    `<button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button">menu</button>`
   );
   markup.push(
     `${addIndentation(5)}<span class="mdc-top-app-bar__title">${
@@ -1179,9 +1184,19 @@ ${
     )}<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>`
   );
   markup.push(`${addIndentation(1)}<script>
-    window.onload = function(){
-    mdc.tabBar.MDCTabBar(document.querySelector<HTMLElement>('.mdc-tab-bar'));
-    mdc.tabScroller.MDCTabScroller(document.querySelector<HTMLElement>('.mdc-tab-scroller'));
+       window.onload = function(){
+
+    const drawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('nav-drawer'));
+
+    const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+    //topAppBar.setScrollTarget(document.querySelector<HTMLElement>('.ed-body'));
+    topAppBar.listen('MDCTopAppBar:nav', () => {
+      drawer.open = !drawer.open;});
+
+    const listEl = document.getElementById('nav-drawer');
+      console.log(listEl);
+      
+    const mainContentEl = document.querySelector<HTMLElement>('.ed-body');
     }
 
   </script>`);
@@ -1214,7 +1229,7 @@ let generateDocSiteSideNav = (
 ) => {
   let markup = [];
 
-  markup.push(`${addIndentation(initialIdentation)}<aside class="mdc-drawer">`);
+  markup.push(`${addIndentation(initialIdentation)}<aside class="mdc-drawer mdc-drawer--dismissible" id="nav-drawer">`);
   markup.push(
     `${addIndentation(initialIdentation + 1)}<div class="mdc-drawer__content">`
   );

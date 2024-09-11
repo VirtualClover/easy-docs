@@ -127,13 +127,6 @@ export async function generateBlockDataFromList(
 ): Promise<BlockData> {
   let listTextContent = setFlavoredTextOnEncodedString(node);
   let content = clone(encodeStringForHTML(listTextContent));
-  //console.log('unformattedcontent');
-  //console.log(unformattedContent);
-  let emptyLastItem: boolean = false;
-  if (content.match(/\n+$/gm)) {
-    emptyLastItem = true;
-    //console.log('empty line true!');
-  }
   let arr = [];
   if (content) {
     content = content.replace(/\n\<\/b\>/g, '</b>\n');
