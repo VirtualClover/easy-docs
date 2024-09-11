@@ -41,7 +41,6 @@ export async function pushFigmaUpdates(lastFetchDoc: DocData): Promise<{
 
     if (generatedDoc.pages) {
       let reconciliation = reconcileDocData(generatedDoc, lastFetchDoc);
-      //console.log(reconciliation);
       if (reconciliation.changesNumber) {
         return {
           type: 'new-node-data',

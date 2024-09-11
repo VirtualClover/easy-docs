@@ -105,9 +105,9 @@ export function reconcilePageData(
         !_.isEqual(newBlock.data, currentDataBlock.data) ||
         newBlock.type != currentDataBlock.type
       ) {
-        //console.log('data not equal');
-        //console.log('new', newBlock.data, editor.new);
-        //console.log('current', currentDataBlock.data, editor.current);
+        console.log('data not equal');
+        console.log('new', newBlock.data, editor.new);
+        console.log('current', currentDataBlock.data, editor.current);
 
         changesNumber++;
         currentDataBlock.data = newBlock.data;

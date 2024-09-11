@@ -194,7 +194,7 @@ function App({ initialPluginData }: ComponentProps) {
           }
         };
       }
-    }, 300);
+    }, 50);
 
     return () => clearInterval(interval);
   }, [
