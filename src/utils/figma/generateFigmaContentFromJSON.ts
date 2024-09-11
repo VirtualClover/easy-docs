@@ -121,34 +121,20 @@ async function generateFrameDataFromJSON(
       ? frame.children.length
       : blocks.length;
 
+  if (frame.children) {
+    for (const child of frame.children) {
+      child.remove();
+    }
+  }
   for (let i = 0; i < totalLength; i++) {
     const block = blocks[i];
     if (block) {
-      let indexInFrame = i;
-      let figmaNode = frame.children[indexInFrame];
-      if (figmaNode) {
-        if (i < blocks.length) {
-          await generateBlockInstanceFromJSON(
-            block,
-            frame,
-            indexInFrame,
-            componentVersion,
-            reloadFrame
-          )
-            .then(() => figmaNode.remove())
-            .catch((e) => handleFigmaError('F9', e));
-        } else {
-          figmaNode.remove();
-        }
-      } else {
-        await generateBlockInstanceFromJSON(
-          block,
-          frame,
-          indexInFrame,
-          componentVersion,
-          reloadFrame
-        ).catch((e) => handleFigmaError('F10', e));
-      }
+      await generateBlockInstanceFromJSON(
+        block,
+        frame,
+        componentVersion,
+        reloadFrame
+      ).catch((e) => handleFigmaError('F10', e));
     }
   }
   frame.opacity = 1;
@@ -164,7 +150,6 @@ async function generateFrameDataFromJSON(
 async function generateBlockInstanceFromJSON(
   block: BlockData,
   frame: FrameNode,
-  indexInFrame: number,
   componentVersion: number,
   reloadFrame: boolean = false
 ) {
@@ -261,7 +246,12 @@ async function generateBlockInstanceFromJSON(
         .catch((e) => handleFigmaError('F20', e));
       break;
     case 'componentDoc':
-      await generateComponentDocInstance(block.data, componentVersion,null,reloadFrame)
+      await generateComponentDocInstance(
+        block.data,
+        componentVersion,
+        null,
+        reloadFrame
+      )
         .then((n) => {
           if (n) {
             node = n;
@@ -275,7 +265,7 @@ async function generateBlockInstanceFromJSON(
       break;
   }
   if (node) {
-    frame.insertChild(indexInFrame, node);
+    frame.appendChild(node);
     node.layoutSizingHorizontal = 'FILL';
   }
   console.log('done generating block!');
