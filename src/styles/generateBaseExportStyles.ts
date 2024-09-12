@@ -7,6 +7,9 @@ export let generateCSSVars = (
 ) => {
   let vars = [];
   vars.push(`
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+    `);
+  vars.push(`
 /*Font*/
 :root {--ed-theme-font-family: ${settings.fontFamily};}
 /*Base palette*/
@@ -81,7 +84,9 @@ export let generateBaseCSSDocumentStyles = () => {
   styles.push(
     `body {font-family: var(--ed-theme-font-family); color: var(--ed-theme-on-background-mid); margin: 0; background-color:var(--ed-theme-background-default);}`
   );
-  styles.push(`.ed-document-page-content {max-width:800px; margin: 0 auto;padding:8px; overflow:auto;}`);
+  styles.push(
+    `.ed-document-page-content {max-width:800px; margin: 0 auto;padding:8px; overflow:auto;}`
+  );
   styles.push(
     `h1, h2, h3, h4, h5, h6, h7, h8, h9, h10 {font-weight: 700; color: var(--ed-theme-on-background-high);-webkit-hyphens: auto;-moz-hyphens: auto;-ms-hyphens: auto; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; hyphens: auto;}`
   );
@@ -105,7 +110,9 @@ export let generateBaseCSSDocumentStyles = () => {
   styles.push(
     `th {font-weight: 700; color: var(--ed-theme-on-background-high); background-color: var(--ed-theme-background-tonal-high); text-align:left;}`
   );
-  styles.push(`.ed-p {-webkit-hyphens: auto;-moz-hyphens: auto;-ms-hyphens: auto; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; hyphens: auto;};`);
+  styles.push(
+    `.ed-p {-webkit-hyphens: auto;-moz-hyphens: auto;-ms-hyphens: auto; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; hyphens: auto;};`
+  );
   styles.push(
     `.ed-quote {background: var(--ed-theme-surface); margin: 16px 0; padding: 8px 8px 8px 16px; border-left: 12px solid var(--ed-theme-divider-simple); border-radius: 8px;}`
   );
@@ -195,9 +202,15 @@ export let generateBaseCSSDocSiteStyles = () => {
   styles.push(
     `.mdc-tab--active .mdc-tab__text-label{color: var(--ed-theme-on-background-link);}`
   );
-  styles.push(`.ed-doc-header {border-bottom: 1px solid var(--ed-theme-divider-simple); padding: 8px;}`);
-  styles.push(`.ed-doc-header-content {max-width: 800px;margin: 24px auto; width:100%;}`);
-  styles.push(`.mdc-top-app-bar .mdc-top-app-bar__navigation-icon {color: var(--ed-theme-on-background-high);}`);
+  styles.push(
+    `.ed-doc-header {border-bottom: 1px solid var(--ed-theme-divider-simple); padding: 8px;}`
+  );
+  styles.push(
+    `.ed-doc-header-content {max-width: 800px;margin: 24px auto; width:100%;}`
+  );
+  styles.push(
+    `.mdc-top-app-bar .mdc-top-app-bar__navigation-icon {color: var(--ed-theme-on-background-high);}`
+  );
   styles.push(`.ed-iframe-wrapper {width: 100%;border: none;height: 100%;}`);
   styles.push(
     `.mdc-drawer {font-family: var(--ed-theme-font-family);height: calc(100% - 65px); border-color:var(--ed-theme-divider-simple);}`
@@ -220,7 +233,9 @@ export let generateBaseCSSDocSiteStyles = () => {
     color: var(--ed-theme-on-background-high);
     position: relative;
   }`);
-  styles.push(`.mdc-drawer .mdc-deprecated-list-item--activated {font-weight: bold;}`);
+  styles.push(
+    `.mdc-drawer .mdc-deprecated-list-item--activated {font-weight: bold;}`
+  );
   styles.push(`  :not(.mdc-deprecated-list-item--disabled).mdc-deprecated-list-item--activated
     .mdc-deprecated-list-item__ripple::before,
   :not(.mdc-deprecated-list-item--disabled).mdc-deprecated-list-item--activated
@@ -259,14 +274,12 @@ export let generateInlineStyles = (
       identation
     )}<link rel="preconnect" href="https://fonts.googleapis.com">\n${addIndentation(
       identation
-    )}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n${addIndentation(
-      identation
-    )}<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">\n`
+    )}<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n`
   );
   styles.push(`${addIndentation(identation)}<style>`);
   styles.push(generateCSSVars(settings, true));
   styles.push(generateBaseCSSDocumentStyles());
-  styles.push(`.ed-doc-body{max-width: 800px;margin: 0 auto;}`)
+  styles.push(`.ed-doc-body{max-width: 800px;margin: 0 auto;}`);
   styles.push('</style> \n');
 
   return styles.join('');

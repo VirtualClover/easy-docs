@@ -225,7 +225,6 @@ export const ExportView = (): JSX.Element => {
     const zip = zipDirectory ? zipDirectory.folder(bundleName) : new JSZip();
 
     for (const [i, document] of data.data.entries()) {
-      console.log(parentMetadata);
       await generateDocumentExport(
         document,
         format,
@@ -313,7 +312,6 @@ export const ExportView = (): JSX.Element => {
     if (scanInProgess)
       onmessage = (event) => {
         if (event.data.pluginMessage && event.data.pluginMessage.type) {
-          console.log(event.data.pluginMessage);
           switch (event.data.pluginMessage.type) {
             case 'docs-in-page':
               generateFigmaPageBundleExport(

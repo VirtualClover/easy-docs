@@ -59,6 +59,7 @@ import {
 
 import JSZip from 'jszip';
 import { addIndentation } from '../general/addIndentation';
+import { baseDocSiteScript } from './baseDocSiteScript';
 import { clone } from '../general/clone';
 import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
 import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
@@ -1018,6 +1019,7 @@ export let generateDocSite = async (
   zip.file('theme.css', generateCSSVars(settings));
   zip.file('nav_view.css', generateBaseCSSDocSiteStyles());
   zip.file('doc_view.css', generateBaseCSSDocumentStyles());
+  zip.file('base_script.js', baseDocSiteScript);
   zip.file(`${METADATA_FILENAME}.json`, JSON.stringify(siteMetadata));
 
   for (const [fpi, figmaPage] of data.data.entries()) {
@@ -1059,7 +1061,6 @@ export let generateDocSitePage = async (
 ) => {
   let currentFigmaPageBundle = docSiteMetadata.directory[currentIndex[2]];
   let currentDocument = currentFigmaPageBundle.directory[currentIndex[1]];
-  let currentPage = currentDocument.directory[currentIndex[0]];
   let markup = [];
   let settings = {
     ...DEFAULT_SETTINGS,
@@ -1092,11 +1093,6 @@ export let generateDocSitePage = async (
     `${addIndentation(
       2
     )}<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>`
-  );
-  markup.push(
-    `${addIndentation(
-      2
-    )}<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>`
   );
   markup.push(
     `${addIndentation(
@@ -1181,25 +1177,8 @@ ${
   markup.push(
     `${addIndentation(
       1
-    )}<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>`
+    )}<script src="./../../base_script.js"></script>`
   );
-  markup.push(`${addIndentation(1)}<script>
-       window.onload = function(){
-
-    const drawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('nav-drawer'));
-
-    const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    //topAppBar.setScrollTarget(document.querySelector<HTMLElement>('.ed-body'));
-    topAppBar.listen('MDCTopAppBar:nav', () => {
-      drawer.open = !drawer.open;});
-
-    const listEl = document.getElementById('nav-drawer');
-      console.log(listEl);
-      
-    const mainContentEl = document.querySelector<HTMLElement>('.ed-body');
-    }
-
-  </script>`);
   markup.push(`</html>`);
 
   /*
