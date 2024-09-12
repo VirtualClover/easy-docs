@@ -13,7 +13,8 @@ import {
   VariantSharedData,
 } from '../../constants';
 import {
-  convertPropObjToArr,
+  convertPropertiesToArr,
+  convertSpecsObjToArr,
   generateSpecsFromNode,
 } from '../getSpecsFromInstance';
 import {
@@ -166,10 +167,9 @@ async function processComponentChildLayer(
   pointerCoords: PointerCoordsObj,
   avoidInstances: boolean = true
 ) {
-
   if (layer.absoluteRenderBounds && !layer.isMask && layer.type != 'GROUP') {
-    await generateSpecsFromNode(layer as FrameNode, avoidInstances)
-      .then(async (res) => {
+    await generateSpecsFromNode(layer as FrameNode, avoidInstances).then(
+      async (res) => {
         if (res) {
           variantSharedData.layers.push({
             layerName: res.nodeName,
@@ -338,7 +338,8 @@ async function processComponentChildLayer(
             specsFrame.appendChild(node);
           });
         }
-      })
+      }
+    );
   }
 
   if (
@@ -403,6 +404,7 @@ async function generateOuterWrapper(
     timeout: 1500,
   });
   let returnedFrame: FrameNode;
+
   //Outer wrapper
   let outerWrapper = figma.createFrame();
   outerWrapper.layoutMode = 'VERTICAL';
@@ -418,6 +420,18 @@ async function generateOuterWrapper(
     outerWrapper.name = `${FIGMA_COMPONENT_PREFIX}Component Documentation: ${
       parentComponent.name ?? ''
     }`;
+
+    //Header
+    await generateHeaderInstance(
+      {
+        level: 3,
+        text: parentComponent.name,
+      },
+      componentVersion
+    ).then((node) => {
+      outerWrapper.appendChild(node);
+      node.layoutSizingHorizontal = 'FILL';
+    });
 
     //Description
     if (parentComponent.description) {
@@ -437,6 +451,49 @@ async function generateOuterWrapper(
     componentSharedData.mainComponentId = parentComponent.id;
     componentSharedData.mainComponentName = parentComponent.name;
     componentSharedData.description = parentComponent.description;
+    componentSharedData.properties = parentComponent.componentPropertyDefinitions;
+
+    //Component properties
+    if (parentComponent.componentPropertyDefinitions) {
+      let compPropArr = convertPropertiesToArr(parentComponent.componentPropertyDefinitions);
+
+      await generateHeaderInstance(
+        {
+          level: 4,
+          text: 'Component Properties',
+        },
+        componentVersion
+      ).then((node) => {
+        outerWrapper.appendChild(node);
+        node.layoutSizingHorizontal = 'FILL';
+      });
+
+      await generateTableInstance(
+        {
+          withHeadings: true,
+          content: [
+            ['Property Name', 'Type', 'Default Value', 'Options'],
+            ...compPropArr,
+          ],
+        },
+        componentVersion
+      ).then((node) => {
+        outerWrapper.appendChild(node);
+        node.layoutSizingHorizontal = 'FILL';
+      });
+    }
+
+    //Specs section
+    await generateHeaderInstance(
+      {
+        level: 4,
+        text: 'Component Specs',
+      },
+      componentVersion
+    ).then((node) => {
+      outerWrapper.appendChild(node);
+      node.layoutSizingHorizontal = 'FILL';
+    });
 
     //Generate specs frame
     let specsFrameWrapper = figma.createFrame();
@@ -513,7 +570,6 @@ async function generateOuterWrapper(
 
       //Generate specs for other layers
       for (const child of componentInstance.children) {
-
         await processComponentChildLayer(
           variantSharedData,
           child as FrameNode,
@@ -599,7 +655,7 @@ async function generateOuterWrapper(
                   withHeadings: true,
                   content: [
                     ['Property', 'Value', 'Source'],
-                    ...convertPropObjToArr(layer.properties),
+                    ...convertSpecsObjToArr(layer.properties),
                   ],
                 },
                 componentVersion
@@ -751,7 +807,6 @@ let componentDocIntegrityCheck = async (
       if (existingDocFrameId) {
         await componentDocFrameIntegrityCheck(existingDocFrameId).then(
           (res) => {
-
             isComponentFrameComplete = res.frameIsComplete;
             componentDocFrame = res.frame;
             componentDocFrameData = res.data;
@@ -782,11 +837,9 @@ let componentDocIntegrityCheck = async (
         });
     }
   } else {
-
     await figma
       .getNodeByIdAsync(parentComponentIdFallback)
       .then(async (node) => {
-
         if (
           node &&
           (node.type == 'COMPONENT' || node.type == 'COMPONENT_SET')
@@ -984,7 +1037,6 @@ export async function generateBlockDataFromComponentDoc(
 
   let frameDetails = getDetailsFromFigmaURL(url, 'decode');
 
-  // Get master component from frame data
   if (instNode.parent && instNode.parent.type == 'FRAME') {
     let storedData = instNode.parent.getSharedPluginData(
       FIGMA_NAMESPACE,
@@ -992,7 +1044,7 @@ export async function generateBlockDataFromComponentDoc(
     );
 
     if (storedData) {
-      parsedData = JSON.parse(storedData);
+      parsedData = {...parsedData,...JSON.parse(storedData)};
       componentIdFromData = parsedData.mainComponentId;
     }
   }
@@ -1015,7 +1067,6 @@ export async function generateBlockDataFromComponentDoc(
               let nodeToRemove: InstanceNode;
               if (isHydratedInstance) {
                 parentFrame = instNode.parent as FrameNode;
-
               } else {
                 parentFrame = instNode.parent.parent as FrameNode;
               }

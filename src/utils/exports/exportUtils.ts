@@ -26,6 +26,10 @@ import {
   PluginSettings,
 } from '../constants';
 import {
+  convertPropertiesToArr,
+  convertSpecsObjToArr,
+} from '../figma/getSpecsFromInstance';
+import {
   decideEmojiBasedOnDosAndDonts,
   decideEmojiBasedOnStatus,
   mapDosAndDontsToStatus,
@@ -61,7 +65,6 @@ import JSZip from 'jszip';
 import { addIndentation } from '../general/addIndentation';
 import { baseDocSiteScript } from './baseDocSiteScript';
 import { clone } from '../general/clone';
-import { convertPropObjToArr } from '../figma/getSpecsFromInstance';
 import { decidedAsciiForNodeType } from '../general/decidedAsciiForNodeType';
 import { formatDirName } from './formatDirName';
 import { getURLFromAnchor } from '../general/flavoredText';
@@ -378,7 +381,7 @@ let generateMDComponentDoc = (
                 withHeadings: true,
                 content: [
                   ['Property', 'Value', 'Source'],
-                  ...convertPropObjToArr(layer.properties),
+                  ...convertSpecsObjToArr(layer.properties),
                 ],
               },
               metadata,
@@ -620,6 +623,16 @@ let generateHTMLComponentDoc = (
         initialIndentation
       )}<div class="${classPrefix}component-doc">`
     );
+
+    //Header
+    html.push(
+      `${addIndentation(
+        initialIndentation + 1
+      )}<h3 class="${classPrefix}component-doc-heading ${classPrefix}h3">${
+        data.mainComponentName
+      }</h3>`
+    );
+
     //Description
     html.push(
       `${addIndentation(
@@ -627,6 +640,36 @@ let generateHTMLComponentDoc = (
       )}<p class="${classPrefix}component-doc-desc ${classPrefix}p">${
         data.description
       }</p>`
+    );
+
+    if (data.properties) {
+      html.push(
+        `${addIndentation(
+          initialIndentation + 1
+        )}<h4 class="${classPrefix}component-doc-properties-heading ${classPrefix}h4">Component Properties</h4>`
+      );
+      html.push(
+        `${generateHTMLTable(
+          {
+            withHeadings: true,
+            content: [
+              ['Property Name', 'Type', 'Default Value', 'Options'],
+              ...convertPropertiesToArr(data.properties),
+            ],
+          },
+          initialIndentation + 1,
+          EMPTY_DOCUMENT_METADATA,
+          'page',
+          [0, 0, 0] // Not necessary to pass the meta data, since, in theory this table should contain hyperlinks
+        )}`
+      );
+    }
+
+    //Specs
+    html.push(
+      `${addIndentation(
+        initialIndentation + 1
+      )}<h4 class="${classPrefix}component-doc-properties-heading ${classPrefix}h4">Component Specs</h4>`
     );
 
     for (const variant of data.variants) {
@@ -685,7 +728,7 @@ let generateHTMLComponentDoc = (
                 withHeadings: true,
                 content: [
                   ['Property', 'Value', 'Source'],
-                  ...convertPropObjToArr(layer.properties),
+                  ...convertSpecsObjToArr(layer.properties),
                 ],
               },
               initialIndentation + 3,
@@ -1113,7 +1156,9 @@ export let generateDocSitePage = async (
   markup.push(`${addIndentation(1)}<body>`);
   //TopBar
   markup.push(
-    `${addIndentation(2)}<header class="mdc-top-app-bar ed-top-bar" id ="app-bar">`
+    `${addIndentation(
+      2
+    )}<header class="mdc-top-app-bar ed-top-bar" id ="app-bar">`
   );
   markup.push(`${addIndentation(3)}<div class="mdc-top-app-bar__row">`);
   markup.push(
@@ -1175,9 +1220,7 @@ ${
     )}<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>`
   );
   markup.push(
-    `${addIndentation(
-      1
-    )}<script src="./../../base_script.js"></script>`
+    `${addIndentation(1)}<script src="./../../base_script.js"></script>`
   );
   markup.push(`</html>`);
 
@@ -1208,7 +1251,11 @@ let generateDocSiteSideNav = (
 ) => {
   let markup = [];
 
-  markup.push(`${addIndentation(initialIdentation)}<aside class="mdc-drawer mdc-drawer--dismissible" id="nav-drawer">`);
+  markup.push(
+    `${addIndentation(
+      initialIdentation
+    )}<aside class="mdc-drawer mdc-drawer--dismissible" id="nav-drawer">`
+  );
   markup.push(
     `${addIndentation(initialIdentation + 1)}<div class="mdc-drawer__content">`
   );

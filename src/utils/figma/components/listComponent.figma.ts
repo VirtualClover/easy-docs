@@ -89,9 +89,6 @@ export async function generateListInstance(
     if (data.items.length) {
       jointData = data.items.join('\n');
       jointDataDecoded = decodeStringForFigma(jointData, true);
-      //console.log(data.items);
-      //console.log('joint data');
-      //console.log(jointData);
     }
     instance.setProperties({
       [componentData.components.list.contentProp]: jointDataDecoded,
@@ -102,8 +99,6 @@ export async function generateListInstance(
       FIGMA_COMPONENT_VERSION_KEY,
       componentVersion.toString()
     );
-
-    //console.log('here');
     await figma
       .loadFontAsync({ family: DEFAULT_FONT_FAMILIES[0], style: 'Regular' })
       .then(() => {
@@ -115,7 +110,6 @@ export async function generateListInstance(
       });
     await setFlavoredTextOnFigmaNode(jointDataDecoded, instance);
     return instance;
-    //instance.set
   }
   return null;
 }
@@ -163,5 +157,4 @@ export async function generateBlockDataFromList(
       style: listStyle,
     },
   };
-  //console.log(arr);
 }

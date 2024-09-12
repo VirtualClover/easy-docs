@@ -138,6 +138,7 @@ export const EMPTY_COMPONENT_SHARED_DATA = {
     existsInFile: undefined,
   },
   fileId: '',
+  properties: null as ComponentPropertyDefinitions,
   variants: [] as VariantSharedData[],
 };
 export type ComponentSharedData = typeof EMPTY_COMPONENT_SHARED_DATA;

@@ -60,7 +60,6 @@ export let generateSpecsFromNode = async (
           anatomy.itemSpacing.value = node.itemSpacing;
         }
 
-
         //Corner radius
         if (node.cornerRadius != 0) {
           anatomy.topLeftRadius.value = node.topLeftRadius;
@@ -71,7 +70,10 @@ export let generateSpecsFromNode = async (
 
         // Stroke weight
         if (node.strokeWeight != 0) {
-          if (node.strokeWeight != figma.mixed && !isNaN(node.strokeWeight as number)) {
+          if (
+            node.strokeWeight != figma.mixed &&
+            !isNaN(node.strokeWeight as number)
+          ) {
             anatomy.strokeWeight.value = node.strokeWeight as number;
           } else {
             anatomy.strokeTopWeight.value = node.strokeTopWeight;
@@ -93,7 +95,6 @@ export let generateSpecsFromNode = async (
 
       // Fill
       //console.log('node fills', node.fills);
-      
 
       if (
         node.fills &&
@@ -267,7 +268,7 @@ let generateRawTextStyleSpecs = (anatomy: AnatomySpecs, node: TextNode) => {
       : null;
 };
 
-export let convertPropObjToArr = (properties: AnatomySpecs) => {
+export let convertSpecsObjToArr = (properties: AnatomySpecs) => {
   let propArr = [];
   for (const [key, value] of Object.entries(properties)) {
     if (value.value) {
@@ -279,4 +280,37 @@ export let convertPropObjToArr = (properties: AnatomySpecs) => {
     }
   }
   return propArr;
+};
+
+export let convertPropertiesToArr = (
+  properties: ComponentPropertyDefinitions
+) => {
+  let compPropArr = [];
+  for (const [key, prop] of Object.entries(properties)) {
+    let options = [];
+    let defaultValue = prop.defaultValue.toString();
+
+    if (prop.preferredValues) {
+      options = prop.preferredValues;
+    }
+    if (prop.variantOptions) {
+      options = prop.variantOptions;
+    }
+    if (prop.type == 'INSTANCE_SWAP') {
+      options = ['N/A'];
+      defaultValue = options[0];
+    }
+
+    if (prop.type == 'TEXT') {
+      options = ['N/A'];
+    }
+
+    compPropArr.push([
+      key.replace(/#[0-9]{1,}:[0-9]{1,}/, ''),
+      _.startCase(_.lowerCase(prop.type)),
+      defaultValue,
+      prop.type == 'BOOLEAN' ? 'true, false' : options.join(', '),
+    ]);
+  }
+  return compPropArr;
 };

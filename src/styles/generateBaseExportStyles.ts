@@ -92,7 +92,7 @@ export let generateBaseCSSDocumentStyles = () => {
   );
   styles.push(`a:visited {color: var(--ed-theme-on-background-link);}`);
   styles.push(
-    `.ed-h2{font-size: 1.8em;}.ed-h3{font-size: 1.6em;}.ed-h4{font-size: 1.4em;}.ed-h5{font-size: 1.2em;}.ed-h6{font-size: 1em;}`
+    `.ed-h2{font-size: 1.8em;}.ed-h3{font-size: 1.6em;}.ed-h4{font-size: 1.3em;}.ed-h5{font-size: 1.1em;}.ed-h6{font-size: 1em; margin: 1.3em 0;}`
   );
   styles.push(`a:link{color: var(--ed-theme-on-background-link);}`);
   styles.push(`hr{border: 1px solid var(--ed-theme-divider-simple);}`);
