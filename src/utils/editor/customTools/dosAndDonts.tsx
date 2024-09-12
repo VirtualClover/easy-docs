@@ -161,6 +161,7 @@ export class DosAndDonts {
   data: any;
   wrapper: HTMLDivElement | undefined;
   settings: any;
+  readOnly: boolean;
 
   static get toolbox() {
     return {
@@ -169,7 +170,8 @@ export class DosAndDonts {
     };
   }
 
-  constructor({ data }) {
+  constructor({ data, readOnly }) {
+    this.readOnly = readOnly;
     this.data = {
       frameId: data.frameId || '',
       fileId: data.fileId || '',
@@ -177,6 +179,10 @@ export class DosAndDonts {
       frameExistsInFile: data.frameExistsInFile,
       caption: data.caption || '',
     };
+  }
+
+  static get isReadOnlySupported() {
+    return true;
   }
 
   renderSettings() {

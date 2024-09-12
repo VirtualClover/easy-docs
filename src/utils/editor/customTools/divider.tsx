@@ -10,7 +10,7 @@ import { dividerIcon } from '../../../assets/svgs';
 //https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
 //`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
 
-interface ComponentProps {}
+interface ComponentProps { }
 
 let BlockWrapper = styled('div')(({ theme }) => ({
   padding: `16px 0`,
@@ -36,6 +36,7 @@ const InputUI = (blockData: ComponentProps) => {
 
 export class Divider {
   data: any;
+  readOnly: boolean;
 
   static get toolbox() {
     return {
@@ -44,9 +45,14 @@ export class Divider {
     };
   }
 
-  constructor({ data }) {
+  constructor({ data, readOnly }) {
     this.data = data;
+    this.readOnly = readOnly;
     //console.log(data);
+  }
+
+  static get isReadOnlySupported() {
+    return true;
   }
 
   render() {

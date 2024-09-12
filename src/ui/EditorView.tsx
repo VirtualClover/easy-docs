@@ -50,6 +50,7 @@ export const EditorView = () => {
   const [creatingNewPage, setCreatingNewPage] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
+
   /**
    * Handles the change of the active tab
    * @param event

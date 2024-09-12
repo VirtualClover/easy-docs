@@ -133,6 +133,7 @@ const InputUI = (blockData: ComponentDocBlockData) => {
 
 export class ComponentDoc {
   data: ComponentDocBlockData;
+  readOnly: boolean;
 
   static get toolbox() {
     return {
@@ -141,8 +142,13 @@ export class ComponentDoc {
     };
   }
 
-  constructor({ data }) {
+  constructor({ data,readOnly }) {
     this.data = data;
+    this.readOnly = readOnly;
+  }
+
+  static get isReadOnlySupported() {
+    return true;
   }
 
   render() {

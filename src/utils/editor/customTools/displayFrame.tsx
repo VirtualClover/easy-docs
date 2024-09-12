@@ -128,6 +128,7 @@ const InputUI = (blockData: DisplayFrameBlockData) => {
 
 export class DisplayFrame {
   data: DisplayFrameBlockData;
+  readOnly: boolean;
 
   static get toolbox() {
     return {
@@ -136,9 +137,14 @@ export class DisplayFrame {
     };
   }
 
-  constructor({ data }) {
+  constructor({ data,readOnly }) {
     this.data = data;
+    this.readOnly = readOnly;
     //console.log(data);
+  }
+
+  static get isReadOnlySupported() {
+    return true;
   }
 
   render() {
