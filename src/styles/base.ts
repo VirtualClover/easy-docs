@@ -67,7 +67,7 @@ const BASE_COLOR_PALETTE_DARK = {
   },
   onBackground: {
     high: '#FFF',
-    mid: '#AEB4CF',
+    mid: '#E1E3EE',
     low: '#565F86',
     link: '#7EB4E1',
   },

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import { CircularProgress, Snackbar } from '@mui/material';
+import { Alert, CircularProgress, Snackbar } from '@mui/material';
 import { DocData, PluginData, PluginViews } from '../utils/constants';
 
 import { BottomSheet } from './components/BottomSheet';
@@ -81,6 +81,14 @@ function App({ initialPluginData }: ComponentProps) {
     initialPluginData.buildingComponentDoc
   );
 
+  const [showError, setShowError] = React.useState(
+    initialPluginData.showError
+  );
+
+  const [errorMessage, setErrorMessage] = React.useState(
+    initialPluginData.errorMessage
+  );
+
   const circularLoader = <CircularProgress size={16} />;
 
   React.useEffect(() => {
@@ -97,7 +105,7 @@ function App({ initialPluginData }: ComponentProps) {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (navigation.currentView != 'SETTINGS' && loadingState != 'MAYOR') {
+      if (navigation.currentView != 'SETTINGS' && !sheetOpen && !outdatedComponents) {
         parent.postMessage({ pluginMessage: { type: 'node-update' } }, '*');
         onmessage = (event) => {
           if (event.data.pluginMessage) {
@@ -206,61 +214,75 @@ function App({ initialPluginData }: ComponentProps) {
   ]);
 
   return (
-      <PluginDataContext.Provider
-        value={{
-          currentDocData,
-          setCurrentDocData,
-          currentUser,
-          setCurrentUser,
-          navigation,
-          setNavigation,
-          loadingState,
-          setLoadingState,
-          settings,
-          setSettings,
-          incomingFigmaChanges,
-          setIncomingFigmaChanges,
-          incomingEditorChanges,
-          setIncomingEditorChanges,
-          activeTab,
-          setActiveTab,
-          sheetOpen,
-          setSheetOpen,
-          sheetContent,
-          setSheetContent,
-          sheetZIndex,
-          setSheetZIndex,
-          outdatedComponents,
-          setOutdatedComponents,
-          lastFormatUsed,
-          setLastFormatUsed,
-          lastExportActionUsed,
-          setLastExportActionUsed,
-          buildingComponentDoc,
-          setBuildingComponentDoc,
+    <PluginDataContext.Provider
+      value={{
+        currentDocData,
+        setCurrentDocData,
+        currentUser,
+        setCurrentUser,
+        navigation,
+        setNavigation,
+        loadingState,
+        setLoadingState,
+        settings,
+        setSettings,
+        incomingFigmaChanges,
+        setIncomingFigmaChanges,
+        incomingEditorChanges,
+        setIncomingEditorChanges,
+        activeTab,
+        setActiveTab,
+        sheetOpen,
+        setSheetOpen,
+        sheetContent,
+        setSheetContent,
+        sheetZIndex,
+        setSheetZIndex,
+        outdatedComponents,
+        setOutdatedComponents,
+        lastFormatUsed,
+        setLastFormatUsed,
+        lastExportActionUsed,
+        setLastExportActionUsed,
+        buildingComponentDoc,
+        setBuildingComponentDoc,
+        showError,
+        setShowError,
+        errorMessage,
+        setErrorMessage
+      }}
+    >
+      <PluginContainer
+        disableGutters
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
         }}
       >
-        <PluginContainer
-          disableGutters
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-          }}
-        >
-          <PluginTopBar />
-          {view}
-          <VersionBanner />
-          <BottomSheet zIndex={sheetZIndex} />
-          <Snackbar
-            open={buildingComponentDoc}
-            autoHideDuration={1000}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            message={'Generating a component documentation...'}
-            action={circularLoader}
-          />
-        </PluginContainer>
-      </PluginDataContext.Provider>
+        <PluginTopBar />
+        {view}
+        <VersionBanner />
+        <BottomSheet zIndex={sheetZIndex} />
+        <Snackbar
+          open={buildingComponentDoc}
+          autoHideDuration={1000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          message={'Generating a component documentation...'}
+          action={circularLoader}
+        />
+        <Snackbar autoHideDuration={30000} open={showError} onClose={() => setShowError(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+          <Alert
+            onClose={() => setShowError(false)}
+            severity="error"
+            variant='standard'
+            sx={{ width: '100%' }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+      </PluginContainer>
+    </PluginDataContext.Provider>
   );
 }
 

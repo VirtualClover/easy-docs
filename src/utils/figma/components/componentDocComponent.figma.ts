@@ -400,9 +400,6 @@ async function generateOuterWrapper(
   componentVersion: number,
   brokenLinkCaption: string = ''
 ) {
-  figma.notify('Generating component documentation ✍', {
-    timeout: 1500,
-  });
   let returnedFrame: FrameNode;
 
   //Outer wrapper
@@ -952,6 +949,14 @@ export async function generateComponentDocInstance(
     return integrityCheckData.componentDocFrame.clone();
   } else {
     //If not, then we generate the component frame and delete de old ones
+    await figma.ui.postMessage({
+      type: 'generating-component-doc',
+    });
+
+    await figma.notify(`Generating component documentation ✍`, {
+      timeout: 1500,
+    });
+
     await figma
       .getNodeByIdAsync(data.anatomyFramesWrapper.id)
       .then((node) => {
@@ -983,10 +988,6 @@ export async function generateComponentDocInstance(
         FIGMA_COMPONENT_VERSION_KEY,
         componentVersion.toString()
       );
-
-      await figma.ui.postMessage({
-        type: 'generating-component-doc',
-      });
 
       await generateOuterWrapper(
         instance,

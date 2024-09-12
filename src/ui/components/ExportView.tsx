@@ -44,6 +44,8 @@ import { METADATA_FILENAME } from '../../utils/constants/exportConstants';
 import { PluginDataContext } from '../../utils/constants/PluginDataContext';
 import React from 'react';
 import { formatStringToFileName } from '../../utils/general/formatStringToFileName';
+import { handleEditorError } from '../../utils/editor/handleEditorError';
+import { handleFigmaError } from '../../utils/figma/handleFigmaError';
 
 export const ExportView = (): JSX.Element => {
   const pluginContext = React.useContext(PluginDataContext);
@@ -62,6 +64,16 @@ export const ExportView = (): JSX.Element => {
     `file.${pluginContext.lastFormatUsed}`
   );
   const [scanInProgess, setScanInProgress] = React.useState(false);
+
+
+  let setScanTimeOut = () => {
+    setTimeout(() => {
+      setScanInProgress(false);
+      setLoading(false);
+      handleEditorError('E1', null, pluginContext.setShowError, pluginContext.setErrorMessage);
+    }, 600000);
+  };
+
   let exportActions = [
     {
       label: 'Download current page',
@@ -88,6 +100,7 @@ export const ExportView = (): JSX.Element => {
       onClick: () => {
         setScanInProgress(true);
         setLoading(true);
+        setScanTimeOut();
         parent.postMessage(
           {
             pluginMessage: {
@@ -103,6 +116,7 @@ export const ExportView = (): JSX.Element => {
       onClick: () => {
         setScanInProgress(true);
         setLoading(true);
+        setScanTimeOut();
         parent.postMessage(
           {
             pluginMessage: {
@@ -118,6 +132,7 @@ export const ExportView = (): JSX.Element => {
       onClick: () => {
         setScanInProgress(true);
         setLoading(true);
+        setScanTimeOut();
         parent.postMessage(
           {
             pluginMessage: {
@@ -309,9 +324,13 @@ export const ExportView = (): JSX.Element => {
    */
   let recieveMessage = () => {
     // Check if the scan was requested before doing anything  
+    console.log('interval');
+
     if (scanInProgess)
       onmessage = (event) => {
+        console.log('scan in progress');
         if (event.data.pluginMessage && event.data.pluginMessage.type) {
+          console.log(event.data.pluginMessage.type);
           switch (event.data.pluginMessage.type) {
             case 'docs-in-page':
               generateFigmaPageBundleExport(
@@ -343,6 +362,14 @@ export const ExportView = (): JSX.Element => {
               });
               break;
 
+            case 'generating-component-doc':
+              pluginContext.setBuildingComponentDoc(true);
+              break;
+
+            case 'finished-generating-component-doc':
+              pluginContext.setBuildingComponentDoc(false);
+              break;
+
             default:
               break;
           }
@@ -359,6 +386,7 @@ export const ExportView = (): JSX.Element => {
     return () => clearInterval(interval);
 
   }, [scanInProgess]);
+
 
 
   return (

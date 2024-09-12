@@ -147,5 +147,9 @@ export const DEFAULT_PLUGIN_DATA = {
   setLastExportActionUsed: (index: number) => {},
   buildingComponentDoc: false,
   setBuildingComponentDoc: (state: boolean) => {},
+  showError: false,
+  setShowError: (state: boolean) => {},
+  errorMessage: '',
+  setErrorMessage: (state: string) => {},
 };
 export type PluginData = typeof DEFAULT_PLUGIN_DATA;

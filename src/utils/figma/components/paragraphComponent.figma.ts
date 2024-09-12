@@ -68,8 +68,6 @@ export async function generateParagraphInstance(
     });
   let content = decodeStringForFigma(data.text, true);
 
-  console.log(content);
-
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
     instance.setProperties({

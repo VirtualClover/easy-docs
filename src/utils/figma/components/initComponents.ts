@@ -1,4 +1,8 @@
-import { BaseComponentData, FIGMA_COMPONENT_DATA_KEY, FIGMA_NAMESPACE } from '../../constants';
+import {
+  BaseComponentData,
+  FIGMA_COMPONENT_DATA_KEY,
+  FIGMA_NAMESPACE,
+} from '../../constants';
 
 import { createAlertComponent } from './AlertComponent.figma';
 import { createBrokenLinkComponent } from './brokenLinkComponent.figma';
@@ -18,15 +22,14 @@ import { setComponentData } from '../getComponentData';
 
 /**
  * Generates a frame to store component doc frames
- * @returns 
+ * @returns
  */
 export let generateComponentDocsSection = () => {
   //Component documentation frames
   let componentDocSection = figma.createSection();
   componentDocSection.name = '[EASY DOCS DOC FRAMES]';
   return componentDocSection;
-}
-
+};
 
 /**
  * Generates the main components in a Figma file
@@ -56,7 +59,7 @@ export async function initComponents(
       let pages = figma.root.children;
       for (let i = 0; i < pages.length; i++) {
         if (pages[i].id != componentData.components.componentsPage.id) {
-          figma.currentPage = pages[i];
+          await figma.setCurrentPageAsync(pages[i]);
           break;
         }
       }
@@ -73,7 +76,6 @@ export async function initComponents(
   frame.primaryAxisSizingMode = 'AUTO';
   frame.itemSpacing = 90;
   let componentDocSection = generateComponentDocsSection();
-
 
   await Promise.all([
     createHeaderComponent(frame),
@@ -118,16 +120,11 @@ export async function initComponents(
       componentData.components.componentDoc = componentDoc;
       componentData.components.pointer = pointer;
       componentData.components.componentsPage.id = page.id;
-      componentData.componentDocSection =  componentDocSection.id; 
+      componentData.componentDocSection = componentDocSection.id;
       componentData.lastGenerated = Date.now();
       setComponentData(componentData);
     })
-    .catch((e) =>
-      handleFigmaError(
-        'F3',
-        e
-      )
-    );
+    .catch((e) => handleFigmaError('F3', e));
 
   await page.loadAsync();
   page.appendChild(frame);

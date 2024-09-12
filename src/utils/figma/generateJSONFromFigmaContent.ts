@@ -89,12 +89,7 @@ export let generateJSONFromFigmaContent = async (
               response.overrideEditorChanges = true;
             }
           })
-          .catch((e) =>
-            handleFigmaError(
-              'F22',
-              e
-            )
-          );
+          .catch((e) => handleFigmaError('F22', e));
       }
     }
 
@@ -130,274 +125,233 @@ export let generatePageDataFromFrame = async (
     let children = frame.children;
     for (let i = 0; i < children.length; i++) {
       let childNode = children[i];
-      let editedDate =
-        parseInt(
-          childNode.getSharedPluginData(FIGMA_NAMESPACE, FIGMA_LAST_EDITED_KEY),
-          10
-        ) || Date.now();
-      let objEssentials = {
-        lastEdited: editedDate,
-        figmaNodeId: childNode.id,
-      };
 
-      let version: number;
+      if (childNode) {
+        let editedDate =
+          parseInt(
+            childNode.getSharedPluginData(
+              FIGMA_NAMESPACE,
+              FIGMA_LAST_EDITED_KEY
+            ),
+            10
+          ) || Date.now();
+        let objEssentials = {
+          lastEdited: editedDate,
+          figmaNodeId: childNode.id,
+        };
 
-      if (childNode.type == 'INSTANCE') {
-        version = parseInt(
-          childNode.getSharedPluginData(
-            FIGMA_NAMESPACE,
-            FIGMA_COMPONENT_VERSION_KEY
-          )
-        );
+        let version: number;
 
-        if (version == componentData.lastGenerated) {
-          let mainCompId: string;
-          await getMainCompIdFromInstance(childNode).then(
-            (id) => (mainCompId = id)
-          ).catch((e) =>
-            handleFigmaError(
-              'F23',
-              e
-            ));
+        if (childNode.type == 'INSTANCE') {
+          version = parseInt(
+            childNode.getSharedPluginData(
+              FIGMA_NAMESPACE,
+              FIGMA_COMPONENT_VERSION_KEY
+            )
+          );
 
-          switch (mainCompId) {
-            case componentData.components.header.id:
-              await generateBlockDataFromHeader(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F24',
-                  e
-                ));
-              break;
-            case componentData.components.paragraph.id:
-              await generateBlockDataFromParagraph(
-                childNode,
-                editedDate,
-                childNode.id
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F25',
-                  e
-                ));
-              break;
-            case componentData.components.quote.id:
-              await generateBlockDataFromQuote(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F26',
-                  e
-                ));
-
-              break;
-            case componentData.components.list.id:
-              await generateBlockDataFromList(
-                childNode,
-                editedDate,
-                childNode.id
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F27',
-                  e
-                ));
-              break;
-            case componentData.components.alert.id:
-              await generateBlockDataFromAlert(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F28',
-                  e
-                ));
-              break;
-            case componentData.components.code.id:
-              await generateBlockDataFromCode(
-                childNode,
-                componentData,
-                editedDate,
-                childNode.id
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F29',
-                  e
-                ));
-              break;
-            case componentData.components.divider.id:
-              await generateBlockDataFromDivider(editedDate, childNode.id).then(
-                (data) => response.pageData.blocks.push(data)
-              ).catch((e) =>
-                handleFigmaError(
-                  'F30',
-                  e
-                ));
-              break;
-            case componentData.components.dosAndDonts.id:
-              //Probably a dehydrated frame
-              await hydrateDosAndDontsFrame(
-                childNode,
-                frame,
-                i,
-                componentData
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F31',
-                  e
-                ));
-              break;
-            case componentData.components.displayFrame.id:
-              //Probably a dehydrated frame
-              await hydrateDisplayFrame(
-                childNode,
-                frame,
-                i,
-                componentData
-              ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                handleFigmaError(
-                  'F36',
-                  e
-                ));
-              break;
-            case componentData.components.componentDoc.id:
-              //Probably a dehydrated frame
-              await hydrateComponentDoc(childNode, i, componentData).then(
-                (data) => response.pageData.blocks.push(data)
-              ).catch((e) =>
-                handleFigmaError(
-                  'F32',
-                  e
-                ));
-              break;
-
-            default:
-              break;
-          }
-        } else {
-          figma.ui.postMessage({
-            type: 'outdated-components',
-          });
-        }
-      } // If a component is inside a frame like frame display
-      else if (childNode.type == 'FRAME') {
-        let instInsideAFrame: InstanceNode = scanForInstancesInsideAFrame(
-          childNode,
-          []
-        );
-        let mainCompId: string;
-
-        version = parseInt(
-          instInsideAFrame.getSharedPluginData(
-            FIGMA_NAMESPACE,
-            FIGMA_COMPONENT_VERSION_KEY
-          )
-        );
-
-        if (version == componentData.lastGenerated) {
-          if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
-            await getMainCompIdFromInstance(instInsideAFrame).then(
-              (id) => (mainCompId = id)
-            ).catch((e) =>
-              handleFigmaError(
-                'F33',
-                e
-              ));
-
-            if (mainCompId == componentData.components.brokenLink.id) {
-              instInsideAFrame = scanForInstancesInsideAFrame(childNode, [
-                instInsideAFrame.id,
-              ]);
-              await getMainCompIdFromInstance(instInsideAFrame).then(
-                (id) => (mainCompId = id)
-              ).catch((e) =>
-                handleFigmaError(
-                  'F34',
-                  e
-                ));
-            }
+          if (version == componentData.lastGenerated) {
+            let mainCompId: string;
+            await getMainCompIdFromInstance(childNode)
+              .then((id) => (mainCompId = id))
+              .catch((e) => handleFigmaError('F23', e));
 
             switch (mainCompId) {
-              case componentData.components.displayFrame.id:
-                await generateBlockDataFromDisplayFrame(
-                  instInsideAFrame,
+              case componentData.components.header.id:
+                await generateBlockDataFromHeader(
+                  childNode,
                   componentData,
                   editedDate,
                   childNode.id
-                ).then((data) => {
-                  response.pageData.blocks.push(data);
-                }).catch((e) =>
-                  handleFigmaError(
-                    'F35',
-                    e
-                  ));
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F24', e));
+                break;
+              case componentData.components.paragraph.id:
+                await generateBlockDataFromParagraph(
+                  childNode,
+                  editedDate,
+                  childNode.id
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F25', e));
+                break;
+              case componentData.components.quote.id:
+                await generateBlockDataFromQuote(
+                  childNode,
+                  componentData,
+                  editedDate,
+                  childNode.id
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F26', e));
+
+                break;
+              case componentData.components.list.id:
+                await generateBlockDataFromList(
+                  childNode,
+                  editedDate,
+                  childNode.id
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F27', e));
+                break;
+              case componentData.components.alert.id:
+                await generateBlockDataFromAlert(
+                  childNode,
+                  componentData,
+                  editedDate,
+                  childNode.id
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F28', e));
+                break;
+              case componentData.components.code.id:
+                await generateBlockDataFromCode(
+                  childNode,
+                  componentData,
+                  editedDate,
+                  childNode.id
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F29', e));
+                break;
+              case componentData.components.divider.id:
+                await generateBlockDataFromDivider(editedDate, childNode.id)
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F30', e));
                 break;
               case componentData.components.dosAndDonts.id:
-                await generateBlockDataFromDosAndDonts(
-                  instInsideAFrame,
-                  componentData,
-                  editedDate,
-                  childNode.id
-                ).then((data) => response.pageData.blocks.push(data)).catch((e) =>
-                  handleFigmaError(
-                    'F37',
-                    e
-                  ));
-
+                //Probably a dehydrated frame
+                await hydrateDosAndDontsFrame(
+                  childNode,
+                  frame,
+                  i,
+                  componentData
+                )
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F31', e));
                 break;
-              case componentData.components.tableCell.id:
-                await generateBlockDataFromTable(
-                  instInsideAFrame,
-                  mainCompId,
-                  componentData,
-                  editedDate,
-                  childNode.id
-                ).then((data) => {
-                  response.pageData.blocks.push(data);
-                }).catch((e) =>
-                  handleFigmaError(
-                    'F38',
-                    e
-                  ));
-
+              case componentData.components.displayFrame.id:
+                //Probably a dehydrated frame
+                await hydrateDisplayFrame(childNode, frame, i, componentData)
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F36', e));
                 break;
-
               case componentData.components.componentDoc.id:
-                
-                await generateBlockDataFromComponentDoc(
-                  instInsideAFrame,
-                  componentData,
-                  editedDate,
-                  childNode.id,
-                  i
-                ).then((data) => {   
-                  response.pageData.blocks.push(data);
-                  response.hasComponentDocBlock = true;
-                }).catch((e) =>
-                  handleFigmaError(
-                    'F39',
-                    e
-                  ));
-
+                //Probably a dehydrated frame
+                await hydrateComponentDoc(childNode, i, componentData)
+                  .then((data) => response.pageData.blocks.push(data))
+                  .catch((e) => handleFigmaError('F32', e));
                 break;
 
               default:
-                //console.log(instInsideAFrame);
-                //console.log(mainCompId);
                 break;
             }
+          } else {
+            figma.ui.postMessage({
+              type: 'outdated-components',
+            });
           }
-        } else {
-          figma.ui.postMessage({
-            type: 'outdated-components',
-          });
+        } // If a component is inside a frame like frame display
+        else if (childNode.type == 'FRAME') {
+          let instInsideAFrame: InstanceNode = scanForInstancesInsideAFrame(
+            childNode,
+            []
+          );
+
+          if (instInsideAFrame) {
+            let mainCompId: string;
+
+            version = parseInt(
+              instInsideAFrame.getSharedPluginData(
+                FIGMA_NAMESPACE,
+                FIGMA_COMPONENT_VERSION_KEY
+              )
+            );
+
+            if (version == componentData.lastGenerated) {
+              if (instInsideAFrame && instInsideAFrame.type == 'INSTANCE') {
+                await getMainCompIdFromInstance(instInsideAFrame)
+                  .then((id) => (mainCompId = id))
+                  .catch((e) => handleFigmaError('F33', e));
+
+                if (mainCompId == componentData.components.brokenLink.id) {
+                  instInsideAFrame = scanForInstancesInsideAFrame(childNode, [
+                    instInsideAFrame.id,
+                  ]);
+                  await getMainCompIdFromInstance(instInsideAFrame)
+                    .then((id) => (mainCompId = id))
+                    .catch((e) => handleFigmaError('F34', e));
+                }
+
+                switch (mainCompId) {
+                  case componentData.components.displayFrame.id:
+                    await generateBlockDataFromDisplayFrame(
+                      instInsideAFrame,
+                      componentData,
+                      editedDate,
+                      childNode.id
+                    )
+                      .then((data) => {
+                        response.pageData.blocks.push(data);
+                      })
+                      .catch((e) => handleFigmaError('F35', e));
+                    break;
+                  case componentData.components.dosAndDonts.id:
+                    await generateBlockDataFromDosAndDonts(
+                      instInsideAFrame,
+                      componentData,
+                      editedDate,
+                      childNode.id
+                    )
+                      .then((data) => response.pageData.blocks.push(data))
+                      .catch((e) => handleFigmaError('F37', e));
+
+                    break;
+                  case componentData.components.tableCell.id:
+                    await generateBlockDataFromTable(
+                      instInsideAFrame,
+                      mainCompId,
+                      componentData,
+                      editedDate,
+                      childNode.id
+                    )
+                      .then((data) => {
+                        response.pageData.blocks.push(data);
+                      })
+                      .catch((e) => handleFigmaError('F38', e));
+
+                    break;
+
+                  case componentData.components.componentDoc.id:
+                    await generateBlockDataFromComponentDoc(
+                      instInsideAFrame,
+                      componentData,
+                      editedDate,
+                      childNode.id,
+                      i
+                    )
+                      .then((data) => {
+                        response.pageData.blocks.push(data);
+                        response.hasComponentDocBlock = true;
+                      })
+                      .catch((e) => handleFigmaError('F39', e));
+
+                    break;
+
+                  default:
+                    //console.log(instInsideAFrame);
+                    //console.log(mainCompId);
+                    break;
+                }
+              }
+            } else {
+              figma.ui.postMessage({
+                type: 'outdated-components',
+              });
+            }
+          }
         }
       }
     }

@@ -1,7 +1,11 @@
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
-import { DocData, EMPTY_DOC_OBJECT } from './utils/constants';
+import {
+  BaseComponentData,
+  DocData,
+  EMPTY_DOC_OBJECT,
+} from './utils/constants';
 
 import { createNewDoc } from './utils/figma/createNewDoc';
 import { generateFigmaContentFromJSON } from './utils/figma/generateFigmaContentFromJSON';
@@ -17,6 +21,7 @@ import {
   scanWholePageForDocuments,
 } from './utils/figma/scans';
 import { handleFigmaError } from './utils/figma/handleFigmaError';
+import { getComponentData } from './utils/figma/getComponentData';
 
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
@@ -27,6 +32,7 @@ figma.showUI(__html__, { themeColors: true, width: 600, height: 628 });
 figma.skipInvisibleInstanceChildren = true;
 
 let cachedMsg = null;
+let pluginInitDone = false;
 let stopUpdates = false;
 let lastFetchDoc = EMPTY_DOC_OBJECT;
 
@@ -95,7 +101,7 @@ figma.ui.onmessage = (msg) => {
     if (msg.type === 'scan-whole-file-for-doc-site') {
       let file = figma.root;
       scanWholeFileForDocuments(file).then((res) => {
-        console.log('send page docs');
+        console.warn('send page docs');
         stopUpdates = true;
         setTimeout(() => {
           figma.ui.postMessage({
@@ -130,7 +136,9 @@ figma.ui.onmessage = (msg) => {
 
     //Initializes the plugin
     if (msg.type === 'load-data') {
-      pluginInit().catch((e) => handleFigmaError('F1', e));
+      pluginInit()
+        .then(() => (pluginInitDone = true))
+        .catch((e) => handleFigmaError('F1', e));
     }
 
     //Saves the current settings in the file sotrage
@@ -235,3 +243,25 @@ figma.ui.onmessage = (msg) => {
     //figma.closePlugin();
   }
 };
+
+let checkComponentsIntegrity = async () => {
+  let componentData: BaseComponentData = getComponentData();
+  let stopLoop = false;
+  for (const key in componentData.components) {
+    if (componentData.components.hasOwnProperty(key)) {
+      let currentNode: BaseNode;
+      await figma.getNodeByIdAsync(componentData.components[key].id).then((node) => {
+        currentNode = node;
+        if (!currentNode || !currentNode.parent) {
+          handleFigmaError('F47', null, true);
+          stopLoop = true;
+        }
+      });
+    }
+    if (stopLoop) {
+      break;
+    }
+  }
+};
+
+setInterval(checkComponentsIntegrity, 3000);

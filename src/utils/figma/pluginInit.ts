@@ -19,26 +19,29 @@ export async function pluginInit() {
     initComponents(componentData, true);
   } else {
     //Check if the components have not been deleted
+    let stopLoop = false;
     for (const key in componentData.components) {
       if (componentData.components.hasOwnProperty(key)) {
         let currentNode: BaseNode;
         await figma
           .getNodeByIdAsync(componentData.components[key].id)
-          .then((node) => {
+          .then(async (node) => {
             currentNode = node;
             if (
-              !currentNode ||
-              (currentNode.type != 'PAGE' && !currentNode.parent)
+              !currentNode || !currentNode.parent
             ) {
-              initComponents(componentData, false).catch((e) =>
+              await initComponents(componentData, false).catch((e) =>
                 handleFigmaError(
                  'F2',
                   e
                 )
               );
+              stopLoop = true;
             }
           });
-        break;
+          if (stopLoop){
+            break;
+          }
       }
     }
   }

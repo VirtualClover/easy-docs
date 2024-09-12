@@ -12,5 +12,6 @@ export let handleFigmaError = (
   console.error(event);
   if (superBreaking) {
     figma.closePlugin();
+    return;
   }
 };

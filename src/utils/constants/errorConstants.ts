@@ -45,5 +45,7 @@ export const ERROR_MESSAGES = {
   F44: `There was an error generating the page data from a component doc block.`,
   F45: `There was an error generating the page data from a component doc block.`,
   F46: `There was an error generating the page data from a component doc block.`,
+  F47: `There easy component docs were deleted, please restart the plugin to regenerate them`,
+  E1: `The export took to long, please try again.`,
 
 };
