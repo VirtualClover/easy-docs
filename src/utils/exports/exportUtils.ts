@@ -342,9 +342,31 @@ let generateMDComponentDoc = (
   let mdArray: string[] = [];
 
   if (data.variants.length && data.variants[0].displayFrame.id) {
+    //Heading
+    mdArray.push(`### ${data.mainComponentName}`);
     //desc
     mdArray.push(data.description);
+    //Properties
+    if (data.properties) {
+      mdArray.push(`#### Component Properties`);
+      mdArray.push(
+        generateMDTable(
+          {
+            withHeadings: true,
+            content: [
+              ['Property Name', 'Type', 'Default Value', 'Options'],
+              ...convertPropertiesToArr(data.properties),
+            ],
+          },
+          metadata,
+          bundleType,
+          currentIndex
+        ) + '  \n'
+      );
+    }
+
     //Variants
+    mdArray.push(`#### Component Specs`);
     for (const variant of data.variants) {
       mdArray.push(
         `##### ${generateHeaderContentForVariant(
@@ -642,6 +664,7 @@ let generateHTMLComponentDoc = (
       }</p>`
     );
 
+    //Properties
     if (data.properties) {
       html.push(
         `${addIndentation(
