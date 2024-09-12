@@ -99,7 +99,6 @@ function App({ initialPluginData }: ComponentProps) {
   React.useEffect(() => {
     if (!currentDocData.pages[activeTab]) {
       setActiveTab(0);
-      //console.log('Reseted active tab on app.tsx');
     }
   }, [activeTab]);
 
@@ -121,14 +120,10 @@ function App({ initialPluginData }: ComponentProps) {
                     event.data.pluginMessage.overrideEditorChanges)
                 ) {
                   setIncomingFigmaChanges(true);
-                  console.log('setting this data');
 
                   setCurrentDocData(data);
                   let selectedFrame = event.data.pluginMessage.selectedFrame;
                   setActiveTab(selectedFrame);
-                  /*console.log(
-                    `selectedFrame in new node data: ${selectedFrame}`
-                  );*/
                   if (navigation.currentView == 'INSPECT') {
                     setNavigation({
                       currentView: 'EDITOR',
@@ -140,16 +135,9 @@ function App({ initialPluginData }: ComponentProps) {
 
               case 'same-node-data':
                 let selectedFrame = event.data.pluginMessage.selectedFrame;
-                /*console.log(
-                  `selectedFrame in same node data: ${selectedFrame}`
-                );*/
-                //console.log(`activetab PRE-CHANGE: ${activeTab}`);
                 if (selectedFrame != activeTab) {
-                  //console.log(`set active tab to: ${selectedFrame}`);
                   setActiveTab(selectedFrame);
-                  //console.log(`activetab: ${activeTab}`);
                 }
-                //console.log('------');
                 if (navigation.currentView == 'INSPECT') {
                   setNavigation({
                     currentView: 'EDITOR',
@@ -170,7 +158,7 @@ function App({ initialPluginData }: ComponentProps) {
                 break;
 
               case 'finished-figma-update':
-                //console.log('set editor changes false');
+
                 setIncomingEditorChanges(false);
                 break;
 
@@ -178,7 +166,6 @@ function App({ initialPluginData }: ComponentProps) {
                 if (!outdatedComponents) {
                   setOutdatedComponents(true);
                 }
-                //console.log('Theres some components that are outdated reload?');
                 break;
 
               case 'close-outdated-overlay':
@@ -186,14 +173,11 @@ function App({ initialPluginData }: ComponentProps) {
                 break;
 
               case 'generating-component-doc':
-                console.log('Mayor loading');
-
                 setBuildingComponentDoc(true);
                 break;
 
               case 'finished-generating-component-doc':
                 setBuildingComponentDoc(false);
-                console.log('None loading');
                 break;
 
               default:

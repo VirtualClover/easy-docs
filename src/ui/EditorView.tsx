@@ -63,8 +63,6 @@ export const EditorView = () => {
       // FAILSAFE If the given index is not found on the current document, the reset it to 0
       selectNewPageFromEditor(0, pluginContext);
     }
-
-    //console.log(newActiveTab);
   };
 
   /**

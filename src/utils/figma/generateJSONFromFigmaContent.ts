@@ -341,8 +341,6 @@ export let generatePageDataFromFrame = async (
                     break;
 
                   default:
-                    //console.log(instInsideAFrame);
-                    //console.log(mainCompId);
                     break;
                 }
               }

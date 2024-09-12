@@ -71,7 +71,6 @@ figma.ui.onmessage = (msg) => {
       let page = figma.currentPage;
       stopUpdates = true;
       scanWholePageForDocuments(page).then((res) => {
-        console.log('send page docs');
         setTimeout(() => {
           figma.ui.postMessage({
             type: 'docs-in-page',
@@ -86,7 +85,6 @@ figma.ui.onmessage = (msg) => {
     if (msg.type === 'scan-whole-file-for-docs') {
       let file = figma.root;
       scanWholeFileForDocuments(file).then((res) => {
-        console.log('send page docs');
         stopUpdates = true;
         setTimeout(() => {
           figma.ui.postMessage({
@@ -126,7 +124,6 @@ figma.ui.onmessage = (msg) => {
     //Returns the id of the first node of the current selection
     if (msg.type === 'get-selected-node') {
       const selection = <any>figma.currentPage.selection[0];
-      //console.log(selection);
 
       figma.ui.postMessage({
         type: 'selected-node-id',
@@ -175,9 +172,6 @@ figma.ui.onmessage = (msg) => {
         pushFigmaUpdates(lastFetchDoc).then((res) => {
           if (res.type === 'new-node-data') {
             lastFetchDoc = res.data;
-            console.log('push figma updates');
-            console.log(res.type);
-            console.log(res.data);
           }
           if (res.type === 'no-node') {
             cachedMsg == null;
@@ -190,8 +184,6 @@ figma.ui.onmessage = (msg) => {
 
     //Get updates from the Editor
     if (msg.type == 'update-selected-doc' || cachedMsg != null) {
-      console.log('msg');
-      console.log(msg);
 
       let section: BaseNode;
       let msgToGenerate;
@@ -199,7 +191,6 @@ figma.ui.onmessage = (msg) => {
       if (msg.type == 'update-selected-doc') {
         msgToGenerate = msg;
       } else {
-        console.log('cached');
         msgToGenerate = cachedMsg;
         isCached = true;
       }
@@ -208,13 +199,9 @@ figma.ui.onmessage = (msg) => {
         figma
           .getNodeByIdAsync(msgToGenerate.data.sectionId)
           .then(async (node) => {
-            //context.stopUpdates = true;
             let data: DocData = msgToGenerate.data;
             lastFetchDoc = data;
-            console.log('start-figma-update');
-            console.log(msgToGenerate);
             section = node;
-            //context.lastFetchDoc = data;
             if (section && section.type === 'SECTION') {
               section.locked = true;
               generateFigmaContentFromJSON(
@@ -223,7 +210,6 @@ figma.ui.onmessage = (msg) => {
                 msgToGenerate.editedFrames,
                 msg.reloadFrame
               ).then(async (section) => {
-                //context.stopUpdates = false;
                 if (isCached && cachedMsg == msgToGenerate) {
                   cachedMsg = null;
                 }
@@ -239,8 +225,6 @@ figma.ui.onmessage = (msg) => {
         }
       }
     }
-    //scan-whole-file-for-doc-site
-    //figma.closePlugin();
   }
 };
 

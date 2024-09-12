@@ -46,7 +46,6 @@ export function reconcileDocData(
       );
 
       let pageData = pageRecon.data as PageData;
-      //console.log(pageRecon.data);
 
       if (pageRecon.changesNumber) {
         changesNumber += pageRecon.changesNumber;
@@ -57,7 +56,6 @@ export function reconcileDocData(
       changesNumber++;
     }
     clonedCurrentData.pages[i] = { ...currentDataPage };
-    //console.log(clonedCurrentData.pages[i]);
     clonedCurrentData.sectionId =
       useCurrentDataSectionId && clonedCurrentData.sectionId
         ? currentData.sectionId
@@ -105,9 +103,6 @@ export function reconcilePageData(
         !_.isEqual(newBlock.data, currentDataBlock.data) ||
         newBlock.type != currentDataBlock.type
       ) {
-        console.log('data not equal');
-        console.log('new', newBlock.data, editor.new);
-        console.log('current', currentDataBlock.data, editor.current);
 
         changesNumber++;
         currentDataBlock.data = newBlock.data;
@@ -134,9 +129,6 @@ export function reconcilePageData(
 
   formatPageData(clonedCurrentData);
   if (useCurrentDataFrameId) {
-    /*console.log(newData.frameId);
-    console.log(currentData.frameId);
-    console.log(clonedCurrentData.frameId);*/
   }
   return { changesNumber, data: clonedCurrentData };
 }

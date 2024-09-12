@@ -21,8 +21,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { mapDosAndDontsToStatus } from '../../general/statusAssetsUtils';
 
-//https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
-//`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
 
 let IFrame = styled('iframe')(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
@@ -62,7 +60,6 @@ const InputUI = (blockData: DosAndDontsBlockData) => {
   );
 
   React.useEffect(() => {
-    //console.log('effect riggered');
 
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
@@ -123,20 +120,6 @@ const InputUI = (blockData: DosAndDontsBlockData) => {
       }}
     >
       <Stack direction="row" gap={2}>
-        {/*<select
-          className="cdx-input"
-          name="Guideline type"
-          id="cdx-dos-and-donts-type"
-          style={{ width: 100 }}
-          defaultValue={type}
-          onChange={(e) => {
-            setType(e.target.value as GuidelineType);
-          }}
-        >
-          <option value="do">✅ Do</option>
-          <option value="dont">❌ Don't</option>
-          <option value="caution">⚠ Caution</option>
-        </select>*/}
         <input
           className="cdx-input"
           id="cdx-dos-and-donts-frame-url"
@@ -144,8 +127,6 @@ const InputUI = (blockData: DosAndDontsBlockData) => {
           style={{ flex: 1 }}
           defaultValue={src}
           onChange={(e) => {
-            //console.log(e.target.value);
-            //console.log(src);
             setSrc(e.target.value);
             setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
           }}
@@ -226,7 +207,6 @@ export class DosAndDonts {
    * @param {string} tune — tune name from this.settings
    */
   _toggleType(type: GuidelineType) {
-    //console.log('Block type changed', type);
     this.data.type = type;
   }
 
@@ -266,8 +246,6 @@ export class DosAndDonts {
       caption = blockContent.querySelector('#cdx-dos-and-donts-caption').value;
     }
 
-    //console.log('frame ei¿xists');
-    //console.log(this.data.frameExistsInFile);
 
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),

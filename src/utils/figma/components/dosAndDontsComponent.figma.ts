@@ -161,7 +161,6 @@ export async function createDosAndDontsComponent(
       componentSet.itemSpacing = 90;
       componentSet.name = `${FIGMA_COMPONENT_PREFIX}DosAndDonts`;
     });
-  //console.log(componentSet.componentPropertyDefinitions);
   return {
     id: componentSet.id,
     sourceProp: Object.keys(componentSet.componentPropertyDefinitions)[0],

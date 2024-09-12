@@ -83,7 +83,6 @@ export let setFlavoredTextOnFigmaNode = async (
         style: 'Regular',
       }),
     ]).then(() => {
-      //console.log('gets here');
       let textNode: TextNode;
       if (node.type === 'INSTANCE') {
         textNode = node.findOne((n) => n.type == 'TEXT') as TextNode;

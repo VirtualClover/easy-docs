@@ -431,7 +431,6 @@ export let generateMarkdownPage = async (
   bundleType: BundleType,
   currentIndex = [0, 0, 0]
 ): Promise<string> => {
-  //console.log(data);
 
   let markdown = [];
   let displayFrameSrcType: FigmaURLType = settings.export.md.linkIframes
@@ -805,7 +804,6 @@ export let generateHTMLPage = async (
   currentIndex: number[],
   initialIndentation: number = 0
 ): Promise<string> => {
-  //console.log(data);
 
   let html = [];
   let bodyIdentation = 0 + initialIndentation;
@@ -1109,8 +1107,6 @@ export let generateDocSite = async (
 
   const zipContent = await zip.generateAsync({ type: 'blob' });
   downloadFile(zipContent, bundleName, 'zip');
-
-  console.log(siteMetadata);
 };
 
 /**

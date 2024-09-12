@@ -39,14 +39,10 @@ export async function generateFigmaContentFromJSON(
   let settings = getPluginSettings();
   let componentVersion = componentData.lastGenerated;
   parentSection.name = docTitle;
-  console.log('editor data');
-
-  console.log(data);
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     let frame: FrameNode;
-    //console.log(page);
 
     if (
       (editedFrames && editedFrames.includes(page.frameId)) ||
@@ -108,7 +104,6 @@ async function generateFrameDataFromJSON(
   reloadFrame: boolean = false
 ) {
   selectNode(frame);
-  console.log('opacity set!');
 
   frame.opacity = 0.5;
   if (frame.layoutMode != 'VERTICAL') {
@@ -259,14 +254,11 @@ async function generateBlockInstanceFromJSON(
         })
         .catch((e) => handleFigmaError('F21', e));
       break;
-    //node = generateParagraphInstance(block.data);
     default:
-      //node = generateParagraphInstance(DEFAULT_PAGE_DATA.blocks[0].data);
       break;
   }
   if (node) {
     frame.appendChild(node);
     node.layoutSizingHorizontal = 'FILL';
   }
-  console.log('done generating block!');
 }

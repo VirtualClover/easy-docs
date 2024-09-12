@@ -22,13 +22,11 @@ for (let index = 0; index < nodes.length; index++) {
   let instance = nodes[index];
   let instanceName = instance.name.replace(FIGMA_COMPONENT_PREFIX, '');
   let mainCompId: string;
-  console.log(instanceName);
   switch (instanceName) {
     case 'Paragraph':
       mainCompId = componentData.components.paragraph.id;
       break;
     case 'Heading':
-      console.log('gets here');
       mainCompId = componentData.components.header.id;
       break;
     case 'Quote':

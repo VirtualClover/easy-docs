@@ -71,8 +71,6 @@ export function getDetailsFromFigmaURL(
     let fileId = fileMatch ? fileMatch[0] : '';
     let frameId = frameMatch ? frameMatch[0] : '';
 
-    //console.log(frameMatch);
-    //console.log(frameId);
     if (fileId && frameId) {
       return {
         fileId: fileId,

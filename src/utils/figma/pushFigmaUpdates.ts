@@ -36,8 +36,6 @@ export async function pushFigmaUpdates(lastFetchDoc: DocData): Promise<{
         overrideEditorChanges = true;
       }
     });
-    //console.log('Generated doc');
-    //console.log(generatedDoc);
 
     if (generatedDoc.pages) {
       let reconciliation = reconcileDocData(generatedDoc, lastFetchDoc);

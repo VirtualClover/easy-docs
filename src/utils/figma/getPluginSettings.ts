@@ -39,7 +39,6 @@ export let setPluginSettings = (settings: PluginSettings) => {
 export let initPluginSettings = (): PluginSettings => {
   let pluginSettings = getPluginSettings();
 
-  //console.log(JSON.parse(stringPluginSettings));
   let mergedSettings: PluginSettings = pluginSettings
     ? _.merge(DEFAULT_SETTINGS, pluginSettings)
     : DEFAULT_SETTINGS;

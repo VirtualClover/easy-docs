@@ -327,9 +327,7 @@ export const ExportView = (): JSX.Element => {
 
     if (scanInProgess)
       onmessage = (event) => {
-        console.log('scan in progress');
         if (event.data.pluginMessage && event.data.pluginMessage.type) {
-          console.log(event.data.pluginMessage.type);
           switch (event.data.pluginMessage.type) {
             case 'docs-in-page':
               generateFigmaPageBundleExport(

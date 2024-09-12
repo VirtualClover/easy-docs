@@ -45,7 +45,6 @@ export const Editor = () => {
    * Handles a new batch of data delivered to the editor
    */
   const handleUpdateData = React.useCallback(async (data: PageData) => {
-    console.log('renders');
     setIsRenderingData(true);
     setCachedData(data);
     await editorCore.current
@@ -53,7 +52,6 @@ export const Editor = () => {
       .then(() => {
         setIsRenderingData(false);
         pluginContext.setIncomingFigmaChanges(false);
-        //console.log('set figma changes on false');
       })
       .catch((e) => {
         console.error(e);
@@ -82,9 +80,6 @@ export const Editor = () => {
         setStopUpdates(true);
         //Get the current data from the editor
         handleSaveEditor().then((data) => {
-          /*console.log(
-          'plugin context for reconciliation with new saved editor data:'
-        */
 
           if (data) {
             //Checks if the data blocks is not empty

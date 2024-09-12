@@ -80,9 +80,6 @@ export async function generateListInstance(
     let instance = component.createInstance();
     let jointData = '';
     let jointDataDecoded = '';
-    //console.log('data items');
-
-    //console.log(data.items);
 
     //Get text node
     let textNode = instance.findOne((n) => n.type === 'TEXT');

@@ -50,8 +50,6 @@ export async function generateDividerInstance(
       component = node;
     });
 
-  //console.log(content);
-
   if (component.type == 'COMPONENT') {
     let instance = component.createInstance();
 
@@ -62,7 +60,6 @@ export async function generateDividerInstance(
     );
 
     return instance;
-    //instance.set
   }
   return null;
 }

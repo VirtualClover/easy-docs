@@ -86,7 +86,6 @@ export async function createTableCellComponent(
       componentSet.itemSpacing = 90;
       componentSet.name = `${FIGMA_COMPONENT_PREFIX}TableCell`;
     });
-  //console.log(componentSet.componentPropertyDefinitions);
   return {
     id: componentSet.id,
     contentProp: Object.keys(componentSet.componentPropertyDefinitions)[0],

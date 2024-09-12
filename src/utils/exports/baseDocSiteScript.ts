@@ -9,7 +9,6 @@ export let baseDocSiteScript = `
       drawer.open = !drawer.open;});
 
     const listEl = document.getElementById('nav-drawer');
-      console.log(listEl);
       
     const mainContentEl = document.querySelector<HTMLElement>('.ed-body');
     }

@@ -62,7 +62,6 @@ export async function createHeaderComponent(
       componentSet.itemSpacing = 90;
       componentSet.name = `${FIGMA_COMPONENT_PREFIX}Heading`;
     });
-  //console.log(componentSet.componentPropertyDefinitions);
   return {
     id: componentSet.id,
     contentProp: Object.keys(componentSet.componentPropertyDefinitions)[0],

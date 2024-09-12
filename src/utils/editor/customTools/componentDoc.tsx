@@ -68,7 +68,6 @@ const InputUI = (blockData: ComponentDocBlockData) => {
   let [errorMsg, setErrorMsg] = React.useState(<></>);
 
   React.useEffect(() => {
-    //console.log('effect riggered');
 
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(

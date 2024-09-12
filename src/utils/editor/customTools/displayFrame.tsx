@@ -14,8 +14,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { figmaIcon } from '../../../assets/svgs';
 
-//https://www.figma.com/file/XUdu09UGUDZUBaEXvkrNnX/Untitled?type=design&node-id=7%3A2206&mode=design&t=fAGyucibEv9Dl8od-1
-//`https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F${fileId}%2FUntitled%3Ftype%3Ddesign%26node-id%3D${frameId}
 
 
 let IFrame = styled('iframe')(({ theme }) => ({
@@ -56,7 +54,6 @@ const InputUI = (blockData: DisplayFrameBlockData) => {
   let [errorMsg, setErrorMsg] = React.useState(<></>);
 
   React.useEffect(() => {
-    //console.log('effect riggered');
 
     if (frameDetails.fileId && frameDetails.frameId) {
       setPreview(
@@ -114,8 +111,6 @@ const InputUI = (blockData: DisplayFrameBlockData) => {
         style={{ flex: 1 }}
         defaultValue={src}
         onChange={(e) => {
-          //console.log(e.target.value);
-          //console.log(src);
           setSrc(e.target.value);
           setFrameDetails(getDetailsFromFigmaURL(e.target.value, 'decode'));
         }}
@@ -140,7 +135,6 @@ export class DisplayFrame {
   constructor({ data,readOnly }) {
     this.data = data;
     this.readOnly = readOnly;
-    //console.log(data);
   }
 
   static get isReadOnlySupported() {
@@ -151,7 +145,6 @@ export class DisplayFrame {
     let ui = document.createElement('div');
     let root = createRoot(ui);
     root.render(<PluginThemeProvider><InputUI {...this.data} /></PluginThemeProvider>);
-    //console.log('render');
     ui.classList.add('display-frame');
 
     return ui;
@@ -169,8 +162,6 @@ export class DisplayFrame {
       caption = blockContent.querySelector('#cdx-display-frame-caption').value;
     }
 
-    //console.log('frame ei¿xists');
-    //console.log(this.data.frameExistsInFile);
 
     return {
       ...getDetailsFromFigmaURL(frameUrl, 'decode'),

@@ -17,11 +17,8 @@ export const pushNewDataToFigma = (
   if (!pluginContext.incomingFigmaChanges) {
     formatDocData(newData, 'editor', pluginContext.currentUser);
     pluginContext.setCurrentDocData(newData);
-    console.log('set editor changes true');
 
     pluginContext.setIncomingEditorChanges(true);
-    console.log('pushed to figma');
-    console.log(newData);
 
     parent.postMessage(
       {

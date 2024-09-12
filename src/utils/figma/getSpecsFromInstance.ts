@@ -43,7 +43,6 @@ export let generateSpecsFromNode = async (
       }
 
       if (node.type === 'TEXT') {
-        //console.log(node);
         if (node.textStyleId && node.textStyleId != figma.mixed) {
           await figma.getStyleByIdAsync(node.textStyleId).then((res) => {
             if (res.name) {
@@ -94,7 +93,6 @@ export let generateSpecsFromNode = async (
       ogValues.typography.value = '';
 
       // Fill
-      //console.log('node fills', node.fills);
 
       if (
         node.fills &&
@@ -191,7 +189,6 @@ export let generateSpecsFromNode = async (
         let value: string = node
           .getSharedPluginData('tokens', key)
           .replace(/['"]+/g, '');
-        //console.log(key, ':', value);
         if (anatomy[key] && anatomy[key].value) {
           anatomy[key].value = `${value} ${
             ogValues[key].value ? `(${ogValues[key].value})` : ''
@@ -215,12 +212,6 @@ export let generateSpecsFromNode = async (
         anatomy.bottomRightRadius.value = 0;
       }
 
-      /*
-  let vars = figma.variables
-    .getVariableByIdAsync(node.boundVariables.itemSpacing.id)
-    .then((res) => console.log(res));
-
-    */
     }
     return {
       nodeName: node.name,

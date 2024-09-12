@@ -16,8 +16,6 @@ export function resizeSection(section: SectionNode) {
 
         if (child.type == 'FRAME') {
           let proposedHeight = child.height + sectionSettings.padding * 2;
-          //console.log(child.height);
-          //console.log(proposedHeight);
           let proposedWidth = child.x + child.width + sectionSettings.docGap;
 
           section.resizeWithoutConstraints(

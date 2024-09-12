@@ -187,7 +187,6 @@ let ExportsView = () => {
   };
 
   React.useEffect(() => {
-    //console.log(tempSettingsObj);
   }, [tempSettingsObj]);
 
   return (
