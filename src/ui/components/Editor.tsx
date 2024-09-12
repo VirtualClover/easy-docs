@@ -80,7 +80,6 @@ export const Editor = () => {
     const interval = setInterval(() => {
       if (!stopUpdates && !pluginContext.sheetOpen && !componentIsMounted) {
         setStopUpdates(true);
-        //console.log('interval');
         //Get the current data from the editor
         handleSaveEditor().then((data) => {
           /*console.log(

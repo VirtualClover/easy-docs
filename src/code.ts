@@ -244,6 +244,8 @@ figma.ui.onmessage = (msg) => {
   }
 };
 
+
+//Check to see if the Easy docs components still exists, if they don't close the plugin
 let checkComponentsIntegrity = async () => {
   let componentData: BaseComponentData = getComponentData();
   let stopLoop = false;

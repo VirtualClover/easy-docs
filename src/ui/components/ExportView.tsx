@@ -323,8 +323,7 @@ export const ExportView = (): JSX.Element => {
    * Check if the Plugin API sent a meesage data, it can recieve a bundle of documents within the current Figma page or a bundle of pages within a Figma file
    */
   let recieveMessage = () => {
-    // Check if the scan was requested before doing anything  
-    console.log('interval');
+    // Check if the scan was requested before doing anything 
 
     if (scanInProgess)
       onmessage = (event) => {

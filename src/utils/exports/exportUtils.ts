@@ -1100,7 +1100,7 @@ export let generateDocSite = async (
       for (const [pi, page] of document.pages.entries()) {
         await generateDocSitePage(page, [pi, di, fpi], siteMetadata).then(
           (markup) => {
-            documentDir.file(`${formatDirName(page.title)}.html`, markup);
+            documentDir.file(siteMetadata.directory[fpi].directory[di].directory[pi].fileName, markup);
           }
         );
       }
