@@ -1084,7 +1084,7 @@ export let generateDocSite = async (
   zip.file('nav_view.css', generateBaseCSSDocSiteStyles());
   zip.file('doc_view.css', generateBaseCSSDocumentStyles());
   zip.file('base_script.js', baseDocSiteScript);
-  zip.file(`${METADATA_FILENAME}.json`, JSON.stringify(siteMetadata));
+  zip.file(`${METADATA_FILENAME}`, JSON.stringify(siteMetadata));
 
   for (const [fpi, figmaPage] of data.data.entries()) {
     let figmaPageDir = zip.folder(siteMetadata.directory[fpi].directoryName);
